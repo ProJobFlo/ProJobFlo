@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ProJobFlo | Quote. Schedule. Get Paid.</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      color: #111827;
+      background: #f8fafc;
+      line-height: 1.5;
+    }
+    .container { max-width: 1100px; margin: 0 auto; padding: 24px; }
+    .nav { display: flex; justify-content: space-between; align-items: center; padding: 18px 0; }
+    .logo { font-size: 26px; font-weight: 900; letter-spacing: -0.04em; }
+    .logo span { color: #047857; }
+    .hero { display: grid; grid-template-columns: 1.1fr .9fr; gap: 36px; align-items: center; padding: 64px 0; }
+    h1 { font-size: 56px; line-height: 1.02; margin: 0 0 18px; letter-spacing: -0.06em; }
+    .subhead { font-size: 21px; color: #4b5563; margin-bottom: 28px; }
+    .buttons { display: flex; gap: 12px; flex-wrap: wrap; }
+    .btn { display: inline-block; padding: 14px 20px; border-radius: 14px; font-weight: 800; text-decoration: none; }
+    .btn-primary { background: #111827; color: white; }
+    .btn-secondary { background: white; color: #111827; border: 1px solid #d1d5db; }
+    .phone-card { background: #111827; color: white; border-radius: 28px; padding: 28px; box-shadow: 0 20px 60px rgba(0,0,0,.22); }
+    .screen { background: white; color: #111827; border-radius: 22px; padding: 18px; }
+    .screen-row { background: #f1f5f9; border-radius: 14px; padding: 12px; margin-bottom: 10px; }
+    .screen-row strong { display: block; }
+    .money { font-size: 30px; font-weight: 900; color: #047857; }
+    .section { padding: 42px 0; }
+    .section h2 { font-size: 36px; margin: 0 0 12px; letter-spacing: -0.04em; }
+    .features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 22px; }
+    .feature { background: white; border: 1px solid #e5e7eb; border-radius: 18px; padding: 20px; }
+    .feature h3 { margin: 0 0 8px; font-size: 20px; }
+    .feature p { margin: 0; color: #4b5563; }
+    .beta { background: #111827; color: white; border-radius: 26px; padding: 34px; display: grid; grid-template-columns: 1.2fr .8fr; gap: 20px; align-items: center; }
+    .beta p { color: #cbd5e1; }
+    .beta .btn-secondary { color: #111827; }
+    .footer { padding: 28px 0; color: #6b7280; font-size: 14px; }
+    .small { font-size: 14px; color: #6b7280; margin-top: 12px; }
+    @media (max-width: 850px) {
+      .hero, .beta { grid-template-columns: 1fr; }
+      h1 { font-size: 42px; }
+      .features { grid-template-columns: 1fr; }
+      .container { padding: 18px; }
+      .hero { padding: 36px 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <nav class="nav">
+      <div class="logo">ProJob<span>Flo</span></div>
+      <a class="btn btn-secondary" href="https://projobflo.github.io/ProJobFlo/" target="_blank">Try Demo</a>
+    </nav>
+
+    <main class="hero">
+      <div>
+        <h1>Quote. Schedule. Get Paid.</h1>
+        <p class="subhead">
+          ProJobFlo helps contractors build quotes, capture signatures, schedule jobs,
+          track follow-ups, and see who owes money — all from the field.
+        </p>
+        <div class="buttons">
+          <a class="btn btn-primary" href="https://projobflo.github.io/ProJobFlo/" target="_blank">Try the Prototype</a>
+          <a class="btn btn-secondary" href="mailto:hello@projobflo.com?subject=ProJobFlo Beta Access">Request Beta Access</a>
+        </div>
+        <p class="small">Early prototype built for flooring, tile, cabinet, countertop, shower, and remodeling contractors.</p>
+      </div>
+
+      <div class="phone-card">
+        <div class="screen">
+          <div class="screen-row">
+            <strong>Follow-Ups Due</strong>
+            4 unsold quotes need attention
+          </div>
+          <div class="screen-row">
+            <strong>Scheduled Jobs</strong>
+            9 jobs on the calendar
+          </div>
+          <div class="screen-row">
+            <strong>Deposits Outstanding</strong>
+            <div class="money">$7,850</div>
+          </div>
+          <div class="screen-row">
+            <strong>Profit Mode</strong>
+            Contractor-only margin tracking
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <section class="section">
+      <h2>Built for contractors who sell in the home.</h2>
+      <p class="subhead">
+        Most small contractors are busy doing the work. ProJobFlo keeps the sales,
+        schedule, money, and follow-ups from falling through the cracks.
+      </p>
+
+      <div class="features">
+        <div class="feature">
+          <h3>Fast Quotes</h3>
+          <p>Build quotes with rooms, line items, waste factor, tax, signatures, and customer-ready totals.</p>
+        </div>
+        <div class="feature">
+          <h3>Smart Scheduling</h3>
+          <p>Turn sold quotes into scheduled jobs, assign crews, track job status, and block out multi-day installs.</p>
+        </div>
+        <div class="feature">
+          <h3>Follow-Up System</h3>
+          <p>Save unsold quotes and get reminders to follow up before the customer forgets about the job.</p>
+        </div>
+        <div class="feature">
+          <h3>Money Tracker</h3>
+          <p>Track deposits due, final balances due, collected payments, and total outstanding money.</p>
+        </div>
+        <div class="feature">
+          <h3>Profit Mode</h3>
+          <p>Enter internal costs and see estimated gross profit and margin without showing the customer.</p>
+        </div>
+        <div class="feature">
+          <h3>Trade Setup</h3>
+          <p>Pick the work you actually do and only see the templates and preset rates that matter to your business.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="beta">
+        <div>
+          <h2>Want to test ProJobFlo?</h2>
+          <p>
+            We’re looking for honest contractor feedback. Try the prototype and tell us what is confusing,
+            what is missing, and what would make it worth paying for.
+          </p>
+        </div>
+        <div class="buttons">
+          <a class="btn btn-secondary" href="https://projobflo.github.io/ProJobFlo/" target="_blank">Open Demo</a>
+          <a class="btn btn-secondary" href="mailto:hello@projobflo.com?subject=ProJobFlo Feedback">Send Feedback</a>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      © 2026 ProJobFlo. Early prototype. Not final production software.
+    </footer>
+  </div>
+</body>
+</html>
