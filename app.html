@@ -174,6 +174,8 @@
     <button class="danger" onclick="signOut()">Logout</button>
    <button class="secondary" onclick="saveCurrentCustomerToCloud()">Save Customer to Cloud</button>
 <button class="secondary" onclick="loadCustomersFromCloud()">Load Cloud Customers</button>
+   <button class="secondary" onclick="saveCurrentQuoteToCloud()">Save Quote to Cloud</button>
+<button class="secondary" onclick="loadQuotesFromCloud()">Load Cloud Quotes</button>
   </div>
   <p id="authStatus" class="small">Not logged in.</p>
 </div>
@@ -1957,7 +1959,122 @@ async function loadCustomersFromCloud() {
       "Logged in as " + currentUser.email + " — Cloud customers loaded: " + customers.length;
   }
 }
+async function saveCurrentQuoteToCloud() {
+  const ok = await requireLoggedIn();
+  if (!ok) return;
 
+  const customerPayload = {
+    user_id: currentUser.id,
+    name: val("customerName") || "Unnamed Customer",
+    phone: val("customerPhone"),
+    email: val("customerEmail"),
+    address: val("jobAddress"),
+    notes: val("notes")
+  };
+
+  const { data: savedCustomer, error: customerError } = await supabaseClient
+    .from("customers")
+    .insert(customerPayload)
+    .select()
+    .single();
+
+  if (customerError) {
+    console.error(customerError);
+    alert("Quote customer did not save: " + customerError.message);
+    return;
+  }
+
+  const measured = getMeasuredSqft();
+  const order = getOrderSqft();
+  const totalText = document.getElementById("grandTotal").textContent || "$0";
+  const total = Number(totalText.replace("$", "").replace(",", "")) || 0;
+
+  const quotePayload = {
+    rooms,
+    roomPhotos,
+    lineItems,
+    notes: val("notes"),
+    company: {
+      name: val("companyName"),
+      phone: val("companyPhone"),
+      email: val("companyEmail")
+    },
+    customer: {
+      name: val("customerName"),
+      phone: val("customerPhone"),
+      email: val("customerEmail"),
+      address: val("jobAddress")
+    },
+    totals: {
+      measuredSqft: measured,
+      orderSqft: order,
+      total: total
+    }
+  };
+
+  const { data, error } = await supabaseClient
+    .from("quotes")
+    .insert({
+      user_id: currentUser.id,
+      customer_id: savedCustomer.id,
+      estimate_number: val("estimateNumber"),
+      status: val("quoteSaveStatus"),
+      total: total,
+      quote_data: quotePayload
+    })
+    .select()
+    .single();
+
+  if (error) {
+    console.error(error);
+    alert("Quote did not save to cloud: " + error.message);
+    return;
+  }
+
+  alert("Quote saved to cloud. Estimate #" + data.estimate_number);
+  await loadQuotesFromCloud();
+}
+
+async function loadQuotesFromCloud() {
+  const ok = await requireLoggedIn();
+  if (!ok) return;
+
+  const { data, error } = await supabaseClient
+    .from("quotes")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error(error);
+    alert("Could not load cloud quotes: " + error.message);
+    return;
+  }
+
+  quotes = (data || []).map(q => {
+    const payload = q.quote_data || {};
+    return {
+      id: q.id,
+      customer: payload.customer?.name || "Unnamed Customer",
+      phone: payload.customer?.phone || "",
+      email: payload.customer?.email || "",
+      address: payload.customer?.address || "",
+      amount: Number(q.total) || 0,
+      status: q.status || "Unsold",
+      estimateNumber: q.estimate_number || "",
+      quoteData: payload,
+      createdAt: q.created_at
+    };
+  });
+
+  renderAll();
+
+  const authStatus = document.getElementById("authStatus");
+  if (authStatus) {
+    authStatus.textContent =
+      "Logged in as " + currentUser.email + " — Cloud quotes loaded: " + quotes.length;
+  }
+}
+ 
 init();
 </script>
 </body>
