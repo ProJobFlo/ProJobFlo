@@ -619,17 +619,21 @@
   </div>
 
   <div id="viewSettings" class="hidden">
-   <div class="card">
-  <h2>Cloud Sync / Developer Tools</h2>
-  <p class="small">Temporary testing buttons while ProJobFlo cloud storage is being built.</p>
-  <div class="actions">
+  <div class="card">
+  <h2>Cloud Sync</h2>
+  <p id="cloudSyncSummary" class="small">Login to sync your data across devices.</p>
+  <p id="cloudSaveIndicator" class="small">Auto-save waiting.</p>
+
+  <button class="secondary" onclick="toggleDeveloperTools()">Show Developer Tools</button>
+
+  <div id="developerTools" class="actions hidden" style="margin-top:10px;">
     <button class="secondary" onclick="saveCurrentCustomerToCloud()">Save Customer to Cloud</button>
     <button class="secondary" onclick="loadCustomersFromCloud()">Load Cloud Customers</button>
     <button class="secondary" onclick="saveCurrentQuoteToCloud()">Save Quote to Cloud</button>
     <button class="secondary" onclick="loadQuotesFromCloud()">Load Cloud Quotes</button>
-   <button class="secondary" onclick="saveJobsToCloud()">Save Jobs to Cloud</button>
-<button class="secondary" onclick="loadJobsFromCloud()">Load Cloud Jobs</button>
-   <button class="secondary" onclick="loadAllCloudData()">Load All Cloud Data</button>
+    <button class="secondary" onclick="saveJobsToCloud()">Save Jobs to Cloud</button>
+    <button class="secondary" onclick="loadJobsFromCloud()">Load Cloud Jobs</button>
+    <button class="secondary" onclick="loadAllCloudData()">Load All Cloud Data</button>
   </div>
 </div>
     <div class="grid">
@@ -2316,6 +2320,12 @@ async function autoSaveCurrentQuoteDraft() {
       "Logged in as " + currentUser.email +
       " — Cloud data loaded.";
   }
+}
+ function toggleDeveloperTools() {
+  const tools = document.getElementById("developerTools");
+  if (!tools) return;
+
+  tools.classList.toggle("hidden");
 }
  
 init();
