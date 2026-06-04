@@ -172,6 +172,8 @@
     <button class="success" onclick="signIn()">Login</button>
     <button class="secondary" onclick="resetPassword()">Forgot Password</button>
     <button class="danger" onclick="signOut()">Logout</button>
+   <button class="secondary" onclick="saveCurrentCustomerToCloud()">Save Customer to Cloud</button>
+<button class="secondary" onclick="loadCustomersFromCloud()">Load Cloud Customers</button>
   </div>
   <p id="authStatus" class="small">Not logged in.</p>
 </div>
@@ -1863,6 +1865,7 @@ async function signIn() {
 
   document.getElementById("authStatus").textContent =
     "Logged in as " + currentUser.email;
+ await loadCustomersFromCloud();
 }
 
 async function signOut() {
@@ -1886,6 +1889,73 @@ async function resetPassword() {
   }
 
   alert("Password reset email sent.");
+}
+ async function requireLoggedIn() {
+  if (currentUser) return true;
+
+  const { data, error } = await supabaseClient.auth.getUser();
+
+  if (error || !data.user) {
+    alert("Please login first.");
+    return false;
+  }
+
+  currentUser = data.user;
+  return true;
+}
+
+async function saveCurrentCustomerToCloud() {
+  const ok = await requireLoggedIn();
+  if (!ok) return;
+
+  const customerPayload = {
+    user_id: currentUser.id,
+    name: val("customerName") || "Unnamed Customer",
+    phone: val("customerPhone"),
+    email: val("customerEmail"),
+    address: val("jobAddress"),
+    notes: val("notes")
+  };
+
+  const { data, error } = await supabaseClient
+    .from("customers")
+    .insert(customerPayload)
+    .select()
+    .single();
+
+  if (error) {
+    console.error(error);
+    alert("Customer did not save to cloud: " + error.message);
+    return;
+  }
+
+  alert("Customer saved to cloud: " + data.name);
+  await loadCustomersFromCloud();
+}
+
+async function loadCustomersFromCloud() {
+  const ok = await requireLoggedIn();
+  if (!ok) return;
+
+  const { data, error } = await supabaseClient
+    .from("customers")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error(error);
+    alert("Could not load cloud customers: " + error.message);
+    return;
+  }
+
+  customers = data || [];
+  renderAll();
+
+  const authStatus = document.getElementById("authStatus");
+  if (authStatus) {
+    authStatus.textContent =
+      "Logged in as " + currentUser.email + " — Cloud customers loaded: " + customers.length;
+  }
 }
 
 init();
