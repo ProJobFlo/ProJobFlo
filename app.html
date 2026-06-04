@@ -1576,7 +1576,7 @@ function getCustomer(id){return customers.find(c=>c.id===id)||{};}
 function renderFollowUps(){
  const filter=val("followFilter");let list=quotes.slice();if(filter==="due")list=list.filter(q=>isDue(q));if(filter==="all")list=list.filter(q=>q.status==="Unsold");if(filter==="sold")list=list.filter(q=>q.status==="Sold"||q.status==="Scheduled");if(filter==="lost")list=list.filter(q=>q.status==="Lost");list.sort((a,b)=>a.nextFollowUpAt-b.nextFollowUpAt);
  const box=document.getElementById("followUpList");if(!box)return;if(!list.length){box.innerHTML="<p class='small'>Nothing here right now.</p>";return;}
- box.innerHTML=list.map(q=>{const c=getCustomer(q.customerId);const due=isDue(q);return `<div class="quote-card ${due?"urgent":""}"><div class="title">${escapeHtml(c.name||"Unnamed")}</div><div class="small">${escapeHtml(c.phone||"")} • ${escapeHtml(c.email||"")}</div><div>${escapeHtml(c.address||"")}</div><div>Quote: <strong>${dollars(q.amount)}</strong></div><div>Status: <span class="pill ${due?"status-FollowUpDue":"status-"+q.status.replaceAll(" ","")}">${due?"Follow-Up Due":q.status}</span></div><div class="small">Next follow-up: ${new Date(q.nextFollowUpAt).toLocaleString()}</div><div class="actions" style="margin-top:8px;"><button class="success" onclick="openQuoteFromFollowUp('${q.id}')">Open Quote</button><button class="secondary" onclick="selectFollowUp('${q.id}')">Follow Up</button><button class="success" onclick="markSold('${q.id}')">Sold</button><button class="warning" onclick="snoozeQuote('${q.id}')">Snooze 48h</button><button class="danger" onclick="markLost('${q.id}')">Lost</button></div></div>`;}).join("");
+ box.innerHTML=list.map(q=>{const c=getCustomer(q.customerId);const due=isDue(q);return `<div class="quote-card ${due?"urgent":""}"><div class="title">${escapeHtml(c.name||"Unnamed")}</div><div class="small">${escapeHtml(c.phone||"")} • ${escapeHtml(c.email||"")}</div><div>${escapeHtml(c.address||"")}</div><div>Quote: <strong>${dollars(q.amount)}</strong></div><div>Status: <span class="pill ${due?"status-FollowUpDue":"status-"+q.status.replaceAll(" ","")}">${due?"Follow-Up Due":q.status}</span></div><div class="small">Next follow-up: ${new Date(q.nextFollowUpAt).toLocaleString()}</div><div class="actions" style="margin-top:8px;"><button class="success" onclick="openQuoteFromFollowUp('${q.id}')">Open Quote</button><button class="success" onclick="openQuoteFromFollowUp('${q.id}')">Open Quote</button><button class="secondary" onclick="selectFollowUp('${q.id}')">Follow Up</button><button class="success" onclick="markSold('${q.id}')">Sold</button><button class="warning" onclick="snoozeQuote('${q.id}')">Snooze 48h</button><button class="danger" onclick="markLost('${q.id}')">Lost</button></div></div>`;}).join("");
 }
 function selectFollowUp(id){const q=quotes.find(q => String(q.id) === String(id));const c=getCustomer(q.customerId);const msg=buildFollowUpMessage(q,c);document.getElementById("selectedFollowUp").innerHTML=`<div class="quote-card"><div class="title">${escapeHtml(c.name)}</div><div>${escapeHtml(c.phone)}<br>${escapeHtml(c.email)}</div><div class="quote-box">${escapeHtml(msg)}</div><div class="actions" style="margin-top:8px;"><button onclick="copyText(\`${escapeJs(msg)}\`)">Copy</button><button class="secondary" onclick="openSms('${escapeAttr(c.phone)}', \`${escapeJs(msg)}\`)">Text</button><button class="secondary" onclick="openEmail('${escapeAttr(c.email)}', \`${escapeJs(msg)}\`)">Email</button><button class="success" onclick="markFollowedUp(${q.id})">Mark Followed Up</button></div></div>`;}
 function buildFollowUpMessage(q,c){const first=(c.name||"there").split(" ")[0];return `Hi ${first}, this is following up on the flooring quote for ${c.address||"your project"}. The estimate was ${dollars(q.amount)}. I wanted to see if you had any questions or if you would like to get on the schedule.`;}
@@ -2447,6 +2447,49 @@ if (cloudSummary) {
 
   alert("Quote loaded.");
 }
+ async function openQuoteFromFollowUp(id) {
+  const q = quotes.find(q => String(q.id) === String(id));
+
+  if (!q) {
+    alert("Quote not found.");
+    return;
+  }
+
+  const payload = q.quoteData || q.quote_data || {};
+
+  if (payload.company) {
+    setVal("companyName", payload.company.name || "");
+    setVal("companyPhone", payload.company.phone || "");
+    setVal("companyEmail", payload.company.email || "");
+  }
+
+  if (payload.customer) {
+    setVal("customerName", payload.customer.name || q.customer || "");
+    setVal("customerPhone", payload.customer.phone || q.phone || "");
+    setVal("customerEmail", payload.customer.email || q.email || "");
+    setVal("jobAddress", payload.customer.address || q.address || "");
+  }
+
+  if (payload.rooms) rooms = payload.rooms;
+  if (payload.roomPhotos) roomPhotos = payload.roomPhotos;
+  if (payload.lineItems) lineItems = payload.lineItems;
+  if (payload.notes !== undefined) setVal("notes", payload.notes || "");
+
+  currentCloudQuoteId = q.id;
+  currentCloudCustomerId = q.customerId || q.customer_id || null;
+
+  await hydrateCloudPhotoUrls();
+
+  showView("quote");
+  renderRooms();
+  renderLineItems();
+  calculateQuote();
+
+  setAutoSaveStatus("Quote loaded from cloud ✓");
+}
+ function setVal(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.value = value;
  
 init();
 </script>
