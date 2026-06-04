@@ -1533,10 +1533,46 @@ function renderFollowUps(){
 function selectFollowUp(id){const q=quotes.find(q=>q.id===id);const c=getCustomer(q.customerId);const msg=buildFollowUpMessage(q,c);document.getElementById("selectedFollowUp").innerHTML=`<div class="quote-card"><div class="title">${escapeHtml(c.name)}</div><div>${escapeHtml(c.phone)}<br>${escapeHtml(c.email)}</div><div class="quote-box">${escapeHtml(msg)}</div><div class="actions" style="margin-top:8px;"><button onclick="copyText(\`${escapeJs(msg)}\`)">Copy</button><button class="secondary" onclick="openSms('${escapeAttr(c.phone)}', \`${escapeJs(msg)}\`)">Text</button><button class="secondary" onclick="openEmail('${escapeAttr(c.email)}', \`${escapeJs(msg)}\`)">Email</button><button class="success" onclick="markFollowedUp(${q.id})">Mark Followed Up</button></div></div>`;}
 function buildFollowUpMessage(q,c){const first=(c.name||"there").split(" ")[0];return `Hi ${first}, this is following up on the flooring quote for ${c.address||"your project"}. The estimate was ${dollars(q.amount)}. I wanted to see if you had any questions or if you would like to get on the schedule.`;}
 function markFollowedUp(id){const q=quotes.find(q=>q.id===id);q.lastFollowedUpAt=nowMs();q.nextFollowUpAt=nowMs()+(Number(q.followUpHours)||48)*60*60*1000;renderAll();selectFollowUp(id);}
-function markSold(id){const q=quotes.find(q=>q.id===id);q.status="Sold";renderAll();}
-function markLost(id){const q=quotes.find(q=>q.id===id);q.status="Lost";renderAll();}
-function snoozeQuote(id){const q=quotes.find(q=>q.id===id);q.nextFollowUpAt=nowMs()+48*60*60*1000;renderAll();}
+async function updateQuoteStatusCloud(id, updates) {
+  const q = quotes.find(q => String(q.id) === String(id));
+  if (!q) return;
 
+  Object.assign(q, updates);
+
+  if (currentUser) {
+    const { error } = await supabaseClient
+      .from("quotes")
+      .update({
+        status: q.status,
+        quote_data: q.quoteData || q.quote_data || {}
+      })
+      .eq("id", id)
+      .eq("user_id", currentUser.id);
+
+    if (error) {
+      console.error(error);
+      alert("Cloud quote update failed: " + error.message);
+      return;
+    }
+  }
+
+  renderAll();
+}
+
+async function markSold(id) {
+  await updateQuoteStatusCloud(id, { status: "Sold" });
+}
+
+async function markLost(id) {
+  await updateQuoteStatusCloud(id, { status: "Lost" });
+}
+
+async function snoozeQuote(id) {
+  await updateQuoteStatusCloud(id, {
+    status: "Unsold",
+    nextFollowUpAt: nowMs() + 48 * 60 * 60 * 1000
+  });
+}
 function renderScheduleQuoteSelect(){
  const sel=document.getElementById("scheduleQuoteSelect");
  if(!sel)return;
