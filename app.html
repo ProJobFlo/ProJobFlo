@@ -127,7 +127,7 @@
 <div id="setupOverlay" class="setup-overlay hidden">
   <div class="setup-modal">
     <h1>Set Up ProJobFlo</h1>
-    <p>Select the work you actually do. JobProFlo will only show those templates and preset rate fields.</p>
+    <p>Select the work you actually do. ProJobFlo will only show those templates and preset rate fields.</p>
     <div class="setup-grid">
       <label class="trade-option"><input type="checkbox" value="carpet" class="setupTrade"><div><strong>Carpet</strong><span class="small">Carpet, pad, removal</span></div></label>
       <label class="trade-option"><input type="checkbox" value="lvp" class="setupTrade" checked><div><strong>LVP</strong><span class="small">Floating/glue-down vinyl jobs</span></div></label>
@@ -922,7 +922,7 @@ function filterPresetRows(){
 
 
 function getNextEstimateNumber(){
- const stored = Number(localStorage.getItem("jobProFloNextEstimateNumber"));
+ const stored = Number(localStorage.getItem("ProJobFloNextEstimateNumber"));
  if(stored && stored > 0) return stored;
  const current = Number(val("estimateNumber")) || 1001;
  return current;
@@ -936,9 +936,9 @@ function setEstimateNumberToNext(){
 
 function advanceEstimateNumber(){
  const current = Number(val("estimateNumber")) || getNextEstimateNumber() || 1001;
- const stored = Number(localStorage.getItem("jobProFloNextEstimateNumber")) || 1001;
+ const stored = Number(localStorage.getItem("ProJobFloNextEstimateNumber")) || 1001;
  const next = Math.max(current + 1, stored + 1);
- localStorage.setItem("jobProFloNextEstimateNumber", String(next));
+ localStorage.setItem("ProJobFloNextEstimateNumber", String(next));
  const el = document.getElementById("estimateNumber");
  if(el) el.value = next;
 }
