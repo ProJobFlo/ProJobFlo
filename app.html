@@ -1286,8 +1286,15 @@ function updateLineItem(id, field, value) {
     if (i.id === id) i[field] = value;
   });
 
-  renderLineItems();
   calculateQuote();
+
+  const item = lineItems.find(i => i.id === id);
+  const amountEl = document.getElementById("itemAmount-" + id);
+
+  if (item && amountEl) {
+    amountEl.textContent =
+      dollars(itemQty(item) * (Number(item.rate) || 0));
+  }
 }
 function itemQty(item){if(item.qtySource==="measured")return getMeasuredSqft();if(item.qtySource==="order")return getOrderSqft();return Number(item.qty)||0;}
 
