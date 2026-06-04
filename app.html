@@ -48,12 +48,12 @@
   .status-Ready { background:#dcfce7; color:#166534; }
   .status-Progress { background:#ffedd5; color:#9a3412; }
   .status-Complete { background:#e5e7eb; color:#374151; }
-  .room-row { display:grid; grid-template-columns:2fr 1fr 1fr 1fr auto; gap:8px; align-items:center; margin-bottom:8px; }
+  .room-row { display:grid; grid-template-columns:1.8fr .75fr .75fr .75fr .75fr 1fr auto; gap:8px; align-items:center; margin-bottom:8px; }
   .item-row { display:grid; grid-template-columns:1.2fr 1.7fr .8fr .7fr .8fr .7fr .8fr auto; gap:8px; align-items:center; margin-bottom:8px; }
   .muted-heading { font-size:12px; color:#6b7280; font-weight:800; text-transform:uppercase; letter-spacing:.04em; margin-bottom:6px; }
   .checkbox-wrap { display:flex; align-items:center; gap:6px; justify-content:center; }
   .checkbox-wrap input { width:auto; margin:0; }
-  .quote-box { white-space:pre-wrap; background:#f9fafb; padding:14px; border-radius:14px; border:1px solid #e5e7eb; font-size:14px; max-height:380px; overflow:auto; }
+  .quote-box { white-space:pre-wrap; background:#f9fafb; padding:16px; border-radius:14px; border:1px solid #e5e7eb; font-size:15px; line-height:1.55; max-height:430px; overflow:auto; }
   .small { font-size:13px; color:#6b7280; }
   .doc-row { display:grid; grid-template-columns:1fr 1.5fr auto; gap:8px; align-items:center; margin-top:8px; }
   .photo-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(110px,1fr)); gap:8px; margin-top:10px; }
@@ -260,40 +260,8 @@
         </div>
 
         <div class="card">
-          <div style="display:flex; justify-content:space-between; gap:12px; align-items:center; margin-bottom:12px;">
-            <h2 style="margin:0;">1. Measure + Document Rooms</h2>
-            <button class="secondary" onclick="showRoomTypePicker()">+ Add Room</button>
-          </div>
-
-          <div id="roomTypePicker" class="subtle-card hidden">
-            <strong>Add Room</strong>
-            <p class="small">Choose a common room type, or choose Other and type the exact room name.</p>
-            <div class="room-type-grid">
-              <button class="secondary" onclick="addRoomByType('Living Room')">Living Room</button>
-              <button class="secondary" onclick="addRoomByType('Bedroom')">Bedroom</button>
-              <button class="secondary" onclick="addRoomByType('Hallway')">Hallway</button>
-              <button class="secondary" onclick="addRoomByType('Closet')">Closet</button>
-              <button class="secondary" onclick="addRoomByType('Kitchen')">Kitchen</button>
-              <button class="secondary" onclick="addRoomByType('Bathroom')">Bathroom</button>
-              <button class="secondary" onclick="addRoomByType('Dining Room')">Dining Room</button>
-              <button class="secondary" onclick="addRoomByType('Laundry Room')">Laundry Room</button>
-              <button class="secondary" onclick="addRoomByType('Stairs')">Stairs</button>
-              <button class="secondary" onclick="addRoomByType('Other')">Other</button>
-            </div>
-          </div>
-
-          <div class="form-grid">
-            <input id="quickRoomName" placeholder="Quick room name" />
-            <input id="quickRoomLength" placeholder="Length" inputmode="decimal" />
-            <input id="quickRoomWidth" placeholder="Width" inputmode="decimal" onkeydown="quickRoomEnter(event)" />
-          </div>
-          <button class="secondary" onclick="quickAddRoom()">Quick Add Room</button>
-          <p class="small">Photos attach to each room. Some templates start with a suggested room, others start blank.</p>
-          <div id="rooms" style="margin-top:12px;"></div>
-        </div>
-
-        <div class="card">
-          <h2>2. Scope Template</h2>
+          <h2>1. Scope Template</h2>
+          <p class="small">Changing the scope updates line items only. Rooms, measurements, photos, and notes are preserved.</p>
           <div class="form-grid">
             <select id="templateSelect">
               <option value="lvp" data-trade="lvp">LVP Install</option>
@@ -310,8 +278,8 @@
               <option value="repair" data-trade="repair">Repair / Small Job</option>
               <option value="blank">Blank Quote</option>
             </select>
-            <button onclick="loadTemplate()">Load Template</button>
-            <button class="secondary" onclick="addLineItem()">+ Add Line Item</button>
+            <button onclick="loadTemplate(false)">Load Template</button>
+            
           </div>
           <div class="form-grid">
             <div class="field">
@@ -337,10 +305,46 @@
         </div>
 
         <div class="card">
-          <h2>3. Line Items</h2>
+          <div style="display:flex; justify-content:space-between; gap:12px; align-items:center; margin-bottom:12px;">
+            <h2 style="margin:0;">2. Measure + Document Rooms</h2>
+            <button class="secondary" onclick="showRoomTypePicker()">+ Add Room</button>
+          </div>
+
+          <div id="roomTypePicker" class="subtle-card hidden">
+            <strong>Add Room</strong>
+            <p class="small">Choose a common room type, or choose Other and type the exact room name.</p>
+            <div class="room-type-grid">
+              <button class="secondary" onclick="addRoomByType('Living Room')">Living Room</button>
+              <button class="secondary" onclick="addRoomByType('Bedroom')">Bedroom</button>
+              <button class="secondary" onclick="addRoomByType('Hallway')">Hallway</button>
+              <button class="secondary" onclick="addRoomByType('Closet')">Closet</button>
+              <button class="secondary" onclick="addRoomByType('Kitchen')">Kitchen</button>
+              <button class="secondary" onclick="addRoomByType('Bathroom')">Bathroom</button>
+              <button class="secondary" onclick="addRoomByType('Dining Room')">Dining Room</button>
+              <button class="secondary" onclick="addRoomByType('Laundry Room')">Laundry Room</button>
+              <button class="secondary" onclick="addRoomByType('Stairs')">Stairs</button>
+              <button class="secondary" onclick="addRoomByType('Other')">Other</button>
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <input id="quickRoomName" placeholder="Quick room name" />
+            <input id="quickRoomLengthFt" placeholder="Length ft" inputmode="numeric" />
+            <input id="quickRoomLengthIn" placeholder="Length in" inputmode="numeric" />
+            <input id="quickRoomWidthFt" placeholder="Width ft" inputmode="numeric" />
+            <input id="quickRoomWidthIn" placeholder="Width in" inputmode="numeric" onkeydown="quickRoomEnter(event)" />
+          </div>
+          <button class="secondary" onclick="quickAddRoom()">Quick Add Room</button>
+          <p class="small">Photos attach to each room. Some templates start with a suggested room, others start blank.</p>
+          <div id="rooms" style="margin-top:12px;"></div>
+        </div>
+
+        
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;"><h2>3. Line Items</h2><button class="secondary" onclick="addLineItem()">+ Add Line Item</button></div>
           <div class="item-row hide-mobile">
             <div class="muted-heading">Service</div><div class="muted-heading">Description</div><div class="muted-heading">Qty</div>
-            <div class="muted-heading">Unit</div><div class="muted-heading">Rate</div><div class="muted-heading">Tax</div><div class="muted-heading">Amount</div><div></div>
+            <div class="muted-heading">Unit</div><div class="muted-heading">$ Rate</div><div class="muted-heading">Tax</div><div class="muted-heading">Amount</div><div></div>
           </div>
           <div id="lineItems"></div>
         </div>
@@ -947,7 +951,7 @@ function init() {
   maybeShowFirstRunSetup();
   setupTaxLocationOptions();
   applyTaxLocationSearch();
-  loadTemplate(val("templateSelect") || enabledTrades[0] || "lvp");
+  loadTemplate(false);
   renderRooms();
   renderLineItems();
   setupSignaturePad();
@@ -1014,6 +1018,33 @@ function applyTaxLocationSearch(){
  calculateQuote();
 }
 
+
+function feetInchesToDecimal(ft, inches){
+ const feet=Number(ft)||0;
+ const inch=Number(inches)||0;
+ return feet + (inch/12);
+}
+
+function roomLengthDecimal(room){
+ if(room.lengthFt!==undefined || room.lengthIn!==undefined) return feetInchesToDecimal(room.lengthFt, room.lengthIn);
+ return Number(room.length)||0;
+}
+
+function roomWidthDecimal(room){
+ if(room.widthFt!==undefined || room.widthIn!==undefined) return feetInchesToDecimal(room.widthFt, room.widthIn);
+ return Number(room.width)||0;
+}
+
+function roomSqft(room){
+ return roomLengthDecimal(room)*roomWidthDecimal(room);
+}
+
+function displayFeetInches(ft, inches){
+ const f=Number(ft)||0;
+ const i=Number(inches)||0;
+ return f + "'" + (i ? " " + i + '"' : "");
+}
+
 function showRoomTypePicker(){
  const picker=document.getElementById("roomTypePicker");
  if(picker) picker.classList.toggle("hidden");
@@ -1038,7 +1069,7 @@ function addRoomByType(type){
  } else {
    name=nextRoomName(type);
  }
- rooms.push({id:Date.now()+Math.random(),name:name,length:"",width:""});
+ rooms.push({id:Date.now()+Math.random(),name:name,lengthFt:"",lengthIn:"",widthFt:"",widthIn:""});
  const picker=document.getElementById("roomTypePicker");
  if(picker) picker.classList.add("hidden");
  renderRooms();
@@ -1047,11 +1078,14 @@ function addRoomByType(type){
 
 function quickAddRoom(){
  const name=val("quickRoomName")||"Room";
- const length=val("quickRoomLength");
- const width=val("quickRoomWidth");
- if(!length||!width){alert("Enter length and width first.");return;}
- rooms.push({id:Date.now()+Math.random(),name,length,width});
- ["quickRoomName","quickRoomLength","quickRoomWidth"].forEach(id=>document.getElementById(id).value="");
+ const lengthFt=val("quickRoomLengthFt");
+ const lengthIn=val("quickRoomLengthIn");
+ const widthFt=val("quickRoomWidthFt");
+ const widthIn=val("quickRoomWidthIn");
+ if(!lengthFt && !lengthIn){alert("Enter room length first.");return;}
+ if(!widthFt && !widthIn){alert("Enter room width first.");return;}
+ rooms.push({id:Date.now()+Math.random(),name,lengthFt,lengthIn,widthFt,widthIn});
+ ["quickRoomName","quickRoomLengthFt","quickRoomLengthIn","quickRoomWidthFt","quickRoomWidthIn"].forEach(id=>document.getElementById(id).value="");
  renderRooms();
  calculateQuote();
  document.getElementById("quickRoomName").focus();
@@ -1062,22 +1096,31 @@ function quickRoomEnter(e){if(e.key==="Enter")quickAddRoom();}
 function addRoom(){showRoomTypePicker();}
 function removeRoom(id){rooms=rooms.filter(r=>r.id!==id);delete roomPhotos[id];renderRooms();calculateQuote();}
 function updateRoom(id,field,value){rooms.forEach(r=>{if(r.id===id)r[field]=value;});calculateQuote();}
-function getMeasuredSqft(){return rooms.reduce((s,r)=>s+((Number(r.length)||0)*(Number(r.width)||0)),0);}
+function getMeasuredSqft(){return rooms.reduce((s,r)=>s+roomSqft(r),0);}
 function getOrderSqft(){return getMeasuredSqft()*(1+(num("waste")/100));}
 
 function renderRooms(){
   const container=document.getElementById("rooms");container.innerHTML="";
+  if(!rooms.length){
+    container.innerHTML="<div class='subtle-card'><strong>No rooms added yet.</strong><p class='small'>Click + Add Room or use Quick Add Room when you are ready to measure.</p></div>";
+    return;
+  }
   rooms.forEach(room=>{
-    const sqft=(Number(room.length)||0)*(Number(room.width)||0);
+    const sqft=roomSqft(room);
     if(!roomPhotos[room.id])roomPhotos[room.id]=[];
     const wrapper=document.createElement("div");wrapper.className="subtle-card";
     const div=document.createElement("div");div.className="room-row";
     const name=document.createElement("input");name.placeholder="Room";name.value=room.name;name.oninput=function(){updateRoom(room.id,"name",this.value);};
-    const length=document.createElement("input");length.placeholder="Length";length.inputMode="decimal";length.value=room.length;length.oninput=function(){updateRoom(room.id,"length",this.value);};
-    const width=document.createElement("input");width.placeholder="Width";width.inputMode="decimal";width.value=room.width;width.oninput=function(){updateRoom(room.id,"width",this.value);};
+
+    const lengthFt=document.createElement("input");lengthFt.placeholder="L ft";lengthFt.inputMode="numeric";lengthFt.value=room.lengthFt ?? "";lengthFt.oninput=function(){updateRoom(room.id,"lengthFt",this.value);};
+    const lengthIn=document.createElement("input");lengthIn.placeholder="L in";lengthIn.inputMode="numeric";lengthIn.value=room.lengthIn ?? "";lengthIn.oninput=function(){updateRoom(room.id,"lengthIn",this.value);};
+    const widthFt=document.createElement("input");widthFt.placeholder="W ft";widthFt.inputMode="numeric";widthFt.value=room.widthFt ?? "";widthFt.oninput=function(){updateRoom(room.id,"widthFt",this.value);};
+    const widthIn=document.createElement("input");widthIn.placeholder="W in";widthIn.inputMode="numeric";widthIn.value=room.widthIn ?? "";widthIn.oninput=function(){updateRoom(room.id,"widthIn",this.value);};
+
     const sq=document.createElement("strong");sq.id="roomSqft-"+room.id;sq.textContent=sqft.toFixed(2)+" sqft";
     const remove=document.createElement("button");remove.className="danger";remove.textContent="X";remove.onclick=function(){removeRoom(room.id);};
-    div.append(name,length,width,sq,remove);
+    div.append(name,lengthFt,lengthIn,widthFt,widthIn,sq,remove);
+
     const doc=document.createElement("div");doc.className="doc-row";
     const cat=document.createElement("select");cat.id="photoCategory-"+room.id;
     ["Existing floor damage","Wall/baseboard damage","Cabinet damage","Moisture concern","Transition/detail","Product/sample","Other"].forEach(label=>{const opt=document.createElement("option");opt.value=label;opt.textContent=label;cat.appendChild(opt);});
@@ -1088,6 +1131,7 @@ function renderRooms(){
     wrapper.append(div,doc,gallery);container.appendChild(wrapper);renderRoomPhotos(room.id);
   });
 }
+
 function addRoomPhotos(roomId,files){const catEl=document.getElementById("photoCategory-"+roomId);const category=catEl?catEl.value:"Other";const list=Array.from(files||[]);if(!roomPhotos[roomId])roomPhotos[roomId]=[];let remaining=list.length;if(!remaining)return;list.forEach(file=>{const reader=new FileReader();reader.onload=function(e){roomPhotos[roomId].push({id:Date.now()+Math.random(),name:file.name,category,dataUrl:e.target.result});remaining--;if(remaining===0){renderRooms();calculateQuote();}};reader.readAsDataURL(file);});}
 function removeRoomPhoto(roomId,photoId){roomPhotos[roomId]=(roomPhotos[roomId]||[]).filter(p=>p.id!==photoId);renderRooms();calculateQuote();}
 function renderRoomPhotos(roomId){const gallery=document.getElementById("roomPhotos-"+roomId);if(!gallery)return;gallery.innerHTML="";(roomPhotos[roomId]||[]).forEach(photo=>{const card=document.createElement("div");card.className="photo-card";const img=document.createElement("img");img.src=photo.dataUrl;const label=document.createElement("div");label.className="photo-label";label.textContent=photo.category;const remove=document.createElement("button");remove.textContent="X";remove.onclick=function(){removeRoomPhoto(roomId,photo.id);};card.append(img,remove,label);gallery.appendChild(card);});}
@@ -1136,33 +1180,19 @@ function loadPresetRates(){
 }
 
 
-function setDefaultRoomsForTemplate(templateName){
- // Bathroom, shower, cabinet, countertop, backsplash, and repair jobs should start blank.
- const defaults = {
-   lvp: "Living Room",
-   laminate: "Living Room",
-   carpet: "Bedroom 1",
-   tilefloor: "Main Floor Area",
-   hardwood: "Living Room",
-   sheetvinyl: "Room"
- };
-
- const defaultName = defaults[templateName];
- if(defaultName){
-   rooms=[{id:Date.now()+Math.random(),name:defaultName,length:"",width:""}];
- } else {
-   rooms=[];
- }
+function setDefaultRoomsForTemplate(templateName, forceDefaultRooms=false){
+ if(!forceDefaultRooms) return;
+ rooms=[];
  roomPhotos={};
  renderRooms();
 }
 
-function loadTemplate(forced){
- const selected=forced||val("templateSelect");
+function loadTemplate(forceDefaultRooms=false){
+ const selected=val("templateSelect") || enabledTrades[0] || "lvp";
  const base=templates[selected]||[];
  lineItems=base.map(item=>({id:Date.now()+Math.random(),costRate:"",...item}));
  applyPresetRatesToTemplate(selected);
- setDefaultRoomsForTemplate(selected);
+ setDefaultRoomsForTemplate(selected, forceDefaultRooms);
  renderLineItems();
  calculateQuote();
 }
@@ -1179,7 +1209,7 @@ function renderLineItems(){
   const desc=document.createElement("input");desc.placeholder="Description";desc.value=item.description;desc.oninput=function(){updateLineItem(item.id,"description",this.value);};
   const qty=document.createElement("input");qty.placeholder="Qty";qty.inputMode="decimal";qty.id="itemQty-"+item.id;qty.value=item.qtySource==="manual"?item.qty:itemQty(item).toFixed(2);qty.disabled=item.qtySource!=="manual";qty.oninput=function(){updateLineItem(item.id,"qty",this.value);};
   const unit=document.createElement("input");unit.placeholder="Unit";unit.value=item.unit;unit.oninput=function(){updateLineItem(item.id,"unit",this.value);};
-  const rate=document.createElement("input");rate.placeholder="Rate";rate.inputMode="decimal";rate.value=item.rate;rate.oninput=function(){updateLineItem(item.id,"rate",this.value);};
+  const rate=document.createElement("input");rate.placeholder="$ Rate";rate.inputMode="decimal";rate.value=item.rate;rate.oninput=function(){updateLineItem(item.id,"rate",this.value);};
   const taxWrap=document.createElement("div");taxWrap.className="checkbox-wrap";const tax=document.createElement("input");tax.type="checkbox";tax.checked=!!item.taxable;tax.onchange=function(){updateLineItem(item.id,"taxable",this.checked);};const taxLabel=document.createElement("span");taxLabel.textContent="Tax";taxWrap.append(tax,taxLabel);
   const amount=document.createElement("strong");amount.id="itemAmount-"+item.id;amount.textContent=dollars(itemQty(item)*(Number(item.rate)||0));
   const remove=document.createElement("button");remove.className="danger";remove.textContent="X";remove.onclick=function(){removeLineItem(item.id);};
@@ -1232,7 +1262,7 @@ function renderProfitMode(){
      <div>${escapeHtml(item.description||item.service||"Line Item")}</div>
      <div>${qty.toFixed(2)} ${escapeHtml(item.unit||"")}</div>
      <div>${dollars(sellRate)}</div>
-     <div><input value="${escapeAttr(item.costRate||"")}" placeholder="Cost" inputmode="decimal" oninput="updateProfitCost(${item.id}, this.value)" /></div>
+     <div><input value="${escapeAttr(item.costRate||"")}" placeholder="$ Cost" inputmode="decimal" oninput="updateProfitCost(${item.id}, this.value)" /></div>
    </div>
    <div class="small" style="margin:-4px 0 8px 0;">Profit on item: <strong id="profitItemProfit-${item.id}">${dollars(itemProfit)}</strong></div>`;
  }).join("");
@@ -1263,17 +1293,60 @@ function calculateQuote(){
  lineItems.forEach(item=>{const amount=itemQty(item)*(Number(item.rate)||0);subtotal+=amount;if(item.taxable)taxableSubtotal+=amount;});
  const tax=taxableSubtotal*((num("taxRate")||0)/100);const total=subtotal+tax;const deposit=total*((num("depositPercent")||0)/100);
  document.getElementById("measuredSqft").textContent=measured.toFixed(2);document.getElementById("orderSqft").textContent=order.toFixed(2);document.getElementById("photoCount").textContent=totalPhotoCount();document.getElementById("subtotal").textContent=dollars(subtotal);document.getElementById("taxTotal").textContent=dollars(tax);document.getElementById("grandTotal").textContent=dollars(total);document.getElementById("depositDue").textContent=dollars(deposit);
- rooms.forEach(room=>{const el=document.getElementById("roomSqft-"+room.id);if(el){const sqft=(Number(room.length)||0)*(Number(room.width)||0);el.textContent=sqft.toFixed(2)+" sqft";}});
+ rooms.forEach(room=>{const el=document.getElementById("roomSqft-"+room.id);if(el){const sqft=roomSqft(room);el.textContent=sqft.toFixed(2)+" sqft";}});
  lineItems.forEach(item=>{const qtyEl=document.getElementById("itemQty-"+item.id);const amountEl=document.getElementById("itemAmount-"+item.id);if(qtyEl&&item.qtySource!=="manual")qtyEl.value=itemQty(item).toFixed(2);if(amountEl)amountEl.textContent=dollars(itemQty(item)*(Number(item.rate)||0));});
  document.getElementById("quotePreview").textContent=buildQuoteText(measured,order,subtotal,tax,total,deposit);
  renderStats();
  renderProfitMode();
 }
 function buildQuoteText(measured,order,subtotal,tax,total,deposit){
- const roomLines=rooms.map(r=>{const sqft=(Number(r.length)||0)*(Number(r.width)||0);return (r.name||"Room")+": "+(r.length||0)+" x "+(r.width||0)+" = "+sqft.toFixed(2)+" sqft";}).join("\n");
- const itemLines=lineItems.map(i=>{const qty=itemQty(i);const amount=qty*(Number(i.rate)||0);return (i.service||"Service")+" | "+(i.description||"Description")+" | "+qty.toFixed(2)+" "+(i.unit||"")+" x "+dollars(i.rate)+" = "+dollars(amount)+(i.taxable?" taxable":"");}).join("\n");
- return (val("companyName")||"Company")+"\n"+val("companyPhone")+"\n"+val("companyEmail")+"\n\nEstimate #: "+val("estimateNumber")+"\nDate: "+val("estimateDate")+"\n\nCustomer: "+(val("customerName")||"Customer")+"\nPhone: "+val("customerPhone")+"\nEmail: "+val("customerEmail")+"\nAddress: "+val("jobAddress")+"\n\nRooms:\n"+roomLines+"\n\nMeasured sqft: "+measured.toFixed(2)+"\nOrder sqft with "+(val("waste")||"0")+"% waste: "+order.toFixed(2)+"\n\nLine Items:\n"+itemLines+"\n\nSubtotal: "+dollars(subtotal)+"\nTax ("+(val("taxRate")||"0")+"%): "+dollars(tax)+"\nTOTAL: "+dollars(total)+"\n\nDeposit due upon scheduling ("+(val("depositPercent")||"0")+"%): "+dollars(deposit)+"\n\nPhoto Documentation:\n"+getPhotoSummaryText()+"\n\nNotes / Terms:\n"+val("notes");
+ const roomLines=rooms.length ? rooms.map(r=>{
+   const sqft=roomSqft(r);
+   const lengthText=displayFeetInches(r.lengthFt ?? r.length ?? 0, r.lengthIn ?? 0);
+   const widthText=displayFeetInches(r.widthFt ?? r.width ?? 0, r.widthIn ?? 0);
+   return "• " + (r.name||"Room") + "\n  " + lengthText + " x " + widthText + " = " + sqft.toFixed(2) + " sqft";
+ }).join("\n\n") : "No rooms added.";
+
+ const itemLines=lineItems.length ? lineItems.map(i=>{
+   const qty=itemQty(i);
+   const amount=qty*(Number(i.rate)||0);
+   return (i.description||i.service||"Line Item") +
+     "\n  Qty: " + qty.toFixed(2) + " " + (i.unit||"") +
+     "\n  Rate: " + dollars(i.rate) +
+     "\n  Amount: " + dollars(amount) +
+     (i.taxable ? "\n  Taxable: Yes" : "");
+ }).join("\n\n") : "No line items added.";
+
+ return (val("companyName")||"Company")+
+ "\n"+val("companyPhone")+
+ "\n"+val("companyEmail")+
+ "\n\n=============================="+
+ "\nESTIMATE #"+val("estimateNumber")+
+ "\nDate: "+val("estimateDate")+
+ "\n=============================="+
+ "\n\nCUSTOMER"+
+ "\n"+(val("customerName")||"Customer")+
+ "\nPhone: "+val("customerPhone")+
+ "\nEmail: "+val("customerEmail")+
+ "\nAddress: "+val("jobAddress")+
+ "\n\nROOMS / MEASUREMENTS"+
+ "\n"+roomLines+
+ "\n\nMeasured Sqft: "+measured.toFixed(2)+
+ "\nOrder Sqft with "+(val("waste")||"0")+"% waste: "+order.toFixed(2)+
+ "\n\nLINE ITEMS"+
+ "\n"+itemLines+
+ "\n\n=============================="+
+ "\nSubtotal: "+dollars(subtotal)+
+ "\nTax ("+(val("taxRate")||"0")+"%): "+dollars(tax)+
+ "\nTOTAL: "+dollars(total)+
+ "\nDeposit Due ("+(val("depositPercent")||"0")+"%): "+dollars(deposit)+
+ "\n=============================="+
+ "\n\nPHOTO DOCUMENTATION"+
+ "\n"+getPhotoSummaryText()+
+ "\n\nNOTES / TERMS"+
+ "\n"+val("notes");
 }
+
 function getCurrentQuoteTotal(){let subtotal=0,taxableSubtotal=0;lineItems.forEach(i=>{const amount=itemQty(i)*(Number(i.rate)||0);subtotal+=amount;if(i.taxable)taxableSubtotal+=amount;});return subtotal+(taxableSubtotal*((num("taxRate")||0)/100));}
 
 function getOrCreateCustomer(){
@@ -1312,7 +1385,7 @@ function newQuote(){
  if(soldScreen) soldScreen.classList.add("hidden");
  clearSignature();
  setEstimateNumberToNext();
- loadTemplate(val("templateSelect") || enabledTrades[0] || "lvp");
+ loadTemplate(false);
  renderRooms();
  renderLineItems();
  calculateQuote();
