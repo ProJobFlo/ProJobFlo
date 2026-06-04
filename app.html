@@ -172,10 +172,6 @@
     <button class="success" onclick="signIn()">Login</button>
     <button class="secondary" onclick="resetPassword()">Forgot Password</button>
     <button class="danger" onclick="signOut()">Logout</button>
-   <button class="secondary" onclick="saveCurrentCustomerToCloud()">Save Customer to Cloud</button>
-<button class="secondary" onclick="loadCustomersFromCloud()">Load Cloud Customers</button>
-   <button class="secondary" onclick="saveCurrentQuoteToCloud()">Save Quote to Cloud</button>
-<button class="secondary" onclick="loadQuotesFromCloud()">Load Cloud Quotes</button>
   </div>
   <p id="authStatus" class="small">Not logged in.</p>
 </div>
@@ -622,6 +618,16 @@
   </div>
 
   <div id="viewSettings" class="hidden">
+   <div class="card">
+  <h2>Cloud Sync / Developer Tools</h2>
+  <p class="small">Temporary testing buttons while ProJobFlo cloud storage is being built.</p>
+  <div class="actions">
+    <button class="secondary" onclick="saveCurrentCustomerToCloud()">Save Customer to Cloud</button>
+    <button class="secondary" onclick="loadCustomersFromCloud()">Load Cloud Customers</button>
+    <button class="secondary" onclick="saveCurrentQuoteToCloud()">Save Quote to Cloud</button>
+    <button class="secondary" onclick="loadQuotesFromCloud()">Load Cloud Quotes</button>
+  </div>
+</div>
     <div class="grid">
       <div>
         <div class="card">
