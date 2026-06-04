@@ -2133,7 +2133,6 @@ async function loadQuotesFromCloud() {
     const { error } = await supabaseClient
       .from("jobs")
       .upsert({
-        id: job.cloudId || job.id,
         user_id: currentUser.id,
         quote_id: job.quoteId || null,
         customer_id: job.customerId || null,
