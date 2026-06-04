@@ -2301,6 +2301,21 @@ async function autoSaveCurrentQuoteDraft() {
 
   setAutoSaveStatus("Cloud Saved ✓ " + new Date().toLocaleTimeString());
 }
+ async function loadAllCloudData() {
+  const ok = await requireLoggedIn();
+  if (!ok) return;
+
+  await loadCustomersFromCloud();
+  await loadQuotesFromCloud();
+  await loadJobsFromCloud();
+
+  const authStatus = document.getElementById("authStatus");
+  if (authStatus) {
+    authStatus.textContent =
+      "Logged in as " + currentUser.email +
+      " — Cloud data loaded.";
+  }
+}
  
 init();
 </script>
