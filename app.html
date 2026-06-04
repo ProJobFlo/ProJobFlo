@@ -2163,15 +2163,6 @@ async function loadQuotesFromCloud() {
       createdAt: q.created_at
     };
   });
- if (quotes.length && quotes[0].quoteData) {
-  const latestQuote = quotes[0].quoteData;
-
-  if (latestQuote.rooms) rooms = latestQuote.rooms;
-  if (latestQuote.roomPhotos) roomPhotos = latestQuote.roomPhotos;
-  if (latestQuote.lineItems) lineItems = latestQuote.lineItems;
-
-  await hydrateCloudPhotoUrls();
-}
 
   renderAll();
 
