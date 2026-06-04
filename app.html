@@ -693,6 +693,16 @@ let lastAcceptedQuoteId = null;
 let currentMonth = new Date(); currentMonth.setDate(1);
 let selectedDate = new Date().toISOString().slice(0,10);
 let editingJobId = null;
+ const SUPABASE_URL = "https://fwklbatktyqxlwkkiwbh.supabase.co";
+
+const SUPABASE_KEY = "sb_publishable_xxxxxxxxxxxxxxxxxxxxx";
+
+const supabaseClient = supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
+let currentUser = null;
 
 const templates = {
   lvp: [
