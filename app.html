@@ -2395,6 +2395,20 @@ if (cloudSummary) {
     uploadedAt: new Date().toISOString()
   };
 }
+ async function getCloudPhotoUrl(cloudPath) {
+  if (!cloudPath) return "";
+
+  const { data, error } = await supabaseClient.storage
+    .from("job-photos")
+    .createSignedUrl(cloudPath, 60 * 60);
+
+  if (error) {
+    console.error(error);
+    return "";
+  }
+
+  return data.signedUrl;
+}
  
 init();
 </script>
