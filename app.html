@@ -1347,6 +1347,7 @@ function calculateQuote(){
  document.getElementById("quotePreview").textContent=buildQuoteText(measured,order,subtotal,tax,total,deposit);
  renderStats();
  renderProfitMode();
+ queueAutoSave();
 }
 function buildQuoteText(measured,order,subtotal,tax,total,deposit){
  const roomLines=rooms.length ? rooms.map(r=>{
