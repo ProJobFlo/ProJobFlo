@@ -1186,7 +1186,36 @@ function renderRooms(){
   });
 }
 
-function addRoomPhotos(roomId,files){const catEl=document.getElementById("photoCategory-"+roomId);const category=catEl?catEl.value:"Other";const list=Array.from(files||[]);if(!roomPhotos[roomId])roomPhotos[roomId]=[];let remaining=list.length;if(!remaining)return;list.forEach(file=>{const reader=new FileReader();reader.onload=function(e){roomPhotos[roomId].push({id:Date.now()+Math.random(),name:file.name,category,dataUrl:e.target.result});remaining--;if(remaining===0){renderRooms();calculateQuote();}};reader.readAsDataURL(file);});}
+async function addRoomPhotos(roomId, files) {
+  const catEl = document.getElementById("photoCategory-" + roomId);
+  const category = catEl ? catEl.value : "Other";
+  const list = Array.from(files || []);
+
+  if (!roomPhotos[roomId]) roomPhotos[roomId] = [];
+
+  for (const file of list) {
+    const localPhoto = {
+      name: file.name,
+      category,
+      url: URL.createObjectURL(file),
+      uploadedAt: new Date().toISOString()
+    };
+
+    roomPhotos[roomId].push(localPhoto);
+    renderRoomPhotos(roomId);
+
+    if (currentUser) {
+      const cloudPhoto = await uploadPhotoToCloud(file, roomId, category);
+
+      if (cloudPhoto) {
+        Object.assign(localPhoto, cloudPhoto);
+      }
+    }
+  }
+
+  calculateQuote();
+  queueAutoSave();
+}
 function removeRoomPhoto(roomId,photoId){roomPhotos[roomId]=(roomPhotos[roomId]||[]).filter(p=>p.id!==photoId);renderRooms();calculateQuote();}
 function renderRoomPhotos(roomId){const gallery=document.getElementById("roomPhotos-"+roomId);if(!gallery)return;gallery.innerHTML="";(roomPhotos[roomId]||[]).forEach(photo=>{const card=document.createElement("div");card.className="photo-card";const img=document.createElement("img");img.src=photo.dataUrl;const label=document.createElement("div");label.className="photo-label";label.textContent=photo.category;const remove=document.createElement("button");remove.textContent="X";remove.onclick=function(){removeRoomPhoto(roomId,photo.id);};card.append(img,remove,label);gallery.appendChild(card);});}
 function totalPhotoCount(){let count=0;Object.keys(roomPhotos).forEach(id=>count+=(roomPhotos[id]||[]).length);return count;}
