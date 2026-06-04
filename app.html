@@ -2409,6 +2409,15 @@ if (cloudSummary) {
 
   return data.signedUrl;
 }
+ async function hydrateCloudPhotoUrls() {
+  for (const roomId of Object.keys(roomPhotos || {})) {
+    for (const photo of roomPhotos[roomId] || []) {
+      if (photo.cloudPath && !photo.url) {
+        photo.url = await getCloudPhotoUrl(photo.cloudPath);
+      }
+    }
+  }
+}
  
 init();
 </script>
