@@ -730,6 +730,10 @@ const supabaseClient = supabase.createClient(
 );
 
 let currentUser = null;
+ let currentCloudCustomerId = null;
+let currentCloudQuoteId = null;
+let autoSaveTimer = null;
+let autoSaveEnabled = true;
 
 const templates = {
   lvp: [
@@ -2192,6 +2196,103 @@ async function loadJobsFromCloud() {
     authStatus.textContent =
       "Logged in as " + currentUser.email + " — Cloud jobs loaded: " + jobs.length;
   }
+}
+ function setAutoSaveStatus(message) {
+  const el = document.getElementById("autoSaveStatus");
+  if (el) el.textContent = message;
+}
+
+function queueAutoSave() {
+  if (!autoSaveEnabled) return;
+  if (!currentUser) return;
+
+  setAutoSaveStatus("Auto-save pending...");
+
+  clearTimeout(autoSaveTimer);
+
+  autoSaveTimer = setTimeout(() => {
+    autoSaveCurrentQuoteDraft();
+  }, 2000);
+}
+
+async function autoSaveCurrentQuoteDraft() {
+  if (!currentUser) return;
+
+  setAutoSaveStatus("Saving to cloud...");
+
+  if (!currentCloudCustomerId) {
+    currentCloudCustomerId = crypto.randomUUID();
+  }
+
+  if (!currentCloudQuoteId) {
+    currentCloudQuoteId = crypto.randomUUID();
+  }
+
+  const customerPayload = {
+    id: currentCloudCustomerId,
+    user_id: currentUser.id,
+    name: val("customerName") || "Unnamed Customer",
+    phone: val("customerPhone"),
+    email: val("customerEmail"),
+    address: val("jobAddress"),
+    notes: val("notes")
+  };
+
+  const { error: customerError } = await supabaseClient
+    .from("customers")
+    .upsert(customerPayload);
+
+  if (customerError) {
+    console.error(customerError);
+    setAutoSaveStatus("Customer auto-save failed.");
+    return;
+  }
+
+  const totalText = document.getElementById("grandTotal").textContent || "$0";
+  const total = Number(totalText.replace("$", "").replace(",", "")) || 0;
+
+  const quotePayload = {
+    rooms,
+    roomPhotos,
+    lineItems,
+    notes: val("notes"),
+    company: {
+      name: val("companyName"),
+      phone: val("companyPhone"),
+      email: val("companyEmail")
+    },
+    customer: {
+      name: val("customerName"),
+      phone: val("customerPhone"),
+      email: val("customerEmail"),
+      address: val("jobAddress")
+    },
+    totals: {
+      measuredSqft: getMeasuredSqft(),
+      orderSqft: getOrderSqft(),
+      total: total
+    }
+  };
+
+  const { error: quoteError } = await supabaseClient
+    .from("quotes")
+    .upsert({
+      id: currentCloudQuoteId,
+      user_id: currentUser.id,
+      customer_id: currentCloudCustomerId,
+      estimate_number: val("estimateNumber"),
+      status: val("quoteSaveStatus"),
+      total: total,
+      quote_data: quotePayload
+    });
+
+  if (quoteError) {
+    console.error(quoteError);
+    setAutoSaveStatus("Quote auto-save failed.");
+    return;
+  }
+
+  setAutoSaveStatus("Cloud Saved ✓ " + new Date().toLocaleTimeString());
 }
  
 init();
