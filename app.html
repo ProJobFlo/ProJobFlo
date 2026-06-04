@@ -2336,6 +2336,36 @@ if (cloudSummary) {
 
   tools.classList.toggle("hidden");
 }
+ async function uploadPhotoToCloud(file, roomId, category) {
+  const ok = await requireLoggedIn();
+  if (!ok) return null;
+
+  const fileExt = file.name.split(".").pop() || "jpg";
+  const fileName = Date.now() + "-" + Math.random().toString(36).slice(2) + "." + fileExt;
+
+  const filePath =
+    currentUser.id + "/" +
+    "rooms/" +
+    roomId + "/" +
+    fileName;
+
+  const { error } = await supabaseClient.storage
+    .from("job-photos")
+    .upload(filePath, file);
+
+  if (error) {
+    console.error(error);
+    alert("Photo did not upload: " + error.message);
+    return null;
+  }
+
+  return {
+    cloudPath: filePath,
+    category: category || "Other",
+    fileName: file.name,
+    uploadedAt: new Date().toISOString()
+  };
+}
  
 init();
 </script>
