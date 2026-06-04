@@ -2206,6 +2206,9 @@ async function loadJobsFromCloud() {
  function setAutoSaveStatus(message) {
   const el = document.getElementById("autoSaveStatus");
   if (el) el.textContent = message;
+
+  const cloudEl = document.getElementById("cloudSaveIndicator");
+  if (cloudEl) cloudEl.textContent = message;
 }
 
 async function queueAutoSave() {
