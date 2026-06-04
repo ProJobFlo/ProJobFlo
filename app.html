@@ -2203,8 +2203,14 @@ async function loadJobsFromCloud() {
   if (el) el.textContent = message;
 }
 
-function queueAutoSave() {
+async function queueAutoSave() {
   if (!autoSaveEnabled) return;
+
+  if (!currentUser) {
+    const { data } = await supabaseClient.auth.getUser();
+    currentUser = data.user;
+  }
+
   if (!currentUser) return;
 
   setAutoSaveStatus("Auto-save pending...");
