@@ -161,6 +161,20 @@
 </div>
 
 <div class="app">
+ <div id="authBox" class="card">
+  <h2>Login to ProJobFlo</h2>
+  <div class="form-grid">
+    <input id="authEmail" type="email" placeholder="Email" />
+    <input id="authPassword" type="password" placeholder="Password" />
+  </div>
+  <div class="actions">
+    <button onclick="signUp()">Create Account</button>
+    <button class="success" onclick="signIn()">Login</button>
+    <button class="secondary" onclick="resetPassword()">Forgot Password</button>
+    <button class="danger" onclick="signOut()">Logout</button>
+  </div>
+  <p id="authStatus" class="small">Not logged in.</p>
+</div>
   <div class="topbar">
     <div>
       <h1>ProJobFlo</h1>
@@ -1812,6 +1826,67 @@ function clearAll(){if(!confirm("Clear all saved app data?"))return;customers=[]
 function escapeHtml(text){return String(text||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");}
 function escapeJs(text){return String(text||"").replace(/\\/g,"\\\\").replace(/`/g,"\\`").replace(/\$/g,"\\$").replace(/\n/g,"\\n").replace(/\r/g,"");}
 function escapeAttr(text){return String(text||"").replace(/'/g,"&#039;").replace(/"/g,"&quot;");}
+ async function signUp() {
+  const email = document.getElementById("authEmail").value;
+  const password = document.getElementById("authPassword").value;
+
+  const { data, error } = await supabaseClient.auth.signUp({
+    email,
+    password
+  });
+
+  if (error) {
+    alert(error.message);
+    return;
+  }
+
+  document.getElementById("authStatus").textContent =
+    "Account created. Check your email.";
+}
+
+async function signIn() {
+  const email = document.getElementById("authEmail").value;
+  const password = document.getElementById("authPassword").value;
+
+  const { data, error } =
+    await supabaseClient.auth.signInWithPassword({
+      email,
+      password
+    });
+
+  if (error) {
+    alert(error.message);
+    return;
+  }
+
+  currentUser = data.user;
+
+  document.getElementById("authStatus").textContent =
+    "Logged in as " + currentUser.email;
+}
+
+async function signOut() {
+  await supabaseClient.auth.signOut();
+
+  currentUser = null;
+
+  document.getElementById("authStatus").textContent =
+    "Not logged in.";
+}
+
+async function resetPassword() {
+  const email = document.getElementById("authEmail").value;
+
+  const { error } =
+    await supabaseClient.auth.resetPasswordForEmail(email);
+
+  if (error) {
+    alert(error.message);
+    return;
+  }
+
+  alert("Password reset email sent.");
+}
 
 init();
 </script>
