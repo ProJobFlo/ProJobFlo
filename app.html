@@ -626,6 +626,8 @@
     <button class="secondary" onclick="loadCustomersFromCloud()">Load Cloud Customers</button>
     <button class="secondary" onclick="saveCurrentQuoteToCloud()">Save Quote to Cloud</button>
     <button class="secondary" onclick="loadQuotesFromCloud()">Load Cloud Quotes</button>
+   <button class="secondary" onclick="saveJobsToCloud()">Save Jobs to Cloud</button>
+<button class="secondary" onclick="loadJobsFromCloud()">Load Cloud Jobs</button>
   </div>
 </div>
     <div class="grid">
@@ -2114,6 +2116,83 @@ async function loadQuotesFromCloud() {
   if (authStatus) {
     authStatus.textContent =
       "Logged in as " + currentUser.email + " — Cloud quotes loaded: " + quotes.length;
+  }
+}
+ async function saveJobsToCloud() {
+  const ok = await requireLoggedIn();
+  if (!ok) return;
+
+  if (!jobs.length) {
+    alert("No scheduled jobs to save.");
+    return;
+  }
+
+  let savedCount = 0;
+
+  for (const job of jobs) {
+    const { error } = await supabaseClient
+      .from("jobs")
+      .upsert({
+        id: job.cloudId || job.id,
+        user_id: currentUser.id,
+        quote_id: job.quoteId || null,
+        customer_id: job.customerId || null,
+        start_date: job.startDate || job.date || null,
+        duration_days: Number(job.duration || job.durationDays || 1),
+        crew: job.crew || "",
+        status: job.status || "Scheduled",
+        notes: job.notes || ""
+      })
+      .select();
+
+    if (error) {
+      console.error(error);
+      alert("Job did not save to cloud: " + error.message);
+      return;
+    }
+
+    savedCount++;
+  }
+
+  alert(savedCount + " job(s) saved to cloud.");
+  await loadJobsFromCloud();
+}
+
+async function loadJobsFromCloud() {
+  const ok = await requireLoggedIn();
+  if (!ok) return;
+
+  const { data, error } = await supabaseClient
+    .from("jobs")
+    .select("*")
+    .order("start_date", { ascending: true });
+
+  if (error) {
+    console.error(error);
+    alert("Could not load cloud jobs: " + error.message);
+    return;
+  }
+
+  jobs = (data || []).map(j => ({
+    id: j.id,
+    cloudId: j.id,
+    quoteId: j.quote_id,
+    customerId: j.customer_id,
+    startDate: j.start_date,
+    date: j.start_date,
+    duration: j.duration_days || 1,
+    durationDays: j.duration_days || 1,
+    crew: j.crew || "",
+    status: j.status || "Scheduled",
+    notes: j.notes || ""
+  }));
+
+  renderAll();
+
+  const authStatus = document.getElementById("authStatus");
+  if (authStatus) {
+    authStatus.textContent =
+      "Logged in as " + currentUser.email + " — Cloud jobs loaded: " + jobs.length;
   }
 }
  
