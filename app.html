@@ -1281,7 +1281,14 @@ function loadTemplate(forceDefaultRooms=false){
 }
 function addLineItem(){lineItems.push({id:Date.now()+Math.random(),service:"",description:"",qtySource:"manual",qty:"1",unit:"each",rate:"",costRate:"",taxable:false});renderLineItems();calculateQuote();}
 function removeLineItem(id){lineItems=lineItems.filter(i=>i.id!==id);renderLineItems();calculateQuote();}
-function updateLineItem(id,field,value){lineItems.forEach(i=>{if(i.id===id)i[field]=value;});calculateQuote();}
+function updateLineItem(id, field, value) {
+  lineItems.forEach(i => {
+    if (i.id === id) i[field] = value;
+  });
+
+  renderLineItems();
+  calculateQuote();
+}
 function itemQty(item){if(item.qtySource==="measured")return getMeasuredSqft();if(item.qtySource==="order")return getOrderSqft();return Number(item.qty)||0;}
 
 function renderLineItems(){
