@@ -2432,26 +2432,7 @@ if (cloudSummary) {
     }
   }
 }
- async function openQuoteFromFollowUp(id) {
-  const q = quotes.find(q => String(q.id) === String(id));
-
-  if (!q) {
-    alert("Quote not found.");
-    return;
-  }
-
-  const payload = q.quoteData || q.quote_data || {};
-
-  if (payload.rooms) rooms = payload.rooms;
-  if (payload.roomPhotos) roomPhotos = payload.roomPhotos;
-  if (payload.lineItems) lineItems = payload.lineItems;
-
-  await hydrateCloudPhotoUrls();
-
-  renderAll();
-
-  alert("Quote loaded.");
-}
+ 
  async function openQuoteFromFollowUp(id) {
   const q = quotes.find(q => String(q.id) === String(id));
 
@@ -2485,7 +2466,7 @@ if (cloudSummary) {
 
   await hydrateCloudPhotoUrls();
 
-  showView("quote");
+  showTab("quote");
   renderRooms();
   renderLineItems();
   calculateQuote();
