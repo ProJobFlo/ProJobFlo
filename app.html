@@ -1917,7 +1917,7 @@ async function signIn() {
 
   document.getElementById("authStatus").textContent =
     "Logged in as " + currentUser.email;
- await loadCustomersFromCloud();
+ await loadAllCloudData();
 }
 
 async function signOut() {
