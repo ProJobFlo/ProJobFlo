@@ -2323,6 +2323,12 @@ async function autoSaveCurrentQuoteDraft() {
       "Logged in as " + currentUser.email +
       " — Cloud data loaded.";
   }
+  const cloudSummary = document.getElementById("cloudSyncSummary");
+if (cloudSummary) {
+  cloudSummary.textContent =
+    "Cloud sync active for " + currentUser.email +
+    ". Customers, quotes, and jobs load automatically after login.";
+}
 }
  function toggleDeveloperTools() {
   const tools = document.getElementById("developerTools");
