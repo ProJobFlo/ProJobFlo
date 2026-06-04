@@ -2134,8 +2134,6 @@ async function loadQuotesFromCloud() {
       .from("jobs")
       .upsert({
         user_id: currentUser.id,
-        quote_id: job.quoteId || null,
-        customer_id: job.customerId || null,
         start_date: job.startDate || job.date || null,
         duration_days: Number(job.duration || job.durationDays || 1),
         crew: job.crew || "",
