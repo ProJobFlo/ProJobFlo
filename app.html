@@ -2484,6 +2484,7 @@ async function autoSaveCurrentQuoteDraft() {
   await loadCustomersFromCloud();
   await loadQuotesFromCloud();
   await loadJobsFromCloud();
+  await loadUserSettings();
 
   const authStatus = document.getElementById("authStatus");
   if (authStatus) {
