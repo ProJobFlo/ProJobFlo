@@ -2480,6 +2480,79 @@ if (cloudSummary) {
   const el = document.getElementById(id);
   if (el) el.value = value;
  }
+ function generateQuotePDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+
+  let y = 18;
+
+  function line(text, size = 11, bold = false) {
+    doc.setFontSize(size);
+    doc.setFont("helvetica", bold ? "bold" : "normal");
+    doc.text(String(text || ""), 14, y);
+    y += 7;
+  }
+
+  function moneyText(id) {
+    const el = document.getElementById(id);
+    return el ? el.textContent : "$0.00";
+  }
+
+  doc.setFontSize(20);
+  doc.setFont("helvetica", "bold");
+  doc.text(val("companyName") || "ProJobFlo Quote", 14, y);
+  y += 10;
+
+  line("Estimate #" + (val("estimateNumber") || ""), 11);
+  line("Date: " + (val("estimateDate") || new Date().toLocaleDateString()), 11);
+  y += 4;
+
+  line("Customer Information", 14, true);
+  line(val("customerName"));
+  line(val("customerPhone"));
+  line(val("customerEmail"));
+  line(val("jobAddress"));
+  y += 4;
+
+  line("Project Summary", 14, true);
+  line("Measured Sqft: " + moneyText("measuredSqft").replace("$", ""));
+  line("Order Sqft: " + moneyText("orderSqft").replace("$", ""));
+  y += 4;
+
+  line("Line Items", 14, true);
+
+  lineItems.forEach(item => {
+    const qty = itemQty(item);
+    const amount = qty * (Number(item.rate) || 0);
+
+    if (y > 270) {
+      doc.addPage();
+      y = 18;
+    }
+
+    line((item.service || "Item") + " - " + (item.description || ""), 10, true);
+    line("Qty: " + qty.toFixed(2) + " " + (item.unit || "") + " @ $" + (Number(item.rate) || 0).toFixed(2));
+    line("Amount: " + dollars(amount));
+    y += 2;
+  });
+
+  y += 4;
+  line("Totals", 14, true);
+  line("Subtotal: " + moneyText("subtotal"));
+  line("Tax: " + moneyText("taxTotal"));
+  line("Final Quote: " + moneyText("grandTotal"), 13, true);
+  line("Deposit Due: " + moneyText("depositDue"));
+
+  y += 6;
+  line("Notes / Terms", 14, true);
+
+  const notes = doc.splitTextToSize(val("notes") || "No additional notes.", 180);
+  doc.setFontSize(10);
+  doc.setFont("helvetica", "normal");
+  doc.text(notes, 14, y);
+
+  doc.save("ProJobFlo-Quote-" + (val("estimateNumber") || "Estimate") + ".pdf");
+}
  
 init();
 </script>
