@@ -305,6 +305,25 @@
         alert("Proposal signed, but quote status did not update.");
         return;
       }
+      const contractorEmail =
+  loadedQuote.quote_data?.company?.email || "hmtully5@gmail.com";
+
+const { error: emailError } = await supabaseClient.functions.invoke(
+  "send-signature-email",
+  {
+    body: {
+      quote_id: loadedQuote.id,
+      customer_name: printedName,
+      estimate_number: loadedQuote.estimate_number,
+      total: loadedQuote.total,
+      contractor_email: contractorEmail
+    }
+  }
+);
+
+if (emailError) {
+  console.error(emailError);
+}
 
       document.getElementById("status").textContent =
         "Proposal accepted. Thank you.";
