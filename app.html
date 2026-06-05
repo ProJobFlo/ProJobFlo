@@ -659,6 +659,28 @@
     <button class="secondary" onclick="loadAllCloudData()">Load All Cloud Data</button>
   </div>
 </div>
+    <h2>Company Branding</h2>
+
+  <p class="small">
+    Upload your company logo. This logo will appear on proposals and PDFs.
+  </p>
+
+  <input
+    id="companyLogoFile"
+    type="file"
+    accept="image/*"
+    onchange="uploadContractorLogo(this.files[0])"
+  />
+
+  <p id="companyLogoStatus" class="small">
+    No logo uploaded.
+  </p>
+
+  <img
+    id="companyLogoPreview"
+    style="max-height:80px;display:none;margin-top:10px;"
+  />
+</div>
     <div class="grid">
       <div>
         <div class="card">
