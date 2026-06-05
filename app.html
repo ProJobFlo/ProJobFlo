@@ -2197,11 +2197,25 @@ async function saveCurrentQuoteToCloud() {
     notes: val("notes")
   };
 
-  const { data: savedCustomer, error: customerError } = await supabaseClient
+  let savedCustomer = null;
+let customerError = null;
+
+if (currentCloudCustomerId) {
+  savedCustomer = { id: currentCloudCustomerId };
+} else {
+  const result = await supabaseClient
     .from("customers")
     .insert(customerPayload)
     .select()
     .single();
+
+  savedCustomer = result.data;
+  customerError = result.error;
+
+  if (savedCustomer) {
+    currentCloudCustomerId = savedCustomer.id;
+  }
+}
 
   if (customerError) {
     console.error(customerError);
