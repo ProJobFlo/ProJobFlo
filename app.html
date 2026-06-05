@@ -2437,15 +2437,29 @@ async function autoSaveCurrentQuoteDraft() {
     notes: val("notes")
   };
 
-  const { error: customerError } = await supabaseClient
-    .from("customers")
-    .upsert(customerPayload);
+  if (!currentCloudCustomerId) {
+  const hasCustomerInfo =
+    val("customerName").trim() ||
+    val("customerPhone").trim() ||
+    val("customerEmail").trim() ||
+    val("jobAddress").trim();
 
-  if (customerError) {
-    console.error(customerError);
-    setAutoSaveStatus("Customer auto-save failed.");
-    return;
+  if (hasCustomerInfo) {
+    const { data: savedCustomer, error: customerError } = await supabaseClient
+      .from("customers")
+      .insert(customerPayload)
+      .select()
+      .single();
+
+    if (customerError) {
+      console.error(customerError);
+      setAutoSaveStatus("Customer auto-save failed.");
+      return;
+    }
+
+    currentCloudCustomerId = savedCustomer.id;
   }
+}
 
   const totalText = document.getElementById("grandTotal").textContent || "$0";
   const total = Number(totalText.replace("$", "").replace(",", "")) || 0;
