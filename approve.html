@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Approve Proposal | ProJobFlo</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f8fafc;
+      color: #111827;
+    }
+
+    .container {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .card {
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 18px;
+      padding: 22px;
+      margin-bottom: 18px;
+      box-shadow: 0 8px 24px rgba(0,0,0,.06);
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 34px;
+      letter-spacing: -0.04em;
+    }
+
+    h2 {
+      margin-top: 0;
+    }
+
+    .small {
+      color: #6b7280;
+      font-size: 14px;
+    }
+
+    .total {
+      background: #111827;
+      color: white;
+      border-radius: 16px;
+      padding: 18px;
+      font-size: 32px;
+      font-weight: 900;
+      margin-top: 10px;
+    }
+
+    canvas {
+      width: 100%;
+      height: 180px;
+      border: 2px dashed #94a3b8;
+      border-radius: 14px;
+      background: white;
+      touch-action: none;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 12px;
+      font-size: 16px;
+      margin-bottom: 12px;
+    }
+
+    button {
+      padding: 12px 16px;
+      border-radius: 12px;
+      border: 0;
+      font-weight: 800;
+      cursor: pointer;
+      margin-right: 8px;
+      margin-top: 8px;
+    }
+
+    .success {
+      background: #047857;
+      color: white;
+    }
+
+    .secondary {
+      background: white;
+      color: #111827;
+      border: 1px solid #d1d5db;
+    }
+
+    .danger {
+      background: #dc2626;
+      color: white;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="card">
+      <h1>Project Proposal</h1>
+      <p class="small">Powered by ProJobFlo</p>
+      <p id="status">Loading proposal...</p>
+    </div>
+
+    <div id="proposalCard" class="card" style="display:none;">
+      <h2 id="companyName">Company</h2>
+      <p id="customerInfo"></p>
+      <p id="proposalInfo"></p>
+      <div class="total" id="proposalTotal">$0.00</div>
+    </div>
+
+    <div id="acceptCard" class="card" style="display:none;">
+      <h2>Accept Proposal</h2>
+      <p class="small">
+        By signing below, you approve the proposal scope, pricing, and project details provided.
+      </p>
+
+      <input id="signedCustomerName" placeholder="Printed name" />
+
+      <canvas id="signaturePad"></canvas>
+
+      <button class="secondary" onclick="clearSignature()">Clear Signature</button>
+      <button class="success" onclick="acceptProposal()">Accept Proposal</button>
+    </div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = "https://fwklbatktyqxlwkkiwbh.supabase.co";
+    const SUPABASE_KEY = "PASTE_YOUR_FULL_sb_publishable_KEY_HERE";
+
+    const supabaseClient = supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_KEY
+    );
+
+    let loadedQuote = null;
+    let drawing = false;
+    let canvas;
+    let ctx;
+
+    function getToken() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get("token");
+    }
+
+    function dollars(n) {
+      return "$" + (Number(n) || 0).toFixed(2);
+    }
+
+    async function loadProposal() {
+      const token = getToken();
+
+      if (!token) {
+        document.getElementById("status").textContent =
+          "Missing proposal token.";
+        return;
+      }
+
+      const { data, error } = await supabaseClient
+        .from("quotes")
+        .select("*")
+        .eq("signature_token", token)
+        .single();
+
+      if (error || !data) {
+        document.getElementById("status").textContent =
+          "Proposal not found or link is invalid.";
+        return;
+      }
+
+      loadedQuote = data;
+
+      const q = data.quote_data || {};
+      const company = q.company || {};
+      const customer = q.customer || {};
+
+      document.getElementById("status").textContent =
+        "Review the proposal below and sign to approve.";
+
+      document.getElementById("companyName").textContent =
+        company.name || "Project Proposal";
+
+      document.getElementById("customerInfo").innerHTML =
+        "<strong>Prepared For:</strong><br>" +
+        (customer.name || "") + "<br>" +
+        (customer.phone || "") + "<br>" +
+        (customer.email || "") + "<br>" +
+        (customer.address || "");
+
+      document.getElementById("proposalInfo").innerHTML =
+        "<strong>Proposal #:</strong> " +
+        (data.estimate_number || "") +
+        "<br><strong>Status:</strong> " +
+        (data.signature_status || "Sent");
+
+      document.getElementById("proposalTotal").textContent =
+        dollars(data.total);
+
+      document.getElementById("proposalCard").style.display = "block";
+      document.getElementById("acceptCard").style.display = "block";
+
+      setupSignaturePad();
+    }
+
+    function setupSignaturePad() {
+      canvas = document.getElementById("signaturePad");
+      ctx = canvas.getContext("2d");
+
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width * window.devicePixelRatio;
+      canvas.height = rect.height * window.devicePixelRatio;
+      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+
+      ctx.lineWidth = 3;
+      ctx.lineCap = "round";
+      ctx.strokeStyle = "#111827";
+
+      canvas.addEventListener("pointerdown", startDraw);
+      canvas.addEventListener("pointermove", draw);
+      canvas.addEventListener("pointerup", stopDraw);
+      canvas.addEventListener("pointerleave", stopDraw);
+    }
+
+    function getPoint(e) {
+      const rect = canvas.getBoundingClientRect();
+      return {
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top
+      };
+    }
+
+    function startDraw(e) {
+      drawing = true;
+      const p = getPoint(e);
+      ctx.beginPath();
+      ctx.moveTo(p.x, p.y);
+    }
+
+    function draw(e) {
+      if (!drawing) return;
+      const p = getPoint(e);
+      ctx.lineTo(p.x, p.y);
+      ctx.stroke();
+    }
+
+    function stopDraw() {
+      drawing = false;
+    }
+
+    function clearSignature() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    async function acceptProposal() {
+      if (!loadedQuote) {
+        alert("Proposal not loaded.");
+        return;
+      }
+
+      const printedName =
+        document.getElementById("signedCustomerName").value.trim();
+
+      if (!printedName) {
+        alert("Please enter your printed name.");
+        return;
+      }
+
+      const signatureImage = canvas.toDataURL("image/png");
+
+      const { error: insertError } = await supabaseClient
+        .from("proposal_signatures")
+        .insert({
+          quote_id: loadedQuote.id,
+          user_id: loadedQuote.user_id,
+          customer_name: printedName,
+          signature_image: signatureImage
+        });
+
+      if (insertError) {
+        console.error(insertError);
+        alert("Signature could not be saved: " + insertError.message);
+        return;
+      }
+
+      const { error: updateError } = await supabaseClient
+        .from("quotes")
+        .update({
+          signature_status: "Signed",
+          status: "Sold",
+          signed_at: new Date().toISOString(),
+          signed_customer_name: printedName,
+          signature_image: signatureImage
+        })
+        .eq("id", loadedQuote.id);
+
+      if (updateError) {
+        console.error(updateError);
+        alert("Proposal signed, but quote status did not update.");
+        return;
+      }
+
+      document.getElementById("status").textContent =
+        "Proposal accepted. Thank you.";
+
+      document.getElementById("acceptCard").style.display = "none";
+      alert("Proposal accepted successfully.");
+    }
+
+    loadProposal();
+  </script>
+</body>
+</html>
