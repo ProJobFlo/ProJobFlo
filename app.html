@@ -1219,7 +1219,40 @@ async function addRoomPhotos(roomId, files) {
   queueAutoSave();
 }
 function removeRoomPhoto(roomId,photoId){roomPhotos[roomId]=(roomPhotos[roomId]||[]).filter(p=>p.id!==photoId);renderRooms();calculateQuote();}
-function renderRoomPhotos(roomId){const gallery=document.getElementById("roomPhotos-"+roomId);if(!gallery)return;gallery.innerHTML="";(roomPhotos[roomId]||[]).forEach(photo=>{const card=document.createElement("div");card.className="photo-card";const img=document.createElement("img");img.src=photo.dataUrl;const label=document.createElement("div");label.className="photo-label";label.textContent=photo.category;const remove=document.createElement("button");remove.textContent="X";remove.onclick=function(){removeRoomPhoto(roomId,photo.id);};card.append(img,remove,label);gallery.appendChild(card);});}
+function renderRoomPhotos(roomId){
+  const gallery=document.getElementById("roomPhotos-"+roomId);
+  if(!gallery)return;
+
+  gallery.innerHTML="";
+
+  (roomPhotos[roomId]||[]).forEach(photo=>{
+    const card=document.createElement("div");
+    card.className="photo-card";
+
+    const img=document.createElement("img");
+
+    img.src = photo.url || photo.dataUrl || "";
+
+    img.onerror = function(){
+      img.style.display = "none";
+      const missing=document.createElement("div");
+      missing.className="small";
+      missing.textContent="Photo preview loading...";
+      card.prepend(missing);
+    };
+
+    const label=document.createElement("div");
+    label.className="photo-label";
+    label.textContent=photo.category || "Project photo";
+
+    const remove=document.createElement("button");
+    remove.textContent="X";
+    remove.onclick=function(){removeRoomPhoto(roomId,photo.id);};
+
+    card.append(img,remove,label);
+    gallery.appendChild(card);
+  });
+}
 function totalPhotoCount(){let count=0;Object.keys(roomPhotos).forEach(id=>count+=(roomPhotos[id]||[]).length);return count;}
 function getPhotoSummaryText(){let lines=[];rooms.forEach(room=>{const photos=roomPhotos[room.id]||[];if(photos.length){lines.push((room.name||"Room")+": "+photos.length+" photo(s)");photos.forEach((p,i)=>lines.push("  - Photo "+(i+1)+": "+p.category));}});return lines.length?lines.join("\n"):"No photos attached.";}
 
