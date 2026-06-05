@@ -2864,7 +2864,7 @@ async function generateQuotePDF() {
     String(j.customerId||j.customer_id)===String(id)
   );
 
-  const box=document.getElementById("selectedCustomer");
+  const box=document.getElementById("customerDetails");
   if(!box){
     alert(
       (c.name||"Unnamed Customer") +
@@ -2942,7 +2942,7 @@ async function deleteCustomer(id){
   renderCustomers();
   renderStats();
 
-  const box=document.getElementById("selectedCustomer");
+  const box=document.getElementById("customerDetails");
   if(box)box.innerHTML="<p class='small'>Select a customer to view details.</p>";
 
   alert("Customer deleted.");
