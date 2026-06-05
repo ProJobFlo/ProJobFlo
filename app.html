@@ -2121,6 +2121,7 @@ async function resetPassword() {
 }
 
 async function saveCurrentCustomerToCloud() {
+ console.log("SAVE CUSTOMER FIRED");
   const ok = await requireLoggedIn();
   if (!ok) return;
 
