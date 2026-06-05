@@ -2630,6 +2630,9 @@ async function uploadContractorLogo(file) {
     .getPublicUrl(fileName);
 
   contractorLogoUrl = data.publicUrl;
+ await saveUserSettings({
+  company_logo_url: contractorLogoUrl
+});
 
   const status = document.getElementById("companyLogoStatus");
   if (status) status.textContent = "Logo uploaded successfully.";
@@ -3027,6 +3030,59 @@ async function deleteCustomer(id){
   if(box)box.innerHTML="<p class='small'>Select a customer to view details.</p>";
 
   alert("Customer deleted.");
+}
+ async function saveUserSettings(updates) {
+  const ok = await requireLoggedIn();
+  if (!ok) return;
+
+  userSettings = {
+    ...(userSettings || {}),
+    ...updates
+  };
+
+  const { error } = await supabaseClient
+    .from("user_settings")
+    .upsert({
+      user_id: currentUser.id,
+      ...userSettings,
+      updated_at: new Date().toISOString()
+    });
+
+  if (error) {
+    console.error(error);
+    alert("Settings did not save: " + error.message);
+  }
+}
+
+async function loadUserSettings() {
+  const ok = await requireLoggedIn();
+  if (!ok) return;
+
+  const { data, error } = await supabaseClient
+    .from("user_settings")
+    .select("*")
+    .eq("user_id", currentUser.id)
+    .single();
+
+  if (error && error.code !== "PGRST116") {
+    console.error(error);
+    return;
+  }
+
+  userSettings = data || {};
+
+  if (userSettings.company_logo_url) {
+    contractorLogoUrl = userSettings.company_logo_url;
+
+    const status = document.getElementById("companyLogoStatus");
+    if (status) status.textContent = "Logo uploaded.";
+
+    const preview = document.getElementById("companyLogoPreview");
+    if (preview) {
+      preview.src = contractorLogoUrl;
+      preview.style.display = "block";
+    }
+  }
 }
  
 init();
