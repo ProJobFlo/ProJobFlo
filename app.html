@@ -3118,6 +3118,12 @@ async function loadUserSettings() {
   }
 
   userSettings = data || {};
+ setVal("settingsCompanyName", userSettings.company_name || "");
+setVal("settingsCompanyPhone", userSettings.company_phone || "");
+setVal("settingsCompanyEmail", userSettings.company_email || "");
+setVal("settingsCompanyAddress", userSettings.company_address || "");
+setVal("settingsCompanyWebsite", userSettings.company_website || "");
+setVal("settingsCompanyLicense", userSettings.company_license || "");
 
   if (userSettings.company_logo_url) {
     contractorLogoUrl = userSettings.company_logo_url;
@@ -3131,6 +3137,18 @@ async function loadUserSettings() {
       preview.style.display = "block";
     }
   }
+}
+ async function saveCompanySettings() {
+  await saveUserSettings({
+    company_name: val("settingsCompanyName").trim(),
+    company_phone: val("settingsCompanyPhone").trim(),
+    company_email: val("settingsCompanyEmail").trim(),
+    company_address: val("settingsCompanyAddress").trim(),
+    company_website: val("settingsCompanyWebsite").trim(),
+    company_license: val("settingsCompanyLicense").trim()
+  });
+
+  alert("Company settings saved.");
 }
  
 init();
