@@ -2481,17 +2481,33 @@ if (cloudSummary) {
   const el = document.getElementById(id);
   if (el) el.value = value;
  }
- function generateQuotePDF() {
+async function generateQuotePDF() {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
 
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
   let y = 18;
 
-  function line(text, size = 11, bold = false) {
-    doc.setFontSize(size);
-    doc.setFont("helvetica", bold ? "bold" : "normal");
-    doc.text(String(text || ""), 14, y);
-    y += 7;
+  function sectionTitle(title) {
+    y += 4;
+    doc.setFillColor(17, 24, 39);
+    doc.rect(14, y, pageWidth - 28, 8, "F");
+    doc.setTextColor(255, 255, 255);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(11);
+    doc.text(title, 18, y + 5.5);
+    doc.setTextColor(17, 24, 39);
+    y += 14;
+  }
+
+  function text(label, value) {
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(9);
+    doc.text(label, 14, y);
+    doc.setFont("helvetica", "normal");
+    doc.text(String(value || ""), 55, y);
+    y += 6;
   }
 
   function moneyText(id) {
@@ -2499,60 +2515,201 @@ if (cloudSummary) {
     return el ? el.textContent : "$0.00";
   }
 
-  doc.setFontSize(20);
-  doc.setFont("helvetica", "bold");
-  doc.text(val("companyName") || "ProJobFlo Quote", 14, y);
-  y += 10;
-
-  line("Estimate #" + (val("estimateNumber") || ""), 11);
-  line("Date: " + (val("estimateDate") || new Date().toLocaleDateString()), 11);
-  y += 4;
-
-  line("Customer Information", 14, true);
-  line(val("customerName"));
-  line(val("customerPhone"));
-  line(val("customerEmail"));
-  line(val("jobAddress"));
-  y += 4;
-
-  line("Project Summary", 14, true);
-  line("Measured Sqft: " + moneyText("measuredSqft").replace("$", ""));
-  line("Order Sqft: " + moneyText("orderSqft").replace("$", ""));
-  y += 4;
-
-  line("Line Items", 14, true);
-
-  lineItems.forEach(item => {
-    const qty = itemQty(item);
-    const amount = qty * (Number(item.rate) || 0);
-
-    if (y > 270) {
+  function checkPage(space = 20) {
+    if (y + space > pageHeight - 18) {
       doc.addPage();
       y = 18;
     }
+  }
 
-    line((item.service || "Item") + " - " + (item.description || ""), 10, true);
-    line("Qty: " + qty.toFixed(2) + " " + (item.unit || "") + " @ $" + (Number(item.rate) || 0).toFixed(2));
-    line("Amount: " + dollars(amount));
-    y += 2;
+  const company = val("companyName") || "Your Company";
+  const companyPhone = val("companyPhone");
+  const companyEmail = val("companyEmail");
+
+  doc.setFillColor(4, 120, 87);
+  doc.rect(0, 0, pageWidth, 32, "F");
+
+  doc.setTextColor(255, 255, 255);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(20);
+  doc.text(company, 14, 15);
+
+  doc.setFontSize(10);
+  doc.setFont("helvetica", "normal");
+  doc.text("Project Proposal", 14, 24);
+
+  doc.setFontSize(8);
+  doc.text("Created with ProJobFlo", pageWidth - 48, 24);
+
+  doc.setTextColor(17, 24, 39);
+  y = 44;
+
+  sectionTitle("Proposal Details");
+  text("Proposal #", val("estimateNumber") || "1001");
+  text("Date", val("estimateDate") || new Date().toLocaleDateString());
+  text("Prepared By", company);
+  text("Phone", companyPhone);
+  text("Email", companyEmail);
+
+  sectionTitle("Prepared For");
+  text("Customer", val("customerName"));
+  text("Phone", val("customerPhone"));
+  text("Email", val("customerEmail"));
+  text("Address", val("jobAddress"));
+
+  sectionTitle("Project Summary");
+  text("Measured Sqft", document.getElementById("measuredSqft").textContent);
+  text("Order Sqft", document.getElementById("orderSqft").textContent);
+  text("Photos Attached", document.getElementById("photoCount").textContent);
+
+  sectionTitle("Pricing");
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(8);
+  doc.text("Service", 14, y);
+  doc.text("Description", 42, y);
+  doc.text("Qty", 110, y);
+  doc.text("Rate", 138, y);
+  doc.text("Amount", 166, y);
+  y += 4;
+
+  doc.setDrawColor(209, 213, 219);
+  doc.line(14, y, pageWidth - 14, y);
+  y += 6;
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(8);
+
+  lineItems.forEach(item => {
+    checkPage(14);
+
+    const qty = itemQty(item);
+    const rate = Number(item.rate) || 0;
+    const amount = qty * rate;
+
+    doc.setFont("helvetica", "bold");
+    doc.text(String(item.service || "Item"), 14, y);
+
+    doc.setFont("helvetica", "normal");
+    const desc = doc.splitTextToSize(String(item.description || ""), 62);
+    doc.text(desc, 42, y);
+
+    doc.text(qty.toFixed(2) + " " + (item.unit || ""), 110, y);
+    doc.text("$" + rate.toFixed(2), 138, y);
+    doc.text(dollars(amount), 166, y);
+
+    y += Math.max(8, desc.length * 5);
   });
 
   y += 4;
-  line("Totals", 14, true);
-  line("Subtotal: " + moneyText("subtotal"));
-  line("Tax: " + moneyText("taxTotal"));
-  line("Final Quote: " + moneyText("grandTotal"), 13, true);
-  line("Deposit Due: " + moneyText("depositDue"));
+  doc.line(14, y, pageWidth - 14, y);
+  y += 10;
 
-  y += 6;
-  line("Notes / Terms", 14, true);
+  const totalsX = pageWidth - 78;
 
-  const notes = doc.splitTextToSize(val("notes") || "No additional notes.", 180);
-  doc.setFontSize(10);
+  doc.setFillColor(249, 250, 251);
+  doc.roundedRect(totalsX - 6, y - 6, 72, 38, 3, 3, "F");
+
   doc.setFont("helvetica", "normal");
-  doc.text(notes, 14, y);
+  doc.setFontSize(9);
+  doc.text("Subtotal:", totalsX, y);
+  doc.text(moneyText("subtotal"), pageWidth - 16, y, { align: "right" });
+  y += 7;
 
-  doc.save("ProJobFlo-Quote-" + (val("estimateNumber") || "Estimate") + ".pdf");
+  doc.text("Tax:", totalsX, y);
+  doc.text(moneyText("taxTotal"), pageWidth - 16, y, { align: "right" });
+  y += 7;
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(11);
+  doc.text("Total:", totalsX, y);
+  doc.text(moneyText("grandTotal"), pageWidth - 16, y, { align: "right" });
+  y += 8;
+
+  doc.setFontSize(9);
+  doc.text("Deposit Due:", totalsX, y);
+  doc.text(moneyText("depositDue"), pageWidth - 16, y, { align: "right" });
+
+  y += 16;
+
+  sectionTitle("Notes / Terms");
+  const notes = doc.splitTextToSize(val("notes") || "No additional notes.", pageWidth - 28);
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(9);
+  doc.text(notes, 14, y);
+  y += notes.length * 5 + 10;
+
+  checkPage(40);
+  sectionTitle("Customer Acceptance");
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(9);
+  doc.text("By signing, customer approves the scope, pricing, and project details listed in this proposal.", 14, y);
+  y += 16;
+  doc.text("Customer Signature: ________________________________", 14, y);
+  y += 10;
+  doc.text("Date: ____________________", 14, y);
+
+  const allPhotos = [];
+  Object.keys(roomPhotos || {}).forEach(roomId => {
+    (roomPhotos[roomId] || []).forEach(photo => {
+      allPhotos.push(photo);
+    });
+  });
+
+  if (allPhotos.length) {
+    doc.addPage();
+    y = 18;
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(18);
+    doc.setTextColor(17, 24, 39);
+    doc.text("Project Photos", 14, y);
+    y += 12;
+
+    let x = 14;
+    let photoW = 82;
+    let photoH = 62;
+
+    for (let i = 0; i < allPhotos.length; i++) {
+      const photo = allPhotos[i];
+
+      if (y + photoH + 18 > pageHeight - 14) {
+        doc.addPage();
+        y = 18;
+        x = 14;
+      }
+
+      try {
+        const imgUrl = photo.url || "";
+        if (imgUrl) {
+          doc.addImage(imgUrl, "JPEG", x, y, photoW, photoH);
+        }
+      } catch (e) {
+        doc.setDrawColor(209, 213, 219);
+        doc.rect(x, y, photoW, photoH);
+        doc.setFontSize(8);
+        doc.text("Photo preview unavailable", x + 5, y + 30);
+      }
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(8);
+      doc.text(photo.category || "Project Photo", x, y + photoH + 5);
+
+      if (x === 14) {
+        x = 112;
+      } else {
+        x = 14;
+        y += photoH + 18;
+      }
+    }
+  }
+
+  const fileName =
+    "Project-Proposal-" +
+    (val("estimateNumber") || "Estimate") +
+    ".pdf";
+
+  doc.save(fileName);
 }
  
 init();
