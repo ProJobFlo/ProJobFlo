@@ -1800,7 +1800,43 @@ function renderSelectedJobs(){const box=document.getElementById("selectedJobs");
 </div>
 </div>`).join("");}
 
-function renderCustomers(){const box=document.getElementById("customerList");if(!box)return;const search=(val("customerSearch")||"").toLowerCase();const list=customers.filter(c=>[c.name,c.phone,c.email,c.address].join(" ").toLowerCase().includes(search));if(!list.length){box.innerHTML="<p class='small'>No customers found.</p>";return;}box.innerHTML=list.map(c=>{const qs=quotes.filter(q=>q.customerId===c.id);const js=jobs.filter(j=>j.customerId===c.id);return `<div class="customer-card"><div class="title">${escapeHtml(c.name||"Unnamed")}</div><div class="small">${escapeHtml(c.phone||"")} • ${escapeHtml(c.email||"")}</div><div>${escapeHtml(c.address||"")}</div><div class="small">${qs.length} quote(s) • ${js.length} scheduled job(s)</div><div class="actions" style="margin-top:8px;"><button class="secondary" onclick="selectCustomer(${c.id})">View</button></div></div>`;}).join("");}
+function renderCustomers(){
+  const box=document.getElementById("customerList");
+  if(!box)return;
+
+  const search=(val("customerSearch")||"").toLowerCase();
+
+  const list=customers.filter(c=>
+    [c.name,c.phone,c.email,c.address]
+      .join(" ")
+      .toLowerCase()
+      .includes(search)
+  );
+
+  if(!list.length){
+    box.innerHTML="<p class='small'>No customers found.</p>";
+    return;
+  }
+
+  box.innerHTML=list.map(c=>{
+    const qs=quotes.filter(q=>String(q.customerId||q.customer_id)===String(c.id));
+    const js=jobs.filter(j=>String(j.customerId||j.customer_id)===String(c.id));
+
+    return `
+      <div class="customer-card">
+        <div class="title">${escapeHtml(c.name||"Unnamed")}</div>
+        <div class="small">${escapeHtml(c.phone||"")} • ${escapeHtml(c.email||"")}</div>
+        <div>${escapeHtml(c.address||"")}</div>
+        <div class="small">${qs.length} quote(s) • ${js.length} scheduled job(s)</div>
+
+        <div class="actions" style="margin-top:8px;">
+          <button class="secondary" onclick="selectCustomer('${c.id}')">View</button>
+          <button class="danger" onclick="deleteCustomer('${c.id}')">Delete</button>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
 function selectCustomer(id){const c=getCustomer(id);const qs=quotes.filter(q=>q.customerId===id).sort((a,b)=>b.createdAt-a.createdAt);const js=jobs.filter(j=>j.customerId===id).sort((a,b)=>a.date.localeCompare(b.date));document.getElementById("customerDetails").innerHTML=`<div class="customer-card"><div class="title">${escapeHtml(c.name||"Unnamed")}</div><div>${escapeHtml(c.phone||"")}<br>${escapeHtml(c.email||"")}<br>${escapeHtml(c.address||"")}</div></div><h3>Quote History</h3>${qs.length?qs.map(q=>`<div class="quote-card"><div>Quote: <strong>${dollars(q.amount)}</strong></div><div>Status: <span class="pill ${statusClass(q.status)}">${escapeHtml(q.status)}</span></div><div class="small">${new Date(q.createdAt).toLocaleString()}</div></div>`).join(""):"<p>No quote history.</p>"}<h3>Scheduled Jobs</h3>${js.length?js.map(j=>`<div class="job-card"><div>${escapeHtml(j.date)} • ${escapeHtml(j.crew)}</div><div>Status: ${escapeHtml(j.status)}</div></div>`).join(""):"<p>No scheduled jobs.</p>"}`;}
 function statusClass(status){if(status==="Materials Ordered")return"status-Ordered";if(status==="Ready to Install")return"status-Ready";if(status==="In Progress")return"status-Progress";return"status-"+String(status).replaceAll(" ","");}
 
@@ -2811,6 +2847,105 @@ async function generateQuotePDF() {
   await navigator.clipboard.writeText(link);
 
   alert("Signature link copied to clipboard:\n\n" + link);
+}
+ function selectCustomer(id){
+  const c=customers.find(c=>String(c.id)===String(id));
+
+  if(!c){
+    alert("Customer not found.");
+    return;
+  }
+
+  const customerQuotes=quotes.filter(q=>
+    String(q.customerId||q.customer_id)===String(id)
+  );
+
+  const customerJobs=jobs.filter(j=>
+    String(j.customerId||j.customer_id)===String(id)
+  );
+
+  const box=document.getElementById("selectedCustomer");
+  if(!box){
+    alert(
+      (c.name||"Unnamed Customer") +
+      "\n\nQuotes: " + customerQuotes.length +
+      "\nJobs: " + customerJobs.length
+    );
+    return;
+  }
+
+  box.innerHTML=`
+    <div class="card">
+      <h2>${escapeHtml(c.name||"Unnamed Customer")}</h2>
+      <p>${escapeHtml(c.phone||"")}</p>
+      <p>${escapeHtml(c.email||"")}</p>
+      <p>${escapeHtml(c.address||"")}</p>
+
+      <h3>Quotes</h3>
+      ${
+        customerQuotes.length
+        ? customerQuotes.map(q=>`
+            <div class="quote-card">
+              <strong>Quote #${escapeHtml(q.estimateNumber||q.estimate_number||"")}</strong><br>
+              Status: ${escapeHtml(q.status||"Unsold")}<br>
+              Total: ${dollars(q.amount||q.total||0)}
+              <div class="actions" style="margin-top:6px;">
+                <button class="success" onclick="openQuoteFromFollowUp('${q.id}')">Open Quote</button>
+              </div>
+            </div>
+          `).join("")
+        : "<p class='small'>No quotes for this customer.</p>"
+      }
+
+      <h3>Scheduled Jobs</h3>
+      ${
+        customerJobs.length
+        ? customerJobs.map(j=>`
+            <div class="quote-card">
+              <strong>${escapeHtml(j.status||"Scheduled Job")}</strong><br>
+              Start: ${escapeHtml(j.startDate||j.start_date||"")}<br>
+              Notes: ${escapeHtml(j.notes||"")}
+            </div>
+          `).join("")
+        : "<p class='small'>No scheduled jobs for this customer.</p>"
+      }
+    </div>
+  `;
+}
+
+async function deleteCustomer(id){
+  const c=customers.find(c=>String(c.id)===String(id));
+  const name=c?.name||"this customer";
+
+  const sure=confirm("Are you sure you want to delete " + name + "?");
+  if(!sure)return;
+
+  const reallySure=confirm("This cannot be undone. Delete " + name + " permanently?");
+  if(!reallySure)return;
+
+  if(currentUser){
+    const { error } = await supabaseClient
+      .from("customers")
+      .delete()
+      .eq("id", id)
+      .eq("user_id", currentUser.id);
+
+    if(error){
+      console.error(error);
+      alert("Customer could not be deleted: " + error.message);
+      return;
+    }
+  }
+
+  customers=customers.filter(c=>String(c.id)!==String(id));
+
+  renderCustomers();
+  renderStats();
+
+  const box=document.getElementById("selectedCustomer");
+  if(box)box.innerHTML="<p class='small'>Select a customer to view details.</p>";
+
+  alert("Customer deleted.");
 }
  
 init();
