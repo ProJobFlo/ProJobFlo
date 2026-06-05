@@ -3173,6 +3173,40 @@ setVal("settingsCompanyLicense", userSettings.company_license || "");
     setVal("companyEmail", userSettings.company_email);
   }
 }
+ async function createSignatureLink() {
+  const ok = await requireLoggedIn();
+  if (!ok) return "";
+
+  if (!currentCloudQuoteId) {
+    await autoSaveCurrentQuoteDraft();
+  }
+
+  if (!currentCloudQuoteId) {
+    alert("Please save or auto-save the quote first.");
+    return "";
+  }
+
+  const token =
+    crypto.randomUUID() + "-" + Date.now();
+
+  const { error } = await supabaseClient
+    .from("quotes")
+    .update({
+      signature_token: token,
+      signature_status: "Sent"
+    })
+    .eq("id", currentCloudQuoteId)
+    .eq("user_id", currentUser.id);
+
+  if (error) {
+    console.error(error);
+    alert("Could not create signature link: " + error.message);
+    return "";
+  }
+
+  return "https://www.projobflo.com/approve.html?token=" +
+    encodeURIComponent(token);
+}
  async function sendProposalEmail() {
 
   const customerName = val("customerName");
@@ -3194,7 +3228,9 @@ setVal("settingsCompanyLicense", userSettings.company_license || "");
         .replace(",", "")
     ) || 0;
 
-  const approvalLink = await generateSignatureLink();
+  const approvalLink = await createSignatureLink();
+
+if (!approvalLink) return;
 
   const { data: sessionData } = await supabaseClient.auth.getSession();
 const token = sessionData.session?.access_token;
