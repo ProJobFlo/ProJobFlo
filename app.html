@@ -2636,11 +2636,11 @@ async function imageToDataUrl(url) {
   const companyPhone = val("companyPhone");
   const companyEmail = val("companyEmail");
 
-  doc.setFillColor(4, 120, 87);
+  doc.setFillColor(255, 255, 255);
   doc.rect(0, 0, pageWidth, 32, "F");
  try {
   const logoData = await imageToDataUrl(PROJOBFLO_LOGO_URL);
-  doc.addImage(logoData, "PNG", 14, 8, 58, 22);
+  doc.addImage(logoData, "PNG", 14, 8, 45, 17);
 } catch (e) {
   console.error("Logo could not be added to PDF", e);
 }
