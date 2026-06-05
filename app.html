@@ -3194,7 +3194,7 @@ setVal("settingsCompanyLicense", userSettings.company_license || "");
         .replace(",", "")
     ) || 0;
 
-  const approvalLink = await generateApprovalLink();
+  const approvalLink = await generateSignatureLink();
 
   const { data: sessionData } = await supabaseClient.auth.getSession();
 const token = sessionData.session?.access_token;
