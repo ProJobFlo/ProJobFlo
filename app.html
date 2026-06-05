@@ -2064,13 +2064,23 @@ async function saveCurrentCustomerToCloud() {
   const ok = await requireLoggedIn();
   if (!ok) return;
 
+  const customerName = val("customerName").trim();
+  const customerPhone = val("customerPhone").trim();
+  const customerEmail = val("customerEmail").trim();
+  const jobAddress = val("jobAddress").trim();
+  const notes = val("notes").trim();
+
+  if (!customerName && !customerPhone && !customerEmail && !jobAddress && !notes) {
+    return;
+  }
+
   const customerPayload = {
     user_id: currentUser.id,
-    name: val("customerName") || "Unnamed Customer",
-    phone: val("customerPhone"),
-    email: val("customerEmail"),
-    address: val("jobAddress"),
-    notes: val("notes")
+    name: customerName || "Unnamed Customer",
+    phone: customerPhone,
+    email: customerEmail,
+    address: jobAddress,
+    notes: notes
   };
 
   const { data, error } = await supabaseClient
