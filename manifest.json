@@ -1,0 +1,16 @@
+{
+  "name": "ProJobFlo",
+  "short_name": "ProJobFlo",
+  "start_url": "/app.html",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#047857",
+  "description": "Quote, sign, schedule, and manage contractor jobs.",
+  "icons": [
+    {
+      "src": "https://fwklbatktyqxlwkkiwbh.supabase.co/storage/v1/object/public/Logos/ProJobFlo_App_Icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
