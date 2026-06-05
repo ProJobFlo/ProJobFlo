@@ -2638,15 +2638,21 @@ async function imageToDataUrl(url) {
 
   doc.setFillColor(4, 120, 87);
   doc.rect(0, 0, pageWidth, 32, "F");
+ try {
+  const logoData = await imageToDataUrl(PROJOBFLO_LOGO_URL);
+  doc.addImage(logoData, "PNG", 14, 8, 58, 22);
+} catch (e) {
+  console.error("Logo could not be added to PDF", e);
+}
 
   doc.setTextColor(255, 255, 255);
   doc.setFont("helvetica", "bold");
   doc.setFontSize(20);
-  doc.text(company, 14, 15);
+  doc.text(company, 82, 15);
 
   doc.setFontSize(10);
   doc.setFont("helvetica", "normal");
-  doc.text("Project Proposal", 14, 24);
+  doc.text("Project Proposal", 82, 24);
 
   doc.setFontSize(8);
   doc.text("Created with ProJobFlo", pageWidth - 48, 24);
