@@ -378,6 +378,7 @@
           <div id="quotePreview" class="quote-box"></div>
          <div class="actions" style="margin-top:10px;">
   <button class="success" onclick="generateQuotePDF()">Generate PDF Quote</button></div>
+         <button class="secondary" onclick="generateSignatureLink()">Generate Signature Link</button>
 </div>
         </div>
 
@@ -2710,6 +2711,45 @@ async function generateQuotePDF() {
     ".pdf";
 
   doc.save(fileName);
+}
+ async function generateSignatureLink() {
+  const ok = await requireLoggedIn();
+  if (!ok) return;
+
+  if (!currentCloudQuoteId) {
+    await autoSaveCurrentQuoteDraft();
+  }
+
+  if (!currentCloudQuoteId) {
+    alert("Please save or auto-save the quote first.");
+    return;
+  }
+
+  const token =
+    crypto.randomUUID() + "-" + Date.now();
+
+  const { error } = await supabaseClient
+    .from("quotes")
+    .update({
+      signature_token: token,
+      signature_status: "Sent"
+    })
+    .eq("id", currentCloudQuoteId)
+    .eq("user_id", currentUser.id);
+
+  if (error) {
+    console.error(error);
+    alert("Could not create signature link: " + error.message);
+    return;
+  }
+
+  const link =
+    "https://www.projobflo.com/approve.html?token=" +
+    encodeURIComponent(token);
+
+  await navigator.clipboard.writeText(link);
+
+  alert("Signature link copied to clipboard:\n\n" + link);
 }
  
 init();
