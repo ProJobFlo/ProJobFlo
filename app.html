@@ -3136,6 +3136,7 @@ setVal("settingsCompanyLicense", userSettings.company_license || "");
     if (preview) {
       preview.src = contractorLogoUrl;
       preview.style.display = "block";
+     applyCompanySettingsToQuote();
     }
   }
 }
