@@ -3150,6 +3150,21 @@ setVal("settingsCompanyLicense", userSettings.company_license || "");
 
   alert("Company settings saved.");
 }
+ function applyCompanySettingsToQuote() {
+  if (!userSettings) return;
+
+  if (userSettings.company_name) {
+    setVal("companyName", userSettings.company_name);
+  }
+
+  if (userSettings.company_phone) {
+    setVal("companyPhone", userSettings.company_phone);
+  }
+
+  if (userSettings.company_email) {
+    setVal("companyEmail", userSettings.company_email);
+  }
+}
  
 init();
 </script>
