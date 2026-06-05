@@ -38,6 +38,10 @@
   .final { background:#111827; color:white; border-radius:18px; padding:18px; margin-top:12px; }
   .final .stat-label { color:#cbd5e1; }
   .final .stat-value { color:white; font-size:38px; }
+ #liveNumbersCard {
+  position: sticky;
+  top: 20px;
+}
   .pill { display:inline-block; padding:5px 9px; border-radius:999px; font-size:12px; font-weight:800; margin:2px 4px 2px 0; }
   .status-Unsold { background:#fef3c7; color:#92400e; }
   .status-FollowUpDue { background:#fee2e2; color:#991b1b; }
@@ -413,7 +417,7 @@
       </div>
 
       <div>
-        <div class="card">
+        <div class="card" id="liveNumbersCard">
           <h2>Live Numbers</h2>
           <div class="stat"><div class="stat-label">Measured Sqft</div><div id="measuredSqft" class="stat-value">0.00</div></div>
           <div class="stat"><div class="stat-label">Order Sqft</div><div id="orderSqft" class="stat-value">0.00</div></div>
