@@ -2601,6 +2601,46 @@ if (cloudSummary) {
   const el = document.getElementById(id);
   if (el) el.value = value;
  }
+ let contractorLogoUrl = "";
+
+async function uploadContractorLogo(file) {
+  const ok = await requireLoggedIn();
+  if (!ok) return;
+
+  if (!file) return;
+
+  const fileExt = file.name.split(".").pop() || "png";
+  const fileName = currentUser.id + "/company-logo-" + Date.now() + "." + fileExt;
+
+  const { error } = await supabaseClient.storage
+    .from("contractor-logos")
+    .upload(fileName, file, {
+      upsert: true
+    });
+
+  if (error) {
+    console.error(error);
+    alert("Logo did not upload: " + error.message);
+    return;
+  }
+
+  const { data } = supabaseClient.storage
+    .from("contractor-logos")
+    .getPublicUrl(fileName);
+
+  contractorLogoUrl = data.publicUrl;
+
+  const status = document.getElementById("companyLogoStatus");
+  if (status) status.textContent = "Logo uploaded successfully.";
+
+  const preview = document.getElementById("companyLogoPreview");
+  if (preview) {
+    preview.src = contractorLogoUrl;
+    preview.style.display = "block";
+  }
+
+  alert("Company logo uploaded.");
+}
 async function generateQuotePDF() {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
