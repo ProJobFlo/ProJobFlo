@@ -1841,7 +1841,33 @@ function getJobDayNumber(job,iso){const start=new Date(job.date+"T00:00:00");con
 function renderCalendar(){const title=currentMonth.toLocaleDateString(undefined,{month:"long",year:"numeric"});document.getElementById("calendarTitle").textContent=title;const cal=document.getElementById("calendar");if(!cal)return;cal.innerHTML="";const year=currentMonth.getFullYear();const month=currentMonth.getMonth();const first=new Date(year,month,1);const start=new Date(first);start.setDate(first.getDate()-first.getDay());for(let i=0;i<42;i++){const day=new Date(start);day.setDate(start.getDate()+i);const iso=fmtDate(day);const div=document.createElement("div");div.className="day";if(day.getMonth()!==month)div.classList.add("muted");if(iso===selectedDate)div.classList.add("selected");const number=document.createElement("div");number.className="day-number";number.textContent=day.getDate();div.appendChild(number);jobs.filter(j=>jobCoversDate(j,iso)).forEach(job=>{const event=document.createElement("div");event.className="event "+calendarStatusClass(job.status);const dayNum=getJobDayNumber(job,iso);event.innerHTML="<strong>"+escapeHtml(job.customer||"Unnamed")+"</strong><br>"+escapeHtml(job.status)+" • "+escapeHtml(job.crew)+" • Day "+dayNum+"/"+(Number(job.duration)||1);
 event.onclick=function(){editScheduledJob(job.id);};
 div.appendChild(event);});cal.appendChild(div);}}
-function renderSelectedJobs(){const box=document.getElementById("selectedJobs");if(!box)return;const dayJobs=jobs.filter(j=>jobCoversDate(j,selectedDate));if(!dayJobs.length){box.innerHTML="<p class='small'>No jobs scheduled for "+displayDate(selectedDate)+".</p>";return;}box.innerHTML=dayJobs.map(j=>`<div class="job-card"><div class="title">${escapeHtml(j.customer)}</div><div class="small">${escapeHtml(j.address||"")}</div><div>Crew: <strong>${escapeHtml(j.crew)}</strong></div><div>Status: <span class="pill ${statusClass(j.status)}">${escapeHtml(j.status)}</span></div><div>Total: <strong>${dollars(j.total)}</strong></div><div class="small">Duration: ${escapeHtml(j.duration)} day(s)</div>
+function renderSelectedJobs(){
+  const box = document.getElementById("selectedJobs");
+  if(!box) return;
+
+  const dayJobs = jobs.filter(j => jobCoversDate(j, selectedDate));
+
+  if(!dayJobs.length){
+    box.innerHTML = "<p class='small'>No jobs scheduled for this date.</p>";
+    return;
+  }
+
+  box.innerHTML = dayJobs.map(j => `
+    <div class="job-card">
+      <div class="title">${escapeHtml(j.customer || "Unnamed")}</div>
+      <div class="small">${escapeHtml(j.address || "")}</div>
+      <div>Crew: <strong>${escapeHtml(j.crew || "")}</strong></div>
+      <div>Status: <span class="pill status-${escapeAttr(j.status || "Scheduled")}">${escapeHtml(j.status || "Scheduled")}</span></div>
+      <div>Total: <strong>${dollars(j.total || 0)}</strong></div>
+      <div>Duration: ${escapeHtml(j.duration || "1")} day(s)</div>
+
+      <div class="actions" style="margin-top:8px;">
+        <button class="secondary" onclick="editScheduledJob('${j.id}')">Edit</button>
+        <button class="danger" onclick="editingJobId='${j.id}'; deleteScheduledJob();">Delete</button>
+      </div>
+    </div>
+  `).join("");
+}
 <div class="actions" style="margin-top:8px;">
   <button class="secondary" onclick="editScheduledJob(${j.id})">Edit</button>
   <button class="danger" onclick="editingJobId=${j.id}; deleteScheduledJob();">Delete</button>
