@@ -2103,6 +2103,7 @@ async function signIn() {
 
   currentUser = data.user;
  document.getElementById("authBox").style.display = "none";
+ document.getElementById("logoutBtn").style.display = "inline-block";
 
   document.getElementById("authStatus").textContent =
     "Logged in as " + currentUser.email;
@@ -2114,6 +2115,7 @@ async function signOut() {
 
   currentUser = null;
  document.getElementById("authBox").style.display = "block";
+ document.getElementById("logoutBtn").style.display = "none";
 
   document.getElementById("authStatus").textContent =
     "Not logged in.";
