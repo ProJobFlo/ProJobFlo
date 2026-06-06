@@ -1872,7 +1872,8 @@ function renderSelectedJobs(){
   <button class="secondary" onclick="editScheduledJob(${j.id})">Edit</button>
   <button class="danger" onclick="editingJobId=${j.id}; deleteScheduledJob();">Delete</button>
 </div>
-</div>`).join("");}
+</div>`).join("");
+ }
 
 function renderCustomers(){
   const box=document.getElementById("customerList");
