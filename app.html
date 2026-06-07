@@ -1556,13 +1556,25 @@ function getOrCreateCustomer(){
  if(found){found.name=name||found.name;found.phone=phone||found.phone;found.email=email||found.email;found.address=address||found.address;return found;}
  const customer={id:Date.now()+Math.random(),name,phone,email,address,createdAt:nowMs()};customers.push(customer);return customer;
 }
-function saveCurrentQuote(){
- if(!val("customerName")){alert("Enter customer name first.");return;}
- const customer=getOrCreateCustomer();const status=val("quoteSaveStatus");const followHours=Number(val("followUpHours"))||48;const createdAt=nowMs();
- const quote={id:Date.now()+Math.random(),customerId:customer.id,estimateNumber:val("estimateNumber"),amount:getCurrentQuoteTotal().toFixed(2),depositRequired:(getCurrentQuoteTotal()*((num("depositPercent")||0)/100)).toFixed(2),status,notes:val("notes"),quoteText:document.getElementById("quotePreview").textContent,profitSnapshot:profitTotals(),lineItemsSnapshot:lineItems,createdAt,lastFollowedUpAt:null,nextFollowUpAt:createdAt+followHours*60*60*1000,followUpHours};
- quotes.push(quote);renderAll();alert(status==="Sold"?"Quote saved as sold. Go to Schedule tab to schedule it.":"Unsold quote saved for follow-up.");
-}
+async function saveCurrentQuote(){
+  if(!val("customerName")){
+    alert("Enter customer name first.");
+    return;
+  }
 
+  const ok = await requireLoggedIn();
+  if(!ok) return;
+
+  await saveCurrentQuoteToCloud();
+
+  await loadAllCloudData();
+
+  alert(
+    val("quoteSaveStatus") === "Sold"
+      ? "Quote saved to cloud as sold. Go to Schedule tab to schedule it."
+      : "Unsold quote saved to cloud for follow-up."
+  );
+}
 function startNewQuote(){
  const proceed = confirm("Start a new quote? This will clear the current quote screen. Saved customers, quotes, follow-ups, and scheduled jobs will stay saved.");
  if(!proceed)return;
