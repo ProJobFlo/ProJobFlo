@@ -2352,6 +2352,36 @@ async function loadQuotesFromCloud() {
 
   quotes = (data || []).map(q => {
     const payload = q.quote_data || {};
+    const createdMs = q.created_at ? new Date(q.created_at).getTime() : nowMs();
+    const followHours = Number(payload.followUpHours || q.follow_up_hours || 48);
+
+    return {
+      id: q.id,
+      customerId: q.customer_id,
+      estimateNumber: q.estimate_number || "",
+      amount: Number(q.total) || 0,
+      depositRequired: payload.depositRequired || 0,
+      status: q.status || "Unsold",
+      notes: payload.notes || "",
+      quoteText: payload.quoteText || "",
+      profitSnapshot: payload.profitSnapshot || {},
+      lineItemsSnapshot: payload.lineItems || payload.lineItemsSnapshot || [],
+      roomsSnapshot: payload.rooms || payload.roomsSnapshot || [],
+      roomPhotosSnapshot: payload.roomPhotos || payload.roomPhotosSnapshot || {},
+      createdAt: createdMs,
+      lastFollowedUpAt: payload.lastFollowedUpAt || null,
+      nextFollowUpAt: payload.nextFollowUpAt || createdMs + followHours * 60 * 60 * 1000,
+      followUpHours: followHours,
+      acceptedAt: payload.acceptedAt || null,
+      quoteData: payload
+    };
+  });
+
+  renderAll();
+}
+
+  quotes = (data || []).map(q => {
+    const payload = q.quote_data || {};
     return {
       id: q.id,
       customer: payload.customer?.name || "Unnamed Customer",
