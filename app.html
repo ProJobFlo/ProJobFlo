@@ -2452,30 +2452,6 @@ async function loadQuotesFromCloud() {
 
   renderAll();
 }
-
-  quotes = (data || []).map(q => {
-    const payload = q.quote_data || {};
-    return {
-      id: q.id,
-      customer: payload.customer?.name || "Unnamed Customer",
-      phone: payload.customer?.phone || "",
-      email: payload.customer?.email || "",
-      address: payload.customer?.address || "",
-      amount: Number(q.total) || 0,
-      status: q.status || "Unsold",
-      estimateNumber: q.estimate_number || "",
-      quoteData: payload,
-      createdAt: q.created_at
-    };
-  });
-
-  renderAll();
-
-  const authStatus = document.getElementById("authStatus");
-  if (authStatus) {
-    authStatus.textContent =
-      "Logged in as " + currentUser.email + " — Cloud quotes loaded: " + quotes.length;
-  }
  
  async function saveJobsToCloud() {
   const ok = await requireLoggedIn();
@@ -3361,9 +3337,7 @@ setVal("settingsCompanyLicense", userSettings.company_license || "");
     return;
   }
 
-  const estimateNumber =
-    document.getElementById("estimateNumber")?.textContent ||
-    Date.now();
+  const estimateNumber = val("estimateNumber") || Date.now();
 
   const total =
     Number(
@@ -3372,7 +3346,13 @@ setVal("settingsCompanyLicense", userSettings.company_license || "");
         .replace(",", "")
     ) || 0;
 
-  const approvalLink = await createSignatureLink();
+  const saved = await saveCurrentQuoteToCloud();
+
+if (!saved) return;
+
+const approvalLink = await createSignatureLink();
+
+if (!approvalLink) return;
 
 if (!approvalLink) return;
 
