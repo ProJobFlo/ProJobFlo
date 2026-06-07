@@ -2403,7 +2403,7 @@ async function loadQuotesFromCloud() {
     authStatus.textContent =
       "Logged in as " + currentUser.email + " — Cloud quotes loaded: " + quotes.length;
   }
-}
+ 
  async function saveJobsToCloud() {
   const ok = await requireLoggedIn();
   if (!ok) return;
