@@ -2382,6 +2382,10 @@ savedCustomer = customerData;
   currentCloudQuoteId = crypto.randomUUID();
 }
 
+if (!currentCloudQuoteId) {
+  currentCloudQuoteId = crypto.randomUUID();
+}
+
 const { data, error } = await supabaseClient
   .from("quotes")
   .upsert({
