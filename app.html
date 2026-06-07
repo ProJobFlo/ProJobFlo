@@ -1090,6 +1090,9 @@ function showTab(tab) {
   document.getElementById("view" + cap(tab)).classList.remove("hidden");
   document.getElementById("tab" + cap(tab)).classList.add("active");
   renderAll();
+ if (tab === "quote") {
+  setTimeout(setupSignaturePad, 50);
+}
 }
 function cap(s){return s.charAt(0).toUpperCase()+s.slice(1);}
 function dollars(v){return "$"+Number(v||0).toFixed(2);}
