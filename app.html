@@ -1376,7 +1376,11 @@ function setDefaultRoomsForTemplate(templateName, forceDefaultRooms=false){
 function loadTemplate(forceDefaultRooms=false){
  const selected=val("templateSelect") || enabledTrades[0] || "lvp";
  const base=templates[selected]||[];
- lineItems=base.map(item=>({id:Date.now()+Math.random(),costRate:"",...item}));
+lineItems = base.map(item => ({
+  id: Date.now() + Math.random(),
+  costRate: "",
+  ...item
+}));
  applyPresetRatesToTemplate(selected);
  setDefaultRoomsForTemplate(selected, forceDefaultRooms);
  renderLineItems();
