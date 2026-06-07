@@ -2262,25 +2262,21 @@ async function saveCurrentQuoteToCloud() {
     notes: val("notes")
   };
 
-  let savedCustomer = null;
-let customerError = null;
+ let savedCustomer = null;
 
-if (currentCloudCustomerId) {
-  savedCustomer = { id: currentCloudCustomerId };
-} else {
-  const result = await supabaseClient
-    .from("customers")
-    .insert(customerPayload)
-    .select()
-    .single();
+const customerId = currentCloudCustomerId || crypto.randomUUID();
+currentCloudCustomerId = customerId;
 
-  savedCustomer = result.data;
-  customerError = result.error;
+const { data: customerData, error: customerError } = await supabaseClient
+  .from("customers")
+  .upsert({
+    id: customerId,
+    ...customerPayload
+  })
+  .select()
+  .single();
 
-  if (savedCustomer) {
-    currentCloudCustomerId = savedCustomer.id;
-  }
-}
+savedCustomer = customerData;
 
   if (customerError) {
     console.error(customerError);
@@ -2332,11 +2328,11 @@ if (currentCloudCustomerId) {
   if (error) {
     console.error(error);
     alert("Quote did not save to cloud: " + error.message);
-    return;
+    return false;
   }
 
-  alert("Quote saved to cloud. Estimate #" + data.estimate_number);
-  await loadQuotesFromCloud();
+ await loadQuotesFromCloud();
+return true;
 }
 
 async function loadQuotesFromCloud() {
