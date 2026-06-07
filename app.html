@@ -1569,11 +1569,13 @@ async function saveCurrentQuote(){
   const ok = await requireLoggedIn();
   if(!ok) return;
 
-  await saveCurrentQuoteToCloud();
+  const saved = await saveCurrentQuoteToCloud();
 
-  await loadAllCloudData();
+if (!saved) return;
 
-  alert(
+await loadAllCloudData();
+
+alert(
     val("quoteSaveStatus") === "Sold"
       ? "Quote saved to cloud as sold. Go to Schedule tab to schedule it."
       : "Unsold quote saved to cloud for follow-up."
