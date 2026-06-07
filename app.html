@@ -1756,6 +1756,7 @@ async function emailContract(){
         contractor_logo: contractorLogoUrl,
         signed_contract_text: buildSignedAgreementText(),
         signed_at: acceptedAt || new Date().toLocaleString()
+       signature_image: document.getElementById("signaturePad").toDataURL("image/png"),
       })
     }
   );
