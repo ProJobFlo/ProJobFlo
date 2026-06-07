@@ -1705,10 +1705,69 @@ function setupSignaturePad(){const canvas=document.getElementById("signaturePad"
 function clearSignature(){const canvas=document.getElementById("signaturePad");if(!canvas)return;const ctx=canvas.getContext("2d");ctx.clearRect(0,0,canvas.width,canvas.height);signatureComplete=false;acceptedAt="";document.getElementById("acceptedStatus").textContent="Signature cleared.";}
 function buildSignedAgreementText(){return document.getElementById("quotePreview").textContent+"\n\nACCEPTANCE\nCustomer: "+(val("customerSignatureName")||val("customerName")||"Customer")+"\nContractor: "+(val("contractorName")||val("companyName")||"Contractor")+"\nDeposit collected: $"+(val("depositCollected")||"0")+"\n"+(acceptedAt?"Accepted on: "+acceptedAt:"Not accepted yet")+"\nCustomer signed on contractor device.";}
 function downloadSignedContract(){const blob=new Blob([buildSignedAgreementText()],{type:"text/plain"});const url=URL.createObjectURL(blob);const link=document.createElement("a");link.href=url;link.download="signed-contract.txt";document.body.appendChild(link);link.click();document.body.removeChild(link);URL.revokeObjectURL(url);}
-function emailContract(){
- const email=val("customerEmail");
- if(!email){alert("Enter customer email first.");return;}
- window.location.href="mailto:"+encodeURIComponent(email)+"?subject="+encodeURIComponent("Signed Project Contract")+"&body="+encodeURIComponent(buildSignedAgreementText());
+async function emailContract(){
+  const customerName = val("customerName") || val("customerSignatureName") || "Customer";
+  const customerEmail = val("customerEmail");
+
+  if(!customerEmail){
+    alert("Enter customer email first.");
+    return;
+  }
+
+  if(!signatureComplete && !acceptedAt){
+    alert("Please have the customer sign first.");
+    return;
+  }
+
+  const { data: sessionData } = await supabaseClient.auth.getSession();
+  const token = sessionData.session?.access_token;
+
+  if(!token){
+    alert("Please login first.");
+    return;
+  }
+
+  const estimateNumber = val("estimateNumber") || Date.now();
+
+  const total =
+    Number(
+      (document.getElementById("grandTotal")?.textContent || "0")
+        .replace("$", "")
+        .replace(",", "")
+    ) || 0;
+
+  const response = await fetch(
+    "https://fwklbatktyqxlwkkiwbh.supabase.co/functions/v1/super-processor",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token
+      },
+      body: JSON.stringify({
+        email_type: "signed_contract",
+        customer_name: customerName,
+        customer_email: customerEmail,
+        estimate_number: estimateNumber,
+        total: total,
+        contractor_name: val("companyName"),
+        contractor_phone: val("companyPhone"),
+        contractor_email: val("companyEmail"),
+        contractor_logo: contractorLogoUrl,
+        signed_contract_text: buildSignedAgreementText(),
+        signed_at: acceptedAt || new Date().toLocaleString()
+      })
+    }
+  );
+
+  if(!response.ok){
+    const errorText = await response.text();
+    console.error(errorText);
+    alert("Signed contract email failed to send.");
+    return;
+  }
+
+  alert("Signed contract emailed successfully.");
 }
 
 function isDue(q){return q.status==="Unsold"&&q.nextFollowUpAt<=nowMs();}
