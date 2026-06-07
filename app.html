@@ -2378,24 +2378,31 @@ savedCustomer = customerData;
     }
   };
 
-  const { data, error } = await supabaseClient
-    .from("quotes")
-    .insert({
-      user_id: currentUser.id,
-      customer_id: savedCustomer.id,
-      estimate_number: val("estimateNumber"),
-      status: val("quoteSaveStatus"),
-      total: total,
-      quote_data: quotePayload
-    })
-    .select()
-    .single();
+  if (!currentCloudQuoteId) {
+  currentCloudQuoteId = crypto.randomUUID();
+}
+
+const { data, error } = await supabaseClient
+  .from("quotes")
+  .upsert({
+    id: currentCloudQuoteId,
+    user_id: currentUser.id,
+    customer_id: savedCustomer.id,
+    estimate_number: val("estimateNumber"),
+    status: val("quoteSaveStatus"),
+    total: total,
+    quote_data: quotePayload
+  })
+  .select()
+  .single();
 
   if (error) {
     console.error(error);
     alert("Quote did not save to cloud: " + error.message);
     return false;
   }
+ 
+ currentCloudQuoteId = data.id;
 
  await loadQuotesFromCloud();
 return true;
