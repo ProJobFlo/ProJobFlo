@@ -319,10 +319,9 @@
         alert("Proposal signed, but quote status did not update.");
         return;
       }
-      const contractorEmail =
-  loadedQuote.quote_data?.company?.email || "hmtully5@gmail.com";
+      const contractorEmail = "hmtully5@gmail.com";
 
-const { error: emailError } = await supabaseClient.functions.invoke(
+const { data: emailData, error: emailError } = await supabaseClient.functions.invoke(
   "send-signature-email",
   {
     body: {
@@ -336,14 +335,18 @@ const { error: emailError } = await supabaseClient.functions.invoke(
 );
 
 if (emailError) {
-  console.error(emailError);
+  console.error("Contractor notification email failed:", emailError);
+  alert("Proposal was accepted, but contractor email failed: " + emailError.message);
+  return;
 }
+
+console.log("Contractor notification email sent:", emailData);
 
       document.getElementById("status").textContent =
         "Proposal accepted. Thank you.";
 
       document.getElementById("acceptCard").style.display = "none";
-      alert("Proposal accepted successfully.");
+      alert("Proposal accepted successfully. Contractor has been notified.");
     }
 
     loadProposal();
