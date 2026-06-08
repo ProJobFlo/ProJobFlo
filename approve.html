@@ -116,6 +116,11 @@
       <div class="total" id="proposalTotal">$0.00</div>
     </div>
 
+    <div id="lineItemCard" class="card" style="display:none;">
+  <h2>Proposal Details</h2>
+  <div id="approveLineItems"></div>
+</div>
+
     <div id="acceptCard" class="card" style="display:none;">
       <h2>Accept Proposal</h2>
       <p class="small">
@@ -216,6 +221,7 @@
 
       document.getElementById("proposalTotal").textContent =
         dollars(data.total);
+      renderApproveLineItems(q);
 
       document.getElementById("proposalCard").style.display = "block";
       document.getElementById("acceptCard").style.display = "block";
@@ -271,6 +277,45 @@
     function clearSignature() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
+
+    function resolveLineQty(item, totals) {
+  if (item.qtySource === "measured") return Number(totals.measuredSqft) || 0;
+  if (item.qtySource === "order") return Number(totals.orderSqft) || 0;
+  return Number(item.qty) || 0;
+}
+
+function renderApproveLineItems(q) {
+  const box = document.getElementById("approveLineItems");
+  const card = document.getElementById("lineItemCard");
+  if (!box || !card) return;
+
+  const items = q.lineItems || [];
+  const totals = q.totals || {};
+
+  if (!items.length) {
+    card.style.display = "none";
+    return;
+  }
+
+  box.innerHTML = items.map(item => {
+    const qty = resolveLineQty(item, totals);
+    const rate = Number(item.rate) || 0;
+    const amount = qty * rate;
+
+    return `
+      <div style="display:flex;justify-content:space-between;gap:14px;border-bottom:1px solid #e5e7eb;padding:10px 0;">
+        <div>
+          <strong>${item.service || "Line Item"}</strong><br>
+          <span style="color:#6b7280;font-size:14px;">${item.description || ""}</span><br>
+          <span style="color:#6b7280;font-size:13px;">${qty.toFixed(2)} ${item.unit || ""} × $${rate.toFixed(2)}</span>
+        </div>
+        <strong>$${amount.toFixed(2)}</strong>
+      </div>
+    `;
+  }).join("");
+
+  card.style.display = "block";
+}
 
     async function acceptProposal() {
       if (!loadedQuote) {
