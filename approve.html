@@ -284,6 +284,15 @@
   return Number(item.qty) || 0;
 }
 
+    function escapeHtml(value) {
+  return String(value || "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+    
 function renderApproveLineItems(q) {
   const box = document.getElementById("approveLineItems");
   const card = document.getElementById("lineItemCard");
@@ -297,22 +306,42 @@ function renderApproveLineItems(q) {
     return;
   }
 
-  box.innerHTML = items.map(item => {
+  const rows = items.map(item => {
     const qty = resolveLineQty(item, totals);
     const rate = Number(item.rate) || 0;
     const amount = qty * rate;
 
     return `
-      <div style="display:flex;justify-content:space-between;gap:14px;border-bottom:1px solid #e5e7eb;padding:10px 0;">
+      <div style="display:grid;grid-template-columns:1fr auto;gap:14px;border-bottom:1px solid #e5e7eb;padding:12px 0;">
         <div>
-          <strong>${item.service || "Line Item"}</strong><br>
-          <span style="color:#6b7280;font-size:14px;">${item.description || ""}</span><br>
-          <span style="color:#6b7280;font-size:13px;">${qty.toFixed(2)} ${item.unit || ""} × $${rate.toFixed(2)}</span>
+          <strong>${escapeHtml(item.service || "Line Item")}</strong><br>
+          <span style="color:#6b7280;font-size:14px;">${escapeHtml(item.description || "")}</span><br>
+          <span style="color:#6b7280;font-size:13px;">${qty.toFixed(2)} ${escapeHtml(item.unit || "")} × $${rate.toFixed(2)}</span>
         </div>
-        <strong>$${amount.toFixed(2)}</strong>
+        <strong>${dollars(amount)}</strong>
       </div>
     `;
   }).join("");
+
+  const subtotal = Number(totals.subtotal) || 0;
+  const tax = Number(totals.tax) || 0;
+  const total = Number(totals.grandTotal) || Number(loadedQuote?.total) || 0;
+
+  box.innerHTML = `
+    ${rows}
+    <div style="display:grid;grid-template-columns:1fr auto;gap:14px;padding:14px 0 4px;">
+      <strong>Subtotal</strong>
+      <strong>${dollars(subtotal)}</strong>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr auto;gap:14px;padding:4px 0;">
+      <span style="color:#6b7280;">Tax</span>
+      <strong>${dollars(tax)}</strong>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr auto;gap:14px;padding:12px 0 0;border-top:2px solid #111827;margin-top:8px;font-size:20px;">
+      <strong>Total</strong>
+      <strong>${dollars(total)}</strong>
+    </div>
+  `;
 
   card.style.display = "block";
 }
