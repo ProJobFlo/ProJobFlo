@@ -1703,31 +1703,56 @@ function startNewQuote(){
  window.scrollTo({top:0, behavior:"smooth"});
 }
 
-function newQuote(){
- currentCloudCustomerId = null;
-currentCloudQuoteId = null;
- advanceEstimateNumber();
- rooms=[];
- roomPhotos={};
- lineItems=[];
- signatureComplete=false;
- acceptedAt="";
- lastAcceptedQuoteId=null;
- ["customerName","customerPhone","customerEmail","jobAddress","notes","depositCollected","customerSignatureName","contractorName","soldDepositCollected"].forEach(id=>{
-   const el=document.getElementById(id);
-   if(el) el.value="";
- });
- const soldScreen=document.getElementById("soldScreen");
- if(soldScreen) soldScreen.classList.add("hidden");
- clearSignature();
- setEstimateNumberToNext();
- loadTemplate(false);
- applyCompanySettingsToQuote();
- renderRooms();
- renderLineItems();
- calculateQuote();
-}
+ffunction newQuote(){
+  autoSaveEnabled = false;
 
+  currentCloudCustomerId = null;
+  currentCloudQuoteId = null;
+
+  rooms = [];
+  roomPhotos = {};
+  lineItems = [];
+
+  signatureComplete = false;
+  acceptedAt = "";
+  lastAcceptedQuoteId = null;
+
+  [
+    "customerName",
+    "customerPhone",
+    "customerEmail",
+    "jobAddress",
+    "notes",
+    "depositCollected",
+    "customerSignatureName",
+    "contractorName",
+    "soldDepositCollected"
+  ].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = "";
+  });
+
+  const soldScreen = document.getElementById("soldScreen");
+  if (soldScreen) soldScreen.classList.add("hidden");
+
+  const acceptedStatus = document.getElementById("acceptedStatus");
+  if (acceptedStatus) acceptedStatus.textContent = "";
+
+  const quoteSaveStatus = document.getElementById("quoteSaveStatus");
+  if (quoteSaveStatus) quoteSaveStatus.value = "Unsold";
+
+  clearSignature();
+  setEstimateNumberToNext();
+  loadTemplate(false);
+  applyCompanySettingsToQuote();
+  renderRooms();
+  renderLineItems();
+  calculateQuote();
+
+  setTimeout(() => {
+    autoSaveEnabled = true;
+  }, 500);
+}
 
 function saveAcceptedQuoteAsSold(){
  if(!val("customerName")){alert("Enter customer name first.");return null;}
