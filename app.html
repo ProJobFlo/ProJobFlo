@@ -2088,7 +2088,8 @@ function renderSelectedJobs(){
       <div>Total: <strong>${dollars(j.total || 0)}</strong></div>
       <div>Duration: ${escapeHtml(j.duration || "1")} day(s)</div>
 
-      <div class="actions" style="margin-top:8px;">
+           <div class="actions" style="margin-top:8px;">
+        <button class="success" onclick="openGoogleCalendarForJob('${j.id}')">Add to Google Calendar</button>
         <button class="secondary" onclick="editScheduledJob('${j.id}')">Edit</button>
         <button class="danger" onclick="editingJobId='${j.id}'; deleteScheduledJob();">Delete</button>
       </div>
@@ -2412,6 +2413,58 @@ function renderDashboard(){
 function renderStats(){document.getElementById("statCustomers").textContent=customers.length;document.getElementById("statUnsold").textContent=quotes.filter(q=>q.status==="Unsold").length;document.getElementById("statDue").textContent=quotes.filter(q=>isDue(q)).length;document.getElementById("statScheduled").textContent=jobs.length;}
 function renderAll(){calculateQuote();renderStats();renderDashboard();renderFollowUps();renderScheduleQuoteSelect();renderCalendar();renderSelectedJobs();renderCustomers();renderProfitMode();renderMoneyTracker();}
 
+function googleCalendarDateRange(startIso, durationDays) {
+  const start = new Date(startIso + "T00:00:00");
+  const end = new Date(start);
+  end.setDate(start.getDate() + Math.max(1, Number(durationDays) || 1));
+
+  const fmt = d =>
+    d.getFullYear().toString() +
+    String(d.getMonth() + 1).padStart(2, "0") +
+    String(d.getDate()).padStart(2, "0");
+
+  return fmt(start) + "/" + fmt(end);
+}
+
+function buildGoogleCalendarUrl(job) {
+  const title = "ProJobFlo Job - " + (job.customer || "Customer");
+  const dates = googleCalendarDateRange(job.date, job.duration);
+
+  const details =
+    "Customer: " + (job.customer || "") + "\n" +
+    "Address: " + (job.address || "") + "\n" +
+    "Crew: " + (job.crew || "") + "\n" +
+    "Status: " + (job.status || "") + "\n" +
+    "Total: " + dollars(job.total || 0) + "\n\n" +
+    "Notes:\n" + (job.notes || "");
+
+  const params = new URLSearchParams({
+    action: "TEMPLATE",
+    text: title,
+    dates: dates,
+    details: details,
+    location: job.address || ""
+  });
+
+  return "https://calendar.google.com/calendar/render?" + params.toString();
+}
+
+function openGoogleCalendarForJob(jobId) {
+  const job = jobs.find(j => String(j.id) === String(jobId));
+
+  if (!job) {
+    alert("Could not find this scheduled job.");
+    return;
+  }
+
+  if (!job.date) {
+    alert("This job needs a schedule date first.");
+    return;
+  }
+
+  window.open(buildGoogleCalendarUrl(job), "_blank");
+}
+ 
 async function copyText(text){await navigator.clipboard.writeText(text);alert("Copied.");}
 function openSms(phone,msg){if(!phone){alert("No phone number.");return;}window.location.href="sms:"+encodeURIComponent(phone)+"?&body="+encodeURIComponent(msg);}
 function openEmail(email,msg){if(!email){alert("No email.");return;}window.location.href="mailto:"+encodeURIComponent(email)+"?subject="+encodeURIComponent("Following up on your flooring quote")+"&body="+encodeURIComponent(msg);}
