@@ -373,8 +373,14 @@ function renderApproveLineItems(q) {
         alert("Proposal signed, but quote status did not update.");
         return;
       }
-      const contractorEmail = "hmtully5@gmail.com";
+      const contractorEmail =
+  loadedQuote?.quote_data?.company?.email ||
+  "";
 
+if (!contractorEmail) {
+  alert("Proposal accepted, but contractor email is missing. Please contact the contractor directly.");
+  return;
+}
 const { data: emailData, error: emailError } = await supabaseClient.functions.invoke(
   "send-signature-email",
   {
