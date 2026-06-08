@@ -231,10 +231,10 @@
           <h2>Business Dashboard</h2>
           <p class="small">This is the real home screen: what needs attention and how much work is in the pipeline.</p>
           <div class="stat-grid">
-            <div class="stat"><div class="stat-label">Quoted Revenue</div><div id="dashQuotedRevenue" class="stat-value">$0.00</div></div>
-            <div class="stat"><div class="stat-label">Sold Revenue</div><div id="dashSoldRevenue" class="stat-value">$0.00</div></div>
-            <div class="stat"><div class="stat-label">Scheduled Revenue</div><div id="dashScheduledRevenue" class="stat-value">$0.00</div></div>
-            <div class="stat"><div class="stat-label">Est. Gross Profit</div><div id="dashGrossProfit" class="stat-value">$0.00</div></div>
+            <div class="stat"><div class="stat-label">Open Quotes</div><div id="dashOpenQuotes" class="stat-value">0</div></div>
+            <div class="stat"><div class="stat-label">Sold This Month</div><div id="dashSoldThisMonth" class="stat-value">$0.00</div></div>
+            <div class="stat"><div class="stat-label">Scheduled Jobs</div><div id="dashScheduledJobs" class="stat-value">0</div></div>
+            <div class="stat"><div class="stat-label">Outstanding Balance</div><div id="dashOutstandingBalance" class="stat-value">$0.00</div></div>
           </div>
         </div>
 
@@ -2258,17 +2258,35 @@ function recordDepositAndSchedule(){
 }
 
 function renderDashboard(){
- const quotedRevenue = quotes.reduce((s,q)=>s+Number(q.amount||0),0);
- const soldRevenue = quotes.filter(q=>q.status==="Sold"||q.status==="Scheduled").reduce((s,q)=>s+Number(q.amount||0),0);
- const scheduledRevenue = jobs.reduce((s,j)=>s+Number(j.total||0),0);
- const grossProfit = quotes.reduce((s,q)=>s+Number((q.profitSnapshot&&q.profitSnapshot.profit)||0),0);
+  const now = new Date();
+ const thisMonth = now.getMonth();
+ const thisYear = now.getFullYear();
+
+ const openQuotes = quotes.filter(q => q.status === "Unsold").length;
+
+ const soldThisMonth = quotes
+   .filter(q => q.status === "Sold" || q.status === "Scheduled")
+   .filter(q => {
+     const d = new Date(Number(q.signedAt || q.signed_at || q.updatedAt || q.createdAt || 0));
+     return d.getMonth() === thisMonth && d.getFullYear() === thisYear;
+   })
+   .reduce((s,q) => s + Number(q.amount || 0), 0);
+
+ const scheduledJobs = jobs.filter(j => j.status !== "Complete").length;
+
+ const outstandingBalance = jobs.reduce((sum, job) => {
+   const total = Number(job.total || 0);
+   const collected = payments
+     .filter(p => String(p.quoteId) === String(job.quoteId))
+     .reduce((s,p) => s + Number(p.amount || 0), 0);
+   return sum + Math.max(0, total - collected);
+ }, 0);
 
  const setText=(id,value)=>{const el=document.getElementById(id);if(el)el.textContent=value;};
- setText("dashQuotedRevenue",dollars(quotedRevenue));
- setText("dashSoldRevenue",dollars(soldRevenue));
- setText("dashScheduledRevenue",dollars(scheduledRevenue));
- setText("dashGrossProfit",dollars(grossProfit));
-
+ setText("dashOpenQuotes", openQuotes);
+ setText("dashSoldThisMonth", dollars(soldThisMonth));
+ setText("dashScheduledJobs", scheduledJobs);
+ setText("dashOutstandingBalance", dollars(outstandingBalance));
  const attention=document.getElementById("dashAttention");
  if(attention){
    const due=quotes.filter(q=>isDue(q));
