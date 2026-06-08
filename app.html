@@ -3433,8 +3433,10 @@ doc.text("PROJECT PROPOSAL", 14, 42);
   const { error } = await supabaseClient
     .from("quotes")
     .update({
-      signature_token: token,
-      signature_status: "Sent"
+            signature_token: token,
+      signature_status: "Sent",
+      sent_at: new Date().toISOString(),
+      expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
     })
     .eq("id", currentCloudQuoteId)
     .eq("user_id", currentUser.id);
@@ -3661,11 +3663,20 @@ setEstimateNumberToNext();
   const token =
     crypto.randomUUID() + "-" + Date.now();
 
+    const sentAt = new Date().toISOString();
+
+  const expirationDate = new Date();
+  expirationDate.setDate(expirationDate.getDate() + 30);
+
+  const expiresAt = expirationDate.toISOString();
+
   const { error } = await supabaseClient
     .from("quotes")
     .update({
       signature_token: token,
-      signature_status: "Sent"
+      signature_status: "Sent",
+      sent_at: sentAt,
+      expires_at: expiresAt
     })
     .eq("id", currentCloudQuoteId)
     .eq("user_id", currentUser.id);
