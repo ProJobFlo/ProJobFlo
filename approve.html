@@ -121,6 +121,11 @@
   <div id="approveLineItems"></div>
 </div>
 
+    <div id="photoCard" class="card" style="display:none;">
+  <h2>Project Photos</h2>
+  <div id="approvePhotos"></div>
+</div>
+
     <div id="acceptCard" class="card" style="display:none;">
       <h2>Accept Proposal</h2>
       <p class="small">
@@ -222,6 +227,7 @@
       document.getElementById("proposalTotal").textContent =
         dollars(data.total);
       renderApproveLineItems(q);
+      renderApprovePhotos(q);
 
       document.getElementById("proposalCard").style.display = "block";
       document.getElementById("acceptCard").style.display = "block";
@@ -349,6 +355,69 @@ function renderApproveLineItems(q) {
     </div>
   `;
 
+  card.style.display = "block";
+}
+
+    function renderApprovePhotos(q) {
+  const card = document.getElementById("photoCard");
+  const box = document.getElementById("approvePhotos");
+
+  if (!card || !box) return;
+
+  const rooms = q.rooms || [];
+  const photos = q.roomPhotos || {};
+
+  let html = "";
+
+  rooms.forEach(room => {
+    const roomPhotos = photos[room.id] || [];
+
+    if (!roomPhotos.length) return;
+
+    html += `
+      <div style="margin-bottom:24px;">
+        <h3>${escapeHtml(room.name || "Room")}</h3>
+
+        <div style="
+          display:grid;
+          grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+          gap:12px;
+        ">
+    `;
+
+    roomPhotos.forEach(photo => {
+      const url = photo.url || photo.dataUrl || "";
+
+      if (!url) return;
+
+      html += `
+        <div>
+          <img
+            src="${url}"
+            style="
+              width:100%;
+              height:160px;
+              object-fit:cover;
+              border-radius:12px;
+              border:1px solid #e5e7eb;
+            "
+          />
+        </div>
+      `;
+    });
+
+    html += `
+        </div>
+      </div>
+    `;
+  });
+
+  if (!html) {
+    card.style.display = "none";
+    return;
+  }
+
+  box.innerHTML = html;
   card.style.display = "block";
 }
 
