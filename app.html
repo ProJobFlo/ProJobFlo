@@ -4,12 +4,12 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
  <link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#047857">
+<meta name="theme-color" content="#3b82f6">
 <link rel="apple-touch-icon" href="https://fwklbatktyqxlwkkiwbh.supabase.co/storage/v1/object/public/Logos/ProJobFlo_App_Icon.png?v=2">
 <title>ProJobFlo Contractor App</title>
 <style>
   * { box-sizing: border-box; }
-  body { margin: 0; font-family: Arial, sans-serif; background: #f4f6f8; color: #111827; }
+  body { margin: 0; font-family: Arial, sans-serif; background: #f4f6f8; color: #0f172a; }
   .app { max-width: 1300px; margin: 0 auto; padding: 18px; }
   .topbar { display:flex; justify-content:space-between; align-items:flex-end; gap:16px; margin-bottom:16px; }
   h1 { margin:0; font-size:32px; }
@@ -17,8 +17,8 @@
   h3 { margin:0 0 8px; font-size:16px; }
   p { color:#4b5563; margin:4px 0; }
   .tabs { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px; }
-  .tab { background:white; color:#111827; border:1px solid #d1d5db; }
-  .tab.active { background:#111827; color:white; }
+  .tab { background:white; color:#0f172a; border:1px solid #d1d5db; }
+  .tab.active { background:#0f172a; color:white; }
   .grid { display:grid; grid-template-columns: 2fr 1fr; gap:16px; }
   .grid-half { display:grid; grid-template-columns: 1fr 1fr; gap:16px; }
   .card { background:white; padding:16px; border-radius:18px; box-shadow:0 1px 4px rgba(0,0,0,.08); margin-bottom:16px; }
@@ -27,9 +27,9 @@
   .two { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
   input, select, textarea { width:100%; padding:11px; border:1px solid #d1d5db; border-radius:12px; font-size:15px; margin-bottom:8px; background:white; }
   textarea { min-height:75px; resize:vertical; }
-  button { border:none; background:#111827; color:white; padding:11px 14px; border-radius:14px; font-weight:700; cursor:pointer; }
-  button.secondary { background:white; color:#111827; border:1px solid #d1d5db; }
-  button.success { background:#047857; }
+  button { border:none; background:#0f172a; color:white; padding:11px 14px; border-radius:14px; font-weight:700; cursor:pointer; }
+  button.secondary { background:white; color:#0f172a; border:1px solid #d1d5db; }
+  button.success { background:#3b82f6; }
   button.warning { background:#d97706; }
   button.danger { background:#dc2626; }
   .actions { display:flex; gap:8px; flex-wrap:wrap; }
@@ -38,7 +38,7 @@
   .stat { background:white; border-radius:16px; padding:14px; box-shadow:0 1px 4px rgba(0,0,0,.08); }
   .stat-label { font-size:12px; color:#6b7280; font-weight:800; text-transform:uppercase; }
   .stat-value { font-size:26px; font-weight:900; }
-  .final { background:#111827; color:white; border-radius:18px; padding:18px; margin-top:12px; }
+  .final { background:#0f172a; color:white; border-radius:18px; padding:18px; margin-top:12px; }
   .final .stat-label { color:#cbd5e1; }
   .final .stat-value { color:white; font-size:38px; }
  #liveNumbersCard {
@@ -78,7 +78,7 @@
   .dow { text-align:center; font-size:12px; color:#6b7280; font-weight:800; padding:6px; }
   .day { background:#f9fafb; min-height:115px; border:1px solid #e5e7eb; border-radius:12px; padding:8px; }
   .day.muted { opacity:.45; background:#f3f4f6; }
-  .day.selected { outline:3px solid #047857; }
+  .day.selected { outline:3px solid #3b82f6; }
   .day-number { font-weight:800; margin-bottom:6px; }
   .event { color:white; border-radius:9px; padding:6px; margin-bottom:5px; font-size:12px; line-height:1.25; border-left:5px solid rgba(255,255,255,.45); cursor:pointer; }
   .cal-Sold { background:#d97706; }
@@ -97,7 +97,7 @@
   .profit-row div { overflow:hidden; text-overflow:ellipsis; }
   .customer-hidden { font-size:11px; color:#dc2626; font-weight:900; text-transform:uppercase; }
   .sold-screen { background:#ecfdf5; border:1px solid #bbf7d0; border-radius:18px; padding:16px; margin-top:12px; }
-  .money-positive { color:#047857; font-weight:900; }
+  .money-positive { color:#3b82f6; font-weight:900; }
   .money-warning { color:#dc2626; font-weight:900; }
   .setup-overlay { position:fixed; inset:0; background:rgba(15,23,42,.82); z-index:9999; display:flex; align-items:center; justify-content:center; padding:12px; }
   .setup-overlay.hidden { display:none !important; }
@@ -1704,7 +1704,7 @@ function acceptQuote(){
  }
  alert("Signed quote saved as sold. Now choose the install date and schedule the job.");
 }
-function setupSignaturePad(){const canvas=document.getElementById("signaturePad");const ctx=canvas.getContext("2d");let drawing=false,lastX=0,lastY=0;function resize(){const rect=canvas.getBoundingClientRect();canvas.width=rect.width;canvas.height=rect.height;ctx.lineWidth=3;ctx.lineCap="round";ctx.strokeStyle="#111827";}function pos(e){const rect=canvas.getBoundingClientRect();const p=e.touches?e.touches[0]:e;return{x:p.clientX-rect.left,y:p.clientY-rect.top};}function start(e){e.preventDefault();drawing=true;const p=pos(e);lastX=p.x;lastY=p.y;}function draw(e){if(!drawing)return;e.preventDefault();const p=pos(e);ctx.beginPath();ctx.moveTo(lastX,lastY);ctx.lineTo(p.x,p.y);ctx.stroke();lastX=p.x;lastY=p.y;signatureComplete=true;}function stop(){drawing=false;}resize();window.addEventListener("resize",resize);canvas.addEventListener("mousedown",start);canvas.addEventListener("mousemove",draw);window.addEventListener("mouseup",stop);canvas.addEventListener("touchstart",start,{passive:false});canvas.addEventListener("touchmove",draw,{passive:false});canvas.addEventListener("touchend",stop);}
+function setupSignaturePad(){const canvas=document.getElementById("signaturePad");const ctx=canvas.getContext("2d");let drawing=false,lastX=0,lastY=0;function resize(){const rect=canvas.getBoundingClientRect();canvas.width=rect.width;canvas.height=rect.height;ctx.lineWidth=3;ctx.lineCap="round";ctx.strokeStyle="#0f172a";}function pos(e){const rect=canvas.getBoundingClientRect();const p=e.touches?e.touches[0]:e;return{x:p.clientX-rect.left,y:p.clientY-rect.top};}function start(e){e.preventDefault();drawing=true;const p=pos(e);lastX=p.x;lastY=p.y;}function draw(e){if(!drawing)return;e.preventDefault();const p=pos(e);ctx.beginPath();ctx.moveTo(lastX,lastY);ctx.lineTo(p.x,p.y);ctx.stroke();lastX=p.x;lastY=p.y;signatureComplete=true;}function stop(){drawing=false;}resize();window.addEventListener("resize",resize);canvas.addEventListener("mousedown",start);canvas.addEventListener("mousemove",draw);window.addEventListener("mouseup",stop);canvas.addEventListener("touchstart",start,{passive:false});canvas.addEventListener("touchmove",draw,{passive:false});canvas.addEventListener("touchend",stop);}
 function clearSignature(){const canvas=document.getElementById("signaturePad");if(!canvas)return;const ctx=canvas.getContext("2d");ctx.clearRect(0,0,canvas.width,canvas.height);signatureComplete=false;acceptedAt="";document.getElementById("acceptedStatus").textContent="Signature cleared.";}
 function buildSignedAgreementText(){return document.getElementById("quotePreview").textContent+"\n\nACCEPTANCE\nCustomer: "+(val("customerSignatureName")||val("customerName")||"Customer")+"\nContractor: "+(val("contractorName")||val("companyName")||"Contractor")+"\nDeposit collected: $"+(val("depositCollected")||"0")+"\n"+(acceptedAt?"Accepted on: "+acceptedAt:"Not accepted yet")+"\nCustomer signed on contractor device.";}
 function downloadSignedContract(){const blob=new Blob([buildSignedAgreementText()],{type:"text/plain"});const url=URL.createObjectURL(blob);const link=document.createElement("a");link.href=url;link.download="signed-contract.txt";document.body.appendChild(link);link.click();document.body.removeChild(link);URL.revokeObjectURL(url);}
