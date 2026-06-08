@@ -3371,6 +3371,12 @@ setVal("settingsCompanyLicense", userSettings.company_license || "");
       preview.src = contractorLogoUrl;
       preview.style.display = "block";
      applyCompanySettingsToQuote();
+     if (!userSettings.next_estimate_number) {
+  userSettings.next_estimate_number = 1001;
+  await saveUserSettings({ next_estimate_number: 1001 });
+}
+
+setEstimateNumberToNext();
     }
   }
 }
@@ -3492,7 +3498,7 @@ setVal("settingsCompanyLicense", userSettings.company_license || "");
   }
 
   alert("Proposal sent successfully.");
-  advanceEstimateNumber();
+  await advanceEstimateNumberCloud();
 currentCloudQuoteId = null;
 currentCloudCustomerId = null;
 }
