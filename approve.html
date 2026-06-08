@@ -303,15 +303,20 @@
         return;
       }
 
-      const { error: updateError } = await supabaseClient
-        .from("quotes")
-        .update({
-          signature_status: "Signed",
-          status: "Sold",
-          signed_at: new Date().toISOString(),
-          signed_customer_name: printedName,
-          signature_image: signatureImage
-        })
+      .update({
+  signature_status: "Signed",
+  status: "Sold",
+  signed_at: new Date().toISOString(),
+  signed_customer_name: printedName,
+  signature_image: signatureImage,
+  quote_data: {
+    ...(loadedQuote.quote_data || {}),
+    status: "Sold",
+    signature_status: "Signed",
+    signed_at: new Date().toISOString(),
+    signed_customer_name: printedName
+  }
+})
         .eq("id", loadedQuote.id);
 
       if (updateError) {
