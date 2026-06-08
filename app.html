@@ -752,6 +752,15 @@
           </div>
         </div>
 
+       <div class="card">
+          <h2>Manage Crews</h2>
+          <p class="small">Add the crews, installers, or subcontractors you actually use.</p>
+          <div class="two">
+            <input id="newCrewName" placeholder="Crew name, ex: Devon, Tile Crew, Subcontractor" />
+            <button class="success" onclick="addCrew()">Add Crew</button>
+          </div>
+          <div id="crewList"></div>
+        </div>
         <div class="card">
           <h2>How Presets Work</h2>
           <div class="quote-box">Templates should tell the contractor what to quote, not force what to charge.
@@ -788,6 +797,7 @@ let payments = [];
 let rooms = [];
 let roomPhotos = {};
 let lineItems = [];
+let crews = [];
  let userSettings = {};
 let signatureComplete = false;
 let acceptedAt = "";
@@ -1067,12 +1077,94 @@ function advanceEstimateNumber(){
  const el = document.getElementById("estimateNumber");
  if(el) el.value = next;
 }
+ function loadCrewSettings() {
+  try {
+    const raw = localStorage.getItem("projobfloCrews");
+    const saved = raw ? JSON.parse(raw) : null;
+
+    crews = Array.isArray(saved) && saved.length
+      ? saved
+      : ["Crew A", "Crew B", "Tile Crew", "Carpet Crew", "Subcontractor"];
+  } catch (e) {
+    crews = ["Crew A", "Crew B", "Tile Crew", "Carpet Crew", "Subcontractor"];
+  }
+
+  renderCrewOptions();
+  renderCrewSettings();
+}
+
+function saveCrewSettings() {
+  localStorage.setItem("projobfloCrews", JSON.stringify(crews));
+}
+
+function renderCrewOptions() {
+  const select = document.getElementById("crew");
+  if (!select) return;
+
+  const current = select.value;
+
+  select.innerHTML = crews.map(c =>
+    `<option value="${escapeAttr(c)}">${escapeHtml(c)}</option>`
+  ).join("");
+
+  if (current && crews.includes(current)) {
+    select.value = current;
+  }
+}
+
+function renderCrewSettings() {
+  const box = document.getElementById("crewList");
+  if (!box) return;
+
+  box.innerHTML = crews.map((crew, index) => `
+    <div class="customer-card" style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+      <strong>${escapeHtml(crew)}</strong>
+      <button class="danger" onclick="deleteCrew(${index})">Delete</button>
+    </div>
+  `).join("");
+}
+
+function addCrew() {
+  const input = document.getElementById("newCrewName");
+  const name = (input?.value || "").trim();
+
+  if (!name) {
+    alert("Enter a crew name.");
+    return;
+  }
+
+  if (crews.includes(name)) {
+    alert("That crew already exists.");
+    return;
+  }
+
+  crews.push(name);
+  saveCrewSettings();
+  input.value = "";
+  renderCrewOptions();
+  renderCrewSettings();
+}
+
+function deleteCrew(index) {
+  if (!confirm("Delete this crew?")) return;
+
+  crews.splice(index, 1);
+
+  if (!crews.length) {
+    crews = ["Subcontractor"];
+  }
+
+  saveCrewSettings();
+  renderCrewOptions();
+  renderCrewSettings();
+}
 
 function init() {
   document.getElementById("estimateDate").value = new Date().toISOString().slice(0,10);
   setEstimateNumberToNext();
   document.getElementById("scheduleDate").value = selectedDate;
   loadPresetRates();
+  loadCrewSettings();
   maybeShowFirstRunSetup();
   setupTaxLocationOptions();
   applyTaxLocationSearch();
@@ -1883,7 +1975,8 @@ function editScheduledJob(jobId){
  document.getElementById("scheduleDate").value=job.date;
  selectedDate=job.date;
  document.getElementById("duration").value=job.duration||"1";
- document.getElementById("crew").value=job.crew||"Crew A";
+ renderCrewOptions();
+ document.getElementById("crew").value = job.crew || crews[0] || "Subcontractor";
  document.getElementById("jobStatus").value=job.status||"Scheduled";
  document.getElementById("scheduleNotes").value=job.notes||"";
  document.getElementById("scheduleEditStatus").textContent="Editing scheduled job for "+(job.customer||"customer")+". Change fields, then hit Update Job.";
