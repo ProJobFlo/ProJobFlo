@@ -2667,9 +2667,11 @@ savedCustomer = customerData;
   const totalText = document.getElementById("grandTotal").textContent || "$0";
   const total = Number(totalText.replace("$", "").replace(",", "")) || 0;
 
+  const proposalRoomPhotos = await prepareRoomPhotosForProposalData();
+
   const quotePayload = {
     rooms,
-    roomPhotos,
+    roomPhotos: proposalRoomPhotos,
     lineItems,
     notes: val("notes"),
     company: {
@@ -3043,6 +3045,26 @@ if (cloudSummary) {
       }
     }
   }
+}
+
+ async function prepareRoomPhotosForProposalData() {
+  const output = {};
+
+  for (const roomId of Object.keys(roomPhotos || {})) {
+    output[roomId] = [];
+
+    for (const photo of roomPhotos[roomId] || []) {
+      const copy = { ...photo };
+
+      if (copy.cloudPath) {
+        copy.url = await getCloudPhotoUrl(copy.cloudPath);
+      }
+
+      output[roomId].push(copy);
+    }
+  }
+
+  return output;
 }
  
  async function openQuoteFromFollowUp(id) {
