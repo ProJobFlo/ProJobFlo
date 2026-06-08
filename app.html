@@ -1594,6 +1594,8 @@ function startNewQuote(){
 }
 
 function newQuote(){
+ currentCloudCustomerId = null;
+currentCloudQuoteId = null;
  rooms=[];
  roomPhotos={};
  lineItems=[];
@@ -3394,6 +3396,9 @@ setVal("settingsCompanyLicense", userSettings.company_license || "");
   }
 
   alert("Proposal sent successfully.");
+  advanceEstimateNumber();
+currentCloudQuoteId = null;
+currentCloudCustomerId = null;
 }
  
 init();
