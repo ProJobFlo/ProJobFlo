@@ -243,6 +243,12 @@
           <div id="dashAttention"></div>
         </div>
 
+                <div class="card">
+          <h2>Recent Activity</h2>
+          <p class="small">Latest quote, signature, schedule, and payment activity.</p>
+          <div id="dashRecentActivity"></div>
+        </div>
+
         <div class="card">
           <h2>Upcoming Jobs</h2>
           <div id="dashUpcomingJobs"></div>
@@ -2266,7 +2272,7 @@ function renderDashboard(){
  const attention=document.getElementById("dashAttention");
  if(attention){
    const due=quotes.filter(q=>isDue(q));
-   const unscheduled=quotes.filter(q=>(q.status==="Sold")&&!jobs.some(j=>j.quoteId===q.id));
+   const unscheduled=quotes.filter(q=>(q.status==="Sold")&&!jobs.some(j=>String(j.quoteId)===String(q.id)));
    let html="";
    if(due.length){
      html += "<div class='quote-card urgent'><div class='title'>Follow-Ups Due: "+due.length+"</div><div class='small'>These quotes need a call/text/email.</div><button class='secondary' onclick=\"showTab('follow')\">Open Follow-Ups</button></div>";
@@ -2278,10 +2284,100 @@ function renderDashboard(){
    attention.innerHTML=html;
  }
 
+ const activity=document.getElementById("dashRecentActivity");
+ if(activity){
+   const events=[];
+
+   quotes.forEach(q=>{
+     const c=getCustomer(q.customerId);
+     const name=c.name || q.customer || "Unnamed Customer";
+     const estimate=q.estimateNumber || q.estimate_number || "";
+
+     if(q.createdAt){
+       events.push({
+         time:Number(q.createdAt)||0,
+         icon:"📝",
+         title:"Quote created",
+         detail:`${name} ${estimate ? "• Proposal #" + estimate : ""} • ${dollars(q.amount)}`
+       });
+     }
+
+     if(q.signatureStatus==="Sent" || q.signature_status==="Sent"){
+       events.push({
+         time:Number(q.sentAt || q.updatedAt || q.createdAt || 0),
+         icon:"📨",
+         title:"Proposal sent",
+         detail:`${name} ${estimate ? "• Proposal #" + estimate : ""}`
+       });
+     }
+
+     if(q.status==="Sold" || q.signatureStatus==="Signed" || q.signature_status==="Signed"){
+       events.push({
+         time:Number(q.signedAt || q.signed_at || q.updatedAt || q.createdAt || 0),
+         icon:"✅",
+         title:"Proposal signed",
+         detail:`${name} ${estimate ? "• Proposal #" + estimate : ""} • ${dollars(q.amount)}`
+       });
+     }
+   });
+
+   jobs.forEach(j=>{
+     events.push({
+       time:new Date((j.date || selectedDate) + "T00:00:00").getTime(),
+       icon:"📅",
+       title:"Job scheduled",
+       detail:`${j.customer || "Unnamed Customer"} • ${j.date || ""} • ${j.crew || ""}`
+     });
+
+     if(j.status==="Complete"){
+       events.push({
+         time:new Date((j.date || selectedDate) + "T00:00:00").getTime(),
+         icon:"🏁",
+         title:"Job completed",
+         detail:`${j.customer || "Unnamed Customer"} • ${dollars(j.total)}`
+       });
+     }
+   });
+
+   payments.forEach(p=>{
+     const q=quotes.find(q=>String(q.id)===String(p.quoteId));
+     const c=q ? getCustomer(q.customerId) : {};
+     events.push({
+       time:Number(p.createdAt || p.date || nowMs()),
+       icon:"💵",
+       title:"Payment recorded",
+       detail:`${c.name || "Customer"} • ${p.type || "Payment"} • ${dollars(p.amount)}`
+     });
+   });
+
+   events.sort((a,b)=>b.time-a.time);
+
+   activity.innerHTML=events.length
+     ? events.slice(0,8).map(e=>`
+       <div class="quote-card" style="display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start;">
+         <div style="font-size:22px;">${e.icon}</div>
+         <div>
+           <div class="title">${escapeHtml(e.title)}</div>
+           <div>${escapeHtml(e.detail)}</div>
+           <div class="small">${e.time ? new Date(e.time).toLocaleString() : ""}</div>
+         </div>
+       </div>
+     `).join("")
+     : "<p class='small'>No activity yet. Create a quote, send a proposal, schedule a job, or record a payment.</p>";
+ }
+
  const upcoming=document.getElementById("dashUpcomingJobs");
  if(upcoming){
-   const upcomingJobs=jobs.slice().sort((a,b)=>a.date.localeCompare(b.date)).slice(0,6);
-   upcoming.innerHTML=upcomingJobs.length?upcomingJobs.map(j=>`<div class="job-card"><div class="title">${escapeHtml(j.customer||"Unnamed")}</div><div>${escapeHtml(j.date)} • ${escapeHtml(j.crew||"")}</div><div>Status: <span class="pill ${statusClass(j.status)}">${escapeHtml(j.status)}</span></div><div>Total: <strong>${dollars(j.total)}</strong></div></div>`).join(""):"<p class='small'>No upcoming jobs scheduled.</p>";
+   const today=new Date().toISOString().slice(0,10);
+   const upcomingJobs=jobs
+     .filter(j=>(j.date||"")>=today)
+     .slice()
+     .sort((a,b)=>(a.date||"").localeCompare(b.date||""))
+     .slice(0,6);
+
+   upcoming.innerHTML=upcomingJobs.length
+     ? upcomingJobs.map(j=>`<div class="job-card"><div class="title">${escapeHtml(j.customer||"Unnamed")}</div><div>${escapeHtml(j.date)} • ${escapeHtml(j.crew||"")}</div><div>Status: <span class="pill ${statusClass(j.status)}">${escapeHtml(j.status)}</span></div><div>Total: <strong>${dollars(j.total)}</strong></div></div>`).join("")
+     : "<p class='small'>No upcoming jobs scheduled.</p>";
  }
 
  const pipeline=document.getElementById("dashPipeline");
