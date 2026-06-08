@@ -113,6 +113,16 @@
       <h2 id="companyName">Company</h2>
       <p id="customerInfo"></p>
       <p id="proposalInfo"></p>
+      <div
+  id="expirationBanner"
+  style="
+    margin-top:12px;
+    padding:12px;
+    border-radius:12px;
+    display:none;
+    font-weight:700;
+  ">
+</div>
       <div class="total" id="proposalTotal">$0.00</div>
     </div>
 
@@ -200,6 +210,38 @@
       }
 
       loadedQuote = data;
+      const expiresAt = data.expires_at;
+
+if (expiresAt) {
+  const now = new Date();
+  const expiration = new Date(expiresAt);
+
+  const banner = document.getElementById("expirationBanner");
+
+  if (now > expiration) {
+    banner.style.display = "block";
+    banner.style.background = "#fee2e2";
+    banner.style.color = "#991b1b";
+    banner.innerHTML =
+      "⚠ This proposal expired on " +
+      expiration.toLocaleDateString();
+
+    window.proposalExpired = true;
+  } else {
+    banner.style.display = "block";
+    banner.style.background = "#dcfce7";
+    banner.style.color = "#166534";
+    banner.innerHTML =
+      "Proposal valid through " +
+      expiration.toLocaleDateString();
+
+    window.proposalExpired = false;
+    if (window.proposalExpired) {
+  document.getElementById("acceptCard").style.display = "none";
+} else {
+}
+  }
+}
 
       const q = data.quote_data || {};
       const company = q.company || {};
@@ -422,6 +464,12 @@ function renderApproveLineItems(q) {
 }
 
     async function acceptProposal() {
+      if (window.proposalExpired) {
+  alert(
+    "This proposal has expired. Please contact the contractor for updated pricing."
+  );
+  return;
+}
       if (!loadedQuote) {
         alert("Proposal not loaded.");
         return;
