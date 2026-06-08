@@ -1055,26 +1055,29 @@ function filterPresetRows(){
 }
 
 
-function getNextEstimateNumber(){
- const stored = Number(localStorage.getItem("ProJobFloNextEstimateNumber"));
- if(stored && stored > 0) return stored;
- const current = Number(val("estimateNumber")) || 1001;
- return current;
+function getNextEstimateNumber() {
+  return Number(userSettings?.next_estimate_number) || 1001;
 }
 
-function setEstimateNumberToNext(){
- const next = getNextEstimateNumber();
- const el = document.getElementById("estimateNumber");
- if(el) el.value = next;
+function setEstimateNumberToNext() {
+  const el = document.getElementById("estimateNumber");
+  if (el) el.value = getNextEstimateNumber();
 }
 
-function advanceEstimateNumber(){
- const current = Number(val("estimateNumber")) || getNextEstimateNumber() || 1001;
- const stored = Number(localStorage.getItem("ProJobFloNextEstimateNumber")) || 1001;
- const next = Math.max(current + 1, stored + 1);
- localStorage.setItem("ProJobFloNextEstimateNumber", String(next));
- const el = document.getElementById("estimateNumber");
- if(el) el.value = next;
+async function advanceEstimateNumberCloud() {
+  const current = Number(val("estimateNumber")) || getNextEstimateNumber() || 1001;
+  const next = current + 1;
+
+  if (currentUser) {
+    await saveUserSettings({
+      next_estimate_number: next
+    });
+  }
+
+  userSettings.next_estimate_number = next;
+
+  const el = document.getElementById("estimateNumber");
+  if (el) el.value = next;
 }
  function loadCrewSettings() {
   try {
