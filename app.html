@@ -185,7 +185,7 @@
 </div>
   <div class="topbar" style="align-items:center;margin-bottom:8px;">
   <div>
-    <img
+    <img onclick="handleLogoAdminClick()"
       src="https://fwklbatktyqxlwkkiwbh.supabase.co/storage/v1/object/public/Logos/ProJobFlo_Main_Logo.png"
       style="height:175px;width:auto;"
     >
@@ -1188,6 +1188,22 @@ function showTab(tab) {
  if (tab === "quote") {
   setTimeout(setupSignaturePad, 50);
 }
+}
+ let adminLogoClicks = 0;
+let adminLogoTimer = null;
+
+function handleLogoAdminClick() {
+  adminLogoClicks++;
+
+  clearTimeout(adminLogoTimer);
+  adminLogoTimer = setTimeout(() => {
+    adminLogoClicks = 0;
+  }, 1500);
+
+  if (adminLogoClicks >= 5) {
+    adminLogoClicks = 0;
+    toggleDeveloperTools();
+  }
 }
 function cap(s){return s.charAt(0).toUpperCase()+s.slice(1);}
 function dollars(v){return "$"+Number(v||0).toFixed(2);}
