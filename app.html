@@ -2922,9 +2922,11 @@ async function autoSaveCurrentQuoteDraft() {
   const totalText = document.getElementById("grandTotal").textContent || "$0";
   const total = Number(totalText.replace("$", "").replace(",", "")) || 0;
 
+  const proposalRoomPhotos = await prepareRoomPhotosForProposalData();
+
   const quotePayload = {
     rooms,
-    roomPhotos,
+    roomPhotos: proposalRoomPhotos,
     lineItems,
     notes: val("notes"),
     company: {
