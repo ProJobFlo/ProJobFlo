@@ -323,9 +323,15 @@ function renderApproveLineItems(q) {
     `;
   }).join("");
 
-  const subtotal = Number(totals.subtotal) || 0;
-  const tax = Number(totals.tax) || 0;
-  const total = Number(totals.grandTotal) || Number(loadedQuote?.total) || 0;
+  const subtotal = items.reduce((sum, item) => {
+    const qty = resolveLineQty(item, totals);
+    const rate = Number(item.rate) || 0;
+    return sum + (qty * rate);
+  }, 0);
+
+  const total = Number(loadedQuote?.total) || Number(totals.grandTotal) || subtotal;
+
+  const tax = Math.max(0, total - subtotal);
 
   box.innerHTML = `
     ${rows}
