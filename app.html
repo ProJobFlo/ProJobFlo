@@ -3058,7 +3058,13 @@ if (cloudSummary) {
 
       if (copy.cloudPath) {
         copy.url = await getCloudPhotoUrl(copy.cloudPath);
+      } else {
+        copy.url = "";
       }
+
+      delete copy.dataUrl;
+      delete copy.previewUrl;
+      delete copy.localUrl;
 
       output[roomId].push(copy);
     }
