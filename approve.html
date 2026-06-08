@@ -211,11 +211,11 @@
 
       loadedQuote = data;
       const expiresAt = data.expires_at;
+window.proposalExpired = false;
 
 if (expiresAt) {
   const now = new Date();
   const expiration = new Date(expiresAt);
-
   const banner = document.getElementById("expirationBanner");
 
   if (now > expiration) {
@@ -236,13 +236,8 @@ if (expiresAt) {
       expiration.toLocaleDateString();
 
     window.proposalExpired = false;
-    if (window.proposalExpired) {
-  document.getElementById("acceptCard").style.display = "none";
-} else {
-}
   }
 }
-
       const q = data.quote_data || {};
       const company = q.company || {};
       const customer = q.customer || {};
@@ -272,7 +267,8 @@ if (expiresAt) {
       renderApprovePhotos(q);
 
       document.getElementById("proposalCard").style.display = "block";
-      document.getElementById("acceptCard").style.display = "block";
+      document.getElementById("acceptCard").style.display =
+  window.proposalExpired ? "none" : "block";
 
       setupSignaturePad();
     }
