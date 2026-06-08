@@ -2647,7 +2647,7 @@ async function autoSaveCurrentQuoteDraft() {
       user_id: currentUser.id,
       customer_id: currentCloudCustomerId,
       estimate_number: val("estimateNumber"),
-      status: val("quoteSaveStatus"),
+      status: "Draft",
       total: total,
       quote_data: quotePayload
     });
