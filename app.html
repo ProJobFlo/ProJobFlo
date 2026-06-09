@@ -2045,8 +2045,8 @@ const q = quotes.find(q => String(q.cloudId || q.id) === String(selectedQuoteId)
      .from("jobs")
      .insert({
        user_id: currentUser.id,
-       quote_id: q.id,
-       customer_id: c.id,
+       quote_id: q.cloudId || q.id,
+customer_id: c.cloudId || c.id,
        start_date: job.date,
        duration_days: Number(job.duration || 1),
        crew: job.crew || "",
