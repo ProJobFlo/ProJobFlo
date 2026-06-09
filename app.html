@@ -1835,7 +1835,25 @@ if (cloudSaved && currentCloudQuoteId) {
 
  document.getElementById("soldScreen").classList.remove("hidden");
  document.getElementById("soldTotal").textContent=dollars(quote.amount);
- document.getElementById("soldDepositRequired").textContent=dollars(quote.depositRequired||0);
+ document.getElementById("soldDepositRequired").textContent =
+  dollars(quote.depositRequired || 0);
+
+document.getElementById("soldDepositCollected").value =
+  val("depositCollected");
+ 
+ const depositCollected = Number(val("depositCollected")) || 0;
+
+if (depositCollected > 0) {
+  payments.push({
+    id: Date.now() + Math.random(),
+    quoteId: quote.id,
+    amount: depositCollected,
+    type: "Deposit",
+    method: "Collected At Signing",
+    notes: "Deposit collected during quote acceptance",
+    date: new Date().toISOString()
+  });
+}
 
  renderAll();
 
@@ -2422,8 +2440,15 @@ function recordDepositAndSchedule(){
  const quoteId=lastAcceptedQuoteId;
  const q=quotes.find(q=>q.id===quoteId);
  if(!q){alert("Could not find sold quote.");return;}
- const amount=Number(val("soldDepositCollected"))||0;
- if(amount>0){
+ const amount = Number(val("soldDepositCollected")) || 0;
+
+const existingDeposit = payments.some(
+  p =>
+    String(p.quoteId) === String(q.id) &&
+    p.type === "Deposit"
+);
+
+if(amount > 0 && !existingDeposit){
    payments.push({id:Date.now()+Math.random(),quoteId:q.id,amount,type:"Deposit",method:val("soldPaymentMethod"),notes:"Collected at close",date:new Date().toISOString()});
  }
  showTab("schedule");
