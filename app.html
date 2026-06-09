@@ -2125,11 +2125,24 @@ async function updateScheduledJob(){
  alert("Job updated.");
 }
 
-function deleteScheduledJob(){
+async function deleteScheduledJob(){
  if(!editingJobId){alert("Select a calendar job first, then delete it.");return;}
  const job=jobs.find(j=>j.id===editingJobId);
  const name=job ? job.customer : "this job";
  if(!confirm("Delete scheduled job for "+name+"?"))return;
+ if(currentUser && job && job.cloudId){
+  const { error } = await supabaseClient
+    .from("jobs")
+    .delete()
+    .eq("id", job.cloudId)
+    .eq("user_id", currentUser.id);
+
+  if(error){
+    console.error(error);
+    alert("Could not delete job from cloud: " + error.message);
+    return;
+  }
+}
  jobs=jobs.filter(j=>j.id!==editingJobId);
  editingJobId=null;
  document.getElementById("scheduleEditStatus").textContent="Scheduled job deleted. Select another calendar job to edit.";
@@ -3001,19 +3014,27 @@ async function loadJobsFromCloud() {
     return;
   }
 
-  jobs = (data || []).map(j => ({
-    id: j.id,
-    cloudId: j.id,
-    quoteId: j.quote_id,
-    customerId: j.customer_id,
-    startDate: j.start_date,
-    date: j.start_date,
-    duration: j.duration_days || 1,
-    durationDays: j.duration_days || 1,
-    crew: j.crew || "",
-    status: j.status || "Scheduled",
-    notes: j.notes || ""
-  }));
+  jobs = (data || []).map(j => {
+    const q = quotes.find(q => String(q.id) === String(j.quote_id)) || {};
+    const c = customers.find(c => String(c.id) === String(j.customer_id)) || getCustomer(q.customerId);
+
+    return {
+      id: j.id,
+      cloudId: j.id,
+      quoteId: j.quote_id,
+      customerId: j.customer_id,
+      customer: c.name || q.customer || "Unnamed Customer",
+      address: c.address || q.address || "",
+      total: Number(q.amount || 0),
+      startDate: j.start_date,
+      date: j.start_date,
+      duration: j.duration_days || 1,
+      durationDays: j.duration_days || 1,
+      crew: j.crew || "",
+      status: j.status || "Scheduled",
+      notes: j.notes || ""
+    };
+  });
 
   renderAll();
 
