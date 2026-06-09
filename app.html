@@ -486,7 +486,7 @@
     Record Deposit + Schedule
   </button>
 
-  <button class="secondary" onclick="showTab('schedule')">
+  <button class="secondary" onclick="addCurrentJobToGoogleCalendar()">
     Schedule Job
   </button>
 
@@ -1823,7 +1823,7 @@ function acceptQuote(){
  if(!quote){return;}
 
  if(lastAcceptedQuoteId !== quote.id){
-   advanceEstimateNumber();
+   advanceEstimateNumberCloud();
  }
 
  lastAcceptedQuoteId = quote.id;
