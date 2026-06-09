@@ -1810,7 +1810,7 @@ function saveAcceptedQuoteAsSold(){
  return quote;
 }
 
-function acceptQuote(){
+async function acceptQuote(){
  const signedName=val("customerSignatureName")||val("customerName");
  if(!signedName){alert("Enter customer's printed name first.");return;}
  if(!signatureComplete){alert("Please have the customer sign before accepting.");return;}
@@ -1820,7 +1820,12 @@ function acceptQuote(){
  document.getElementById("quoteSaveStatus").value="Sold";
 
  const quote = saveAcceptedQuoteAsSold();
- if(!quote){return;}
+ const cloudSaved = await saveCurrentQuoteToCloud();
+
+if (cloudSaved && currentCloudQuoteId) {
+  quote.cloudId = currentCloudQuoteId;
+  quote.id = currentCloudQuoteId;
+}
 
  if(lastAcceptedQuoteId !== (quote.cloudId || quote.id)){
    advanceEstimateNumberCloud();
@@ -1854,7 +1859,7 @@ function acceptQuote(){
 
  const scheduleSelect=document.getElementById("scheduleQuoteSelect");
  if(scheduleSelect){
-   scheduleSelect.value=quote.id;
+   scheduleSelect.value=quote.cloudId || quote.id;
  }
 
  loadQuoteIntoSchedule();
@@ -2944,6 +2949,7 @@ async function loadQuotesFromCloud() {
 
     return {
       id: q.id,
+     cloudId: q.id,
       customerId: q.customer_id,
       estimateNumber: q.estimate_number || "",
       amount: Number(q.total) || 0,
@@ -3082,45 +3088,31 @@ async function autoSaveCurrentQuoteDraft() {
   setAutoSaveStatus("Saving to cloud...");
 
   if (!currentCloudCustomerId) {
-    currentCloudCustomerId = crypto.randomUUID();
-  }
+  currentCloudCustomerId = crypto.randomUUID();
+}
 
-  if (!currentCloudQuoteId) {
-    currentCloudQuoteId = crypto.randomUUID();
-  }
+if (!currentCloudQuoteId) {
+  currentCloudQuoteId = crypto.randomUUID();
+}
 
-  const customerPayload = {
-    id: currentCloudCustomerId,
-    user_id: currentUser.id,
-    name: val("customerName") || "Unnamed Customer",
-    phone: val("customerPhone"),
-    email: val("customerEmail"),
-    address: val("jobAddress"),
-    notes: val("notes")
-  };
+const customerPayload = {
+  id: currentCloudCustomerId,
+  user_id: currentUser.id,
+  name: val("customerName") || "Unnamed Customer",
+  phone: val("customerPhone"),
+  email: val("customerEmail"),
+  address: val("jobAddress"),
+  notes: val("notes")
+};
 
-  if (!currentCloudCustomerId) {
-  const hasCustomerInfo =
-    val("customerName").trim() ||
-    val("customerPhone").trim() ||
-    val("customerEmail").trim() ||
-    val("jobAddress").trim();
+const { error: customerError } = await supabaseClient
+  .from("customers")
+  .upsert(customerPayload);
 
-  if (hasCustomerInfo) {
-    const { data: savedCustomer, error: customerError } = await supabaseClient
-      .from("customers")
-      .insert(customerPayload)
-      .select()
-      .single();
-
-    if (customerError) {
-      console.error(customerError);
-      setAutoSaveStatus("Customer auto-save failed.");
-      return;
-    }
-
-    currentCloudCustomerId = savedCustomer.id;
-  }
+if (customerError) {
+  console.error(customerError);
+  setAutoSaveStatus("Customer auto-save failed.");
+  return;
 }
 
   const totalText = document.getElementById("grandTotal").textContent || "$0";
