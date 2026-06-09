@@ -1825,26 +1825,28 @@ function acceptQuote(){
  if(lastAcceptedQuoteId !== quote.id){
    advanceEstimateNumber();
  }
- lastAcceptedQuoteId = quote.id;
- showTab("quote");
 
-document
-  .getElementById("soldScreen")
-  .classList.remove("hidden");
-window.scrollTo({
-  top: document.getElementById("soldScreen").offsetTop - 100,
-  behavior: "smooth"
-});
+ lastAcceptedQuoteId = quote.id;
+
+ document.getElementById("soldScreen").classList.remove("hidden");
  document.getElementById("soldTotal").textContent=dollars(quote.amount);
  document.getElementById("soldDepositRequired").textContent=dollars(quote.depositRequired||0);
+
  renderAll();
 
  const shouldEmail = confirm("Quote accepted. Email the signed quote to the customer now?");
  if(shouldEmail){
    emailContract();
- } else {
-   const shouldDownload = confirm("Do you want to download a copy of the signed contract instead?");
-   if(shouldDownload) downloadSignedContract();
+ }
+
+ const shouldSchedule = confirm("Ready to schedule this job now?");
+ if(!shouldSchedule){
+   showTab("quote");
+   window.scrollTo({
+     top: document.getElementById("soldScreen").offsetTop - 100,
+     behavior: "smooth"
+   });
+   return;
  }
 
  showTab("schedule");
@@ -1854,13 +1856,15 @@ window.scrollTo({
  if(scheduleSelect){
    scheduleSelect.value=quote.id;
  }
+
  loadQuoteIntoSchedule();
 
  const dateField=document.getElementById("scheduleDate");
  if(dateField && !dateField.value){
    dateField.value=selectedDate;
  }
- alert("Signed quote saved as sold. Now choose the install date and schedule the job.");
+
+ alert("Choose the install date, crew, and click Schedule Job.");
 }
 function setupSignaturePad(){const canvas=document.getElementById("signaturePad");const ctx=canvas.getContext("2d");let drawing=false,lastX=0,lastY=0;function resize(){const rect=canvas.getBoundingClientRect();canvas.width=rect.width;canvas.height=rect.height;ctx.lineWidth=3;ctx.lineCap="round";ctx.strokeStyle="#0f172a";}function pos(e){const rect=canvas.getBoundingClientRect();const p=e.touches?e.touches[0]:e;return{x:p.clientX-rect.left,y:p.clientY-rect.top};}function start(e){e.preventDefault();drawing=true;const p=pos(e);lastX=p.x;lastY=p.y;}function draw(e){if(!drawing)return;e.preventDefault();const p=pos(e);ctx.beginPath();ctx.moveTo(lastX,lastY);ctx.lineTo(p.x,p.y);ctx.stroke();lastX=p.x;lastY=p.y;signatureComplete=true;}function stop(){drawing=false;}resize();window.addEventListener("resize",resize);canvas.addEventListener("mousedown",start);canvas.addEventListener("mousemove",draw);window.addEventListener("mouseup",stop);canvas.addEventListener("touchstart",start,{passive:false});canvas.addEventListener("touchmove",draw,{passive:false});canvas.addEventListener("touchend",stop);}
 function clearSignature(){const canvas=document.getElementById("signaturePad");if(!canvas)return;const ctx=canvas.getContext("2d");ctx.clearRect(0,0,canvas.width,canvas.height);signatureComplete=false;acceptedAt="";document.getElementById("acceptedStatus").textContent="Signature cleared.";}
