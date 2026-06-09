@@ -482,9 +482,18 @@
             <option>Other</option>
           </select>
           <div class="actions">
-            <button class="success" onclick="recordDepositAndSchedule()">Record Deposit + Schedule</button>
-            <button class="secondary" onclick="showTab('schedule')">Schedule Without Deposit</button>
-          </div>
+  <button class="success" onclick="recordDepositAndSchedule()">
+    Record Deposit + Schedule
+  </button>
+
+  <button class="secondary" onclick="showTab('schedule')">
+    Schedule Job
+  </button>
+
+  <button class="secondary" onclick="addCurrentJobToGoogleCalendar()">
+    Add To Google Calendar
+  </button>
+</div>
         </div>
       </div>
     </div>
@@ -1818,6 +1827,16 @@ function acceptQuote(){
  }
  lastAcceptedQuoteId = quote.id;
  document.getElementById("soldScreen").classList.remove("hidden");
+ showTab("quote");
+
+document
+  .getElementById("soldScreen")
+  .classList.remove("hidden");
+
+window.scrollTo({
+  top: document.getElementById("soldScreen").offsetTop - 100,
+  behavior: "smooth"
+});
  document.getElementById("soldTotal").textContent=dollars(quote.amount);
  document.getElementById("soldDepositRequired").textContent=dollars(quote.depositRequired||0);
  renderAll();
@@ -2256,6 +2275,30 @@ function recordDepositAndSchedule(){
  document.getElementById("scheduleQuoteSelect").value=q.id;
  loadQuoteIntoSchedule();
  renderAll();
+}
+
+ function addCurrentJobToGoogleCalendar() {
+
+  const customer = val("customerName");
+  const address = val("jobAddress");
+
+  showTab("schedule");
+
+  setTimeout(() => {
+
+    const quoteSelect =
+      document.getElementById("scheduleQuoteSelect");
+
+    if (quoteSelect && lastAcceptedQuoteId) {
+      quoteSelect.value = lastAcceptedQuoteId;
+      loadQuoteIntoSchedule();
+    }
+
+    alert(
+      "Select a date and click Schedule Job. Google Calendar will be created automatically."
+    );
+
+  }, 300);
 }
 
 function renderDashboard(){
