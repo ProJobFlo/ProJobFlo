@@ -1844,7 +1844,7 @@ document.getElementById("soldDepositCollected").value =
  const depositCollected = Number(val("depositCollected")) || 0;
 
 if (depositCollected > 0) {
-  payments.push({
+  await addPayment({
     id: Date.now() + Math.random(),
     quoteId: quote.id,
     amount: depositCollected,
@@ -2412,17 +2412,54 @@ function prefillPayment(quoteId, amount, type){
  document.getElementById("paymentType").value=type;
 }
 
-function recordPayment(){
+async function recordPayment(){
  const quoteId=Number(val("paymentJobSelect"));
  if(!quoteId){alert("Select a job/quote first.");return;}
  const amount=Number(val("paymentAmount"))||0;
  if(amount<=0){alert("Enter payment amount.");return;}
- const payment={id:Date.now()+Math.random(),quoteId,amount,type:val("paymentType"),method:val("paymentMethod"),notes:val("paymentNotes"),date:new Date().toISOString()};
- payments.push(payment);
+ await addPayment({
+  quoteId,
+  amount,
+  type: val("paymentType"),
+  method: val("paymentMethod"),
+  notes: val("paymentNotes"),
+  date: new Date().toISOString()
+});
  document.getElementById("paymentAmount").value="";
  document.getElementById("paymentNotes").value="";
  renderAll();
  alert("Payment recorded.");
+}
+
+ async function addPayment(payment) {
+  const newPayment = {
+    id: crypto.randomUUID(),
+    ...payment
+  };
+
+  payments.push(newPayment);
+
+  if (currentUser) {
+    const { error } = await supabaseClient
+      .from("payments")
+      .insert({
+        id: newPayment.id,
+        user_id: currentUser.id,
+        quote_id: newPayment.quoteId,
+        amount: newPayment.amount,
+        type: newPayment.type,
+        method: newPayment.method,
+        notes: newPayment.notes,
+        paid_at: newPayment.date
+      });
+
+    if (error) {
+      console.error(error);
+      alert("Payment saved on screen, but cloud save failed: " + error.message);
+    }
+  }
+
+  renderAll();
 }
 
 function renderPaymentHistory(){
@@ -2436,7 +2473,7 @@ function renderPaymentHistory(){
  }).join("");
 }
 
-function recordDepositAndSchedule(){
+async function recordDepositAndSchedule(){
  const quoteId=lastAcceptedQuoteId;
  const q=quotes.find(q=>q.id===quoteId);
  if(!q){alert("Could not find sold quote.");return;}
@@ -2449,7 +2486,14 @@ const existingDeposit = payments.some(
 );
 
 if(amount > 0 && !existingDeposit){
-   payments.push({id:Date.now()+Math.random(),quoteId:q.id,amount,type:"Deposit",method:val("soldPaymentMethod"),notes:"Collected at close",date:new Date().toISOString()});
+   await addPayment({
+  quoteId: q.id,
+  amount,
+  type: "Deposit",
+  method: val("soldPaymentMethod"),
+  notes: "Collected at close",
+  date: new Date().toISOString()
+});
  }
  showTab("schedule");
  renderScheduleQuoteSelect();
