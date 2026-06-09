@@ -1822,11 +1822,11 @@ function acceptQuote(){
  const quote = saveAcceptedQuoteAsSold();
  if(!quote){return;}
 
- if(lastAcceptedQuoteId !== quote.id){
+ if(lastAcceptedQuoteId !== (quote.cloudId || quote.id)){
    advanceEstimateNumberCloud();
  }
 
- lastAcceptedQuoteId = quote.id;
+ lastAcceptedQuoteId = quote.cloudId || quote.id;
 
  document.getElementById("soldScreen").classList.remove("hidden");
  document.getElementById("soldTotal").textContent=dollars(quote.amount);
@@ -1994,17 +1994,17 @@ function renderScheduleQuoteSelect(){
  sel.innerHTML=sold.length?sold.map(q=>{
    const c=getCustomer(q.customerId);
    const est=q.estimateNumber ? " #"+q.estimateNumber : "";
-   return `<option value="${q.id}">${escapeHtml(c.name||"Unnamed")}${est} — ${dollars(q.amount)} — ${q.status}</option>`;
+   return `<option value="${q.cloudId || q.id}">${escapeHtml(c.name||"Unnamed")}${est} - ${dollars(q.amount)} - ${q.status}</option>`;
  }).join(""):`<option value="">No sold quotes available</option>`;
- if(lastAcceptedQuoteId && sold.some(q=>String(q.id)===String(lastAcceptedQuoteId))){
+ if(lastAcceptedQuoteId && sold.some(q=>String(q.cloudId || q.id)===String(lastAcceptedQuoteId))){
    sel.value=lastAcceptedQuoteId;
- } else if(previous && sold.some(q=>String(q.id)===String(previous))){
+ } else if(previous && sold.some(q=>String(q.cloudId || q.id)===String(previous))){
    sel.value=previous;
  }
 }
 function loadQuoteIntoSchedule(){
- const id=Number(val("scheduleQuoteSelect"));
- const q=quotes.find(q=>q.id===id);
+ const id=val("scheduleQuoteSelect");
+ const q=quotes.find(q=>String(q.cloudId || q.id)===String(id));
  if(!q)return;
  const c=getCustomer(q.customerId);
  document.getElementById("scheduleNotes").value="Customer: "+(c.name||"")+"\nAddress: "+(c.address||"")+"\nQuote total: "+dollars(q.amount);
@@ -2012,7 +2012,8 @@ function loadQuoteIntoSchedule(){
 function setSelectedDate(iso){selectedDate=iso;document.getElementById("scheduleDate").value=iso;renderCalendar();renderSelectedJobs();}
 function changeMonth(delta){currentMonth.setMonth(currentMonth.getMonth()+delta);renderCalendar();}
 async function scheduleSelectedQuote(){
- const q=quotes.find(q=>q.id===Number(val("scheduleQuoteSelect")));
+ const selectedQuoteId = val("scheduleQuoteSelect");
+const q = quotes.find(q => String(q.cloudId || q.id) === String(selectedQuoteId));
  if(!q){alert("Select a sold quote first.");return;}
 
  const c=getCustomer(q.customerId);
@@ -2020,8 +2021,8 @@ async function scheduleSelectedQuote(){
  const job={
   id:Date.now()+Math.random(),
   cloudId:null,
-  quoteId:q.id,
-  customerId:c.id,
+  quote_id: q.cloudId || q.id,
+  customer_id: c.cloudId || c.id,
   customer:c.name,
   address:c.address,
   total:q.amount,
@@ -2064,7 +2065,7 @@ async function scheduleSelectedQuote(){
      editingJobId = job.id;
    }
 
-   await updateQuoteStatusCloud(q.id, { status:"Scheduled" });
+   await updateQuoteStatusCloud(q.cloudId || q.id, { status:"Scheduled" });
  }
 
  document.getElementById("scheduleEditStatus").textContent=
