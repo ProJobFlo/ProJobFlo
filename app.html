@@ -1960,7 +1960,9 @@ async function emailContract(){
 }
 
 function isDue(q){return q.status==="Unsold"&&q.nextFollowUpAt<=nowMs();}
-function getCustomer(id){return customers.find(c=>c.id===id)||{};}
+function getCustomer(id){
+  return customers.find(c => String(c.id) === String(id)) || {};
+}
 function renderFollowUps(){
  const filter=val("followFilter");let list=quotes.slice();if(filter==="due")list=list.filter(q=>isDue(q));if(filter==="all")list=list.filter(q=>q.status==="Unsold");if(filter==="sold")list=list.filter(q=>q.status==="Sold"||q.status==="Scheduled");if(filter==="lost")list=list.filter(q=>q.status==="Lost");list.sort((a,b)=>a.nextFollowUpAt-b.nextFollowUpAt);
  const box=document.getElementById("followUpList");if(!box)return;if(!list.length){box.innerHTML="<p class='small'>Nothing here right now.</p>";return;}
@@ -2992,7 +2994,8 @@ const { data, error } = await supabaseClient
  
  currentCloudQuoteId = data.id;
 
- await loadQuotesFromCloud();
+ await loadCustomersFromCloud();
+await loadQuotesFromCloud();
 return true;
 }
 
