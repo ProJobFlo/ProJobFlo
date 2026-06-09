@@ -2376,7 +2376,7 @@ function renderMoneyTracker(){
      const depPaid=depositPaidForQuote(q.id);
      const owed=Math.max(0,depReq-depPaid);
      if(owed<=0)return "";
-     return `<div class="quote-card"><div class="title">${escapeHtml(c.name||"Unnamed")}</div><div>Deposit owed: <span class="money-warning">${dollars(owed)}</span></div><div class="small">Quote total: ${dollars(q.amount)}</div><button class="secondary" onclick="prefillPayment(${q.id}, ${owed.toFixed(2)}, 'Deposit')">Record Deposit</button></div>`;
+     return `<div class="quote-card"><div class="title">${escapeHtml(c.name||"Unnamed")}</div><div>Deposit owed: <span class="money-warning">${dollars(owed)}</span></div><div class="small">Quote total: ${dollars(q.amount)}</div><button class="secondary" onclick="prefillPayment('${q.id}', ${owed.toFixed(2)}, 'Deposit')">Record Deposit</button></div>`;
    }).join("");
    depositList.innerHTML=items||"<p class='small'>No deposits outstanding.</p>";
  }
@@ -2388,7 +2388,7 @@ function renderMoneyTracker(){
      const paid=totalPaidForQuote(q.id);
      const owed=Math.max(0,Number(q.amount||0)-paid);
      if(owed<=0)return "";
-     return `<div class="quote-card"><div class="title">${escapeHtml(c.name||"Unnamed")}</div><div>Balance owed: <span class="money-warning">${dollars(owed)}</span></div><div class="small">Paid so far: ${dollars(paid)}</div><button class="secondary" onclick="prefillPayment(${q.id}, ${owed.toFixed(2)}, 'Final Payment')">Record Final Payment</button></div>`;
+     return `<div class="quote-card"><div class="title">${escapeHtml(c.name||"Unnamed")}</div><div>Balance owed: <span class="money-warning">${dollars(owed)}</span></div><div class="small">Paid so far: ${dollars(paid)}</div><button class="secondary" onclick="prefillPayment('${q.id}', ${owed.toFixed(2)}, 'Final Payment')">Record Final Payment</button></div>`;
    }).join("");
    finalList.innerHTML=items||"<p class='small'>No final balances outstanding.</p>";
  }
@@ -2415,7 +2415,7 @@ function prefillPayment(quoteId, amount, type){
 }
 
 async function recordPayment(){
- const quoteId=Number(val("paymentJobSelect"));
+ const quoteId = val("paymentJobSelect");
  if(!quoteId){alert("Select a job/quote first.");return;}
  const amount=Number(val("paymentAmount"))||0;
  if(amount<=0){alert("Enter payment amount.");return;}
@@ -2469,7 +2469,7 @@ function renderPaymentHistory(){
  if(!box)return;
  if(!payments.length){box.innerHTML="<p class='small'>No payments recorded yet.</p>";return;}
  box.innerHTML=payments.slice().reverse().map(p=>{
-   const q=quotes.find(q=>q.id===p.quoteId)||{};
+   const q=quotes.find(q=>String(q.id)===String(p.quoteId))||{};
    const c=getCustomer(q.customerId);
    return `<div class="quote-card"><div class="title">${escapeHtml(c.name||"Unnamed")}</div><div>${escapeHtml(p.type)}: <strong>${dollars(p.amount)}</strong></div><div class="small">${escapeHtml(p.method)} • ${new Date(p.date).toLocaleString()}</div><div class="small">${escapeHtml(p.notes||"")}</div></div>`;
  }).join("");
@@ -2477,7 +2477,7 @@ function renderPaymentHistory(){
 
 async function recordDepositAndSchedule(){
  const quoteId=lastAcceptedQuoteId;
- const q=quotes.find(q=>q.id===quoteId);
+ const q=quotes.find(q=>String(q.id)===String(quoteId));
  if(!q){alert("Could not find sold quote.");return;}
  const amount = Number(val("soldDepositCollected")) || 0;
 
