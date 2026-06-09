@@ -2007,12 +2007,15 @@ function loadQuoteIntoSchedule(){
 }
 function setSelectedDate(iso){selectedDate=iso;document.getElementById("scheduleDate").value=iso;renderCalendar();renderSelectedJobs();}
 function changeMonth(delta){currentMonth.setMonth(currentMonth.getMonth()+delta);renderCalendar();}
-function scheduleSelectedQuote(){
+async function scheduleSelectedQuote(){
  const q=quotes.find(q=>q.id===Number(val("scheduleQuoteSelect")));
  if(!q){alert("Select a sold quote first.");return;}
+
  const c=getCustomer(q.customerId);
+
  const job={
   id:Date.now()+Math.random(),
+  cloudId:null,
   quoteId:q.id,
   customerId:c.id,
   customer:c.name,
@@ -2025,13 +2028,67 @@ function scheduleSelectedQuote(){
   duration:val("duration"),
   notes:val("scheduleNotes")
  };
+
  if(!job.date){alert("Choose install date.");return;}
+
  jobs.push(job);
  q.status="Scheduled";
  editingJobId=job.id;
- document.getElementById("scheduleEditStatus").textContent="Editing scheduled job for "+(job.customer||"customer")+".";
+
+ if(currentUser){
+   const { data, error } = await supabaseClient
+     .from("jobs")
+     .insert({
+       user_id: currentUser.id,
+       quote_id: q.id,
+       customer_id: c.id,
+       start_date: job.date,
+       duration_days: Number(job.duration || 1),
+       crew: job.crew || "",
+       status: job.status || "Scheduled",
+       notes: job.notes || ""
+     })
+     .select()
+     .single();
+
+   if(error){
+     console.error(error);
+     alert("Job scheduled locally, but cloud save failed: " + error.message);
+   } else if(data){
+     job.id = data.id;
+     job.cloudId = data.id;
+     editingJobId = job.id;
+   }
+
+   await updateQuoteStatusCloud(q.id, { status:"Scheduled" });
+ }
+
+ document.getElementById("scheduleEditStatus").textContent=
+   "Editing scheduled job for "+(job.customer||"customer")+".";
+
  renderAll();
  alert("Job scheduled.");
+}
+
+ async function saveScheduledJobCloud(job){
+ if(!currentUser || !job || !job.cloudId) return;
+
+ const { error } = await supabaseClient
+   .from("jobs")
+   .update({
+     start_date: job.date,
+     duration_days: Number(job.duration || 1),
+     crew: job.crew || "",
+     status: job.status || "Scheduled",
+     notes: job.notes || ""
+   })
+   .eq("id", job.cloudId)
+   .eq("user_id", currentUser.id);
+
+ if(error){
+   console.error(error);
+   alert("Job updated on screen, but cloud save failed: " + error.message);
+ }
 }
 
 function editScheduledJob(jobId){
@@ -2051,7 +2108,7 @@ function editScheduledJob(jobId){
  renderAll();
 }
 
-function updateScheduledJob(){
+async function updateScheduledJob(){
  if(!editingJobId){alert("Select a calendar job first, then update it.");return;}
  const job=jobs.find(j=>j.id===editingJobId);
  if(!job){alert("Could not find selected job.");return;}
@@ -2063,7 +2120,7 @@ function updateScheduledJob(){
  const q=quotes.find(q=>q.id===job.quoteId);
  if(q) q.status=job.status==="Complete" ? "Scheduled" : "Scheduled";
  document.getElementById("scheduleEditStatus").textContent="Updated scheduled job for "+(job.customer||"customer")+".";
- selectedDate=job.date;
+ await saveScheduledJobCloud(job);
  renderAll();
  alert("Job updated.");
 }
@@ -2132,7 +2189,7 @@ function renderSelectedJobs(){
   );
 }
 
-function markJobInProgress(jobId) {
+async function markJobInProgress(jobId) {
   const job = jobs.find(j => String(j.id) === String(jobId));
 
   if (!job) {
@@ -2146,11 +2203,12 @@ function markJobInProgress(jobId) {
   if (quote) quote.status = "Scheduled";
 
   editingJobId = job.id;
+ await saveScheduledJobCloud(job);
   renderAll();
   alert("Job marked In Progress.");
 }
 
-function markJobComplete(jobId) {
+async function markJobComplete(jobId) {
   const job = jobs.find(j => String(j.id) === String(jobId));
 
   if (!job) {
@@ -2186,6 +2244,7 @@ function markJobComplete(jobId) {
   if (quote) quote.status = "Scheduled";
 
   editingJobId = job.id;
+ await saveScheduledJobCloud(job);
   renderAll();
   alert("Job marked Complete.");
 }
