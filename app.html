@@ -1826,13 +1826,11 @@ function acceptQuote(){
    advanceEstimateNumber();
  }
  lastAcceptedQuoteId = quote.id;
- document.getElementById("soldScreen").classList.remove("hidden");
  showTab("quote");
 
 document
   .getElementById("soldScreen")
   .classList.remove("hidden");
-
 window.scrollTo({
   top: document.getElementById("soldScreen").offsetTop - 100,
   behavior: "smooth"
@@ -2107,13 +2105,89 @@ function renderSelectedJobs(){
       <div>Total: <strong>${dollars(j.total || 0)}</strong></div>
       <div>Duration: ${escapeHtml(j.duration || "1")} day(s)</div>
 
-           <div class="actions" style="margin-top:8px;">
-        <button class="success" onclick="openGoogleCalendarForJob('${j.id}')">Add to Google Calendar</button>
+<div class="actions" style="margin-top:8px;">
+        <button class="success" onclick="openGoogleCalendarForJob('${j.id}')">Google Calendar</button>
+        <button class="secondary" onclick="recordPaymentForJob('${j.id}')">Record Payment</button>
+        <button class="secondary" onclick="markJobInProgress('${j.id}')">Mark In Progress</button>
+        <button class="secondary" onclick="markJobComplete('${j.id}')">Mark Complete</button>
         <button class="secondary" onclick="editScheduledJob('${j.id}')">Edit</button>
         <button class="danger" onclick="editingJobId='${j.id}'; deleteScheduledJob();">Delete</button>
       </div>
     </div>
   `).join("");
+}
+
+ function recordPaymentForJob(jobId) {
+  const job = jobs.find(j => String(j.id) === String(jobId));
+
+  if (!job) {
+    alert("Could not find this job.");
+    return;
+  }
+
+  prefillPayment(
+    job.quoteId,
+    Math.max(0, Number(job.total || 0) - totalPaidForQuote(job.quoteId)).toFixed(2),
+    "Final Payment"
+  );
+}
+
+function markJobInProgress(jobId) {
+  const job = jobs.find(j => String(j.id) === String(jobId));
+
+  if (!job) {
+    alert("Could not find this job.");
+    return;
+  }
+
+  job.status = "In Progress";
+
+  const quote = quotes.find(q => String(q.id) === String(job.quoteId));
+  if (quote) quote.status = "Scheduled";
+
+  editingJobId = job.id;
+  renderAll();
+  alert("Job marked In Progress.");
+}
+
+function markJobComplete(jobId) {
+  const job = jobs.find(j => String(j.id) === String(jobId));
+
+  if (!job) {
+    alert("Could not find this job.");
+    return;
+  }
+
+  const paid = totalPaidForQuote(job.quoteId);
+  const balance = Math.max(0, Number(job.total || 0) - paid);
+
+  if (balance > 0) {
+    const collectNow = confirm(
+      "This job still has a balance due of " +
+      dollars(balance) +
+      ". Do you want to record the final payment now?"
+    );
+
+    if (collectNow) {
+      prefillPayment(job.quoteId, balance.toFixed(2), "Final Payment");
+      return;
+    }
+
+    const completeAnyway = confirm(
+      "Mark this job complete even though there is still a balance due?"
+    );
+
+    if (!completeAnyway) return;
+  }
+
+  job.status = "Complete";
+
+  const quote = quotes.find(q => String(q.id) === String(job.quoteId));
+  if (quote) quote.status = "Scheduled";
+
+  editingJobId = job.id;
+  renderAll();
+  alert("Job marked Complete.");
 }
 
 function renderCustomers(){
