@@ -1846,7 +1846,7 @@ document.getElementById("soldDepositCollected").value =
 if (depositCollected > 0) {
   await addPayment({
     id: Date.now() + Math.random(),
-    quoteId: quote.id,
+    quoteId: quote.cloudId || currentCloudQuoteId || quote.id,
     amount: depositCollected,
     type: "Deposit",
     method: "Collected At Signing",
@@ -2433,10 +2433,23 @@ async function recordPayment(){
  alert("Payment recorded.");
 }
 
- async function addPayment(payment) {
+async function addPayment(payment) {
+  const matchingQuote = quotes.find(
+    q =>
+      String(q.id) === String(payment.quoteId) ||
+      String(q.cloudId) === String(payment.quoteId)
+  );
+
+  const resolvedQuoteId =
+    matchingQuote?.cloudId ||
+    matchingQuote?.id ||
+    currentCloudQuoteId ||
+    payment.quoteId;
+
   const newPayment = {
     id: crypto.randomUUID(),
-    ...payment
+    ...payment,
+    quoteId: resolvedQuoteId
   };
 
   payments.push(newPayment);
@@ -2447,9 +2460,7 @@ async function recordPayment(){
       .insert({
         id: newPayment.id,
         user_id: currentUser.id,
-        quote_id: String(newPayment.quoteId).includes("-")
-  ? newPayment.quoteId
-  : currentCloudQuoteId,
+        quote_id: resolvedQuoteId,
         amount: newPayment.amount,
         type: newPayment.type,
         method: newPayment.method,
@@ -2491,7 +2502,7 @@ const existingDeposit = payments.some(
 
 if(amount > 0 && !existingDeposit){
    await addPayment({
-  quoteId: quote.cloudId || currentCloudQuoteId || quote.id,
+  quoteId: q.cloudId || q.id,
   amount,
   type: "Deposit",
   method: val("soldPaymentMethod"),
