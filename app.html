@@ -1176,7 +1176,7 @@ function deleteCrew(index) {
   renderCrewSettings();
 }
 
-function init() {
+async function init() {
   document.getElementById("estimateDate").value = new Date().toISOString().slice(0,10);
   setEstimateNumberToNext();
   document.getElementById("scheduleDate").value = selectedDate;
@@ -1190,8 +1190,30 @@ function init() {
   renderLineItems();
   setupSignaturePad();
   renderAll();
-}
 
+  try {
+    const { data } = await supabaseClient.auth.getUser();
+
+    if (data && data.user) {
+      currentUser = data.user;
+
+      const authBox = document.getElementById("authBox");
+      if (authBox) authBox.style.display = "none";
+
+      const logoutBtn = document.getElementById("logoutBtn");
+      if (logoutBtn) logoutBtn.style.display = "inline-block";
+
+      const authStatus = document.getElementById("authStatus");
+      if (authStatus) {
+        authStatus.textContent = "Logged in as " + currentUser.email;
+      }
+
+      await loadAllCloudData();
+    }
+  } catch (error) {
+    console.error("Could not restore Supabase session:", error);
+  }
+}
 function showTab(tab) {
   ["dashboard","quote","follow","schedule","money","settings","customers","profit"].forEach(t => {
     document.getElementById("view" + cap(t)).classList.add("hidden");
