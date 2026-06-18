@@ -1867,7 +1867,6 @@ document.getElementById("soldDepositCollected").value =
 
 if (depositCollected > 0) {
   await addPayment({
-    id: Date.now() + Math.random(),
     quoteId: quote.cloudId || currentCloudQuoteId || quote.id,
     amount: depositCollected,
     type: "Deposit",
@@ -2068,8 +2067,8 @@ const q = quotes.find(q => String(q.cloudId || q.id) === String(selectedQuoteId)
  const job={
   id:Date.now()+Math.random(),
   cloudId:null,
-  quote_id: q.cloudId || q.id,
-  customer_id: c.cloudId || c.id,
+  quoteId: q.cloudId || q.id,
+customerId: c.cloudId || c.id,
   customer:c.name,
   address:c.address,
   total:q.amount,
@@ -2472,10 +2471,10 @@ async function addPayment(payment) {
     payment.quoteId;
 
   const newPayment = {
-    id: crypto.randomUUID(),
-    ...payment,
-    quoteId: resolvedQuoteId
-  };
+  ...payment,
+  id: crypto.randomUUID(),
+  quoteId: resolvedQuoteId
+};
 
   payments.push(newPayment);
 
@@ -2558,7 +2557,7 @@ function renderPaymentHistory(){
 
 async function recordDepositAndSchedule(){
  const quoteId=lastAcceptedQuoteId;
- const q=quotes.find(q=>String(q.id)===String(quoteId));
+ const q=quotes.find(q=>String(q.id)===String(quoteId) || String(q.cloudId)===String(quoteId));
  if(!q){alert("Could not find sold quote.");return;}
  const amount = Number(val("soldDepositCollected")) || 0;
 
