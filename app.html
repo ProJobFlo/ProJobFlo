@@ -2339,7 +2339,10 @@ function quoteDepositRequired(q){
 }
 
 function paymentsForQuote(quoteId){
- return payments.filter(p=>p.quoteId===quoteId);
+  return payments.filter(p =>
+    String(p.quoteId) === String(quoteId) ||
+    String(p.quote_id) === String(quoteId)
+  );
 }
 
 function totalPaidForQuote(quoteId){
@@ -2477,15 +2480,58 @@ async function addPayment(payment) {
   renderAll();
 }
 
+ async function loadPaymentsFromCloud() {
+  const ok = await requireLoggedIn();
+  if (!ok) return;
+
+  const { data, error } = await supabaseClient
+    .from("payments")
+    .select("*")
+    .order("paid_at", { ascending: false });
+
+  if (error) {
+    console.error(error);
+    alert("Could not load cloud payments: " + error.message);
+    return;
+  }
+
+  payments = (data || []).map(p => ({
+    id: p.id,
+    quoteId: p.quote_id,
+    amount: Number(p.amount || 0),
+    type: p.type || "Payment",
+    method: p.method || "",
+    notes: p.notes || "",
+    date: p.paid_at || p.created_at || new Date().toISOString()
+  }));
+
+  renderAll();
+}
+
 function renderPaymentHistory(){
- const box=document.getElementById("paymentHistory");
- if(!box)return;
- if(!payments.length){box.innerHTML="<p class='small'>No payments recorded yet.</p>";return;}
- box.innerHTML=payments.slice().reverse().map(p=>{
-   const q=quotes.find(q=>String(q.id)===String(p.quoteId))||{};
-   const c=getCustomer(q.customerId);
-   return `<div class="quote-card"><div class="title">${escapeHtml(c.name||"Unnamed")}</div><div>${escapeHtml(p.type)}: <strong>${dollars(p.amount)}</strong></div><div class="small">${escapeHtml(p.method)} • ${new Date(p.date).toLocaleString()}</div><div class="small">${escapeHtml(p.notes||"")}</div></div>`;
- }).join("");
+  const box=document.getElementById("paymentHistory");
+  if(!box)return;
+
+  if(!payments.length){
+    box.innerHTML="<p class='small'>No payments recorded yet.</p>";
+    return;
+  }
+
+  box.innerHTML=payments.slice().reverse().map(p=>{
+    const q=quotes.find(q =>
+      String(q.id) === String(p.quoteId) ||
+      String(q.cloudId) === String(p.quoteId)
+    ) || {};
+
+    const c=getCustomer(q.customerId || q.customer_id);
+
+    return `<div class="quote-card">
+      <div class="title">${escapeHtml(c.name||"Unnamed")}</div>
+      <div>${escapeHtml(p.type)}: <strong>${dollars(p.amount)}</strong></div>
+      <div class="small">${escapeHtml(p.method)} • ${new Date(p.date).toLocaleString()}</div>
+      <div class="small">${escapeHtml(p.notes||"")}</div>
+    </div>`;
+  }).join("");
 }
 
 async function recordDepositAndSchedule(){
@@ -3255,6 +3301,7 @@ if (customerError) {
   await loadCustomersFromCloud();
   await loadQuotesFromCloud();
   await loadJobsFromCloud();
+  await loadPaymentsFromCloud();
   await loadUserSettings();
 
   const authStatus = document.getElementById("authStatus");
@@ -3263,12 +3310,13 @@ if (customerError) {
       "Logged in as " + currentUser.email +
       " — Cloud data loaded.";
   }
+
   const cloudSummary = document.getElementById("cloudSyncSummary");
-if (cloudSummary) {
-  cloudSummary.textContent =
-    "Cloud sync active for " + currentUser.email +
-    ". Customers, quotes, and jobs load automatically after login.";
-}
+  if (cloudSummary) {
+    cloudSummary.textContent =
+      "Cloud sync active for " + currentUser.email +
+      ". Customers, quotes, jobs, and payments load automatically after login.";
+  }
 }
  function toggleDeveloperTools() {
   const tools = document.getElementById("developerTools");
