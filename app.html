@@ -2447,7 +2447,9 @@ async function recordPayment(){
       .insert({
         id: newPayment.id,
         user_id: currentUser.id,
-        quote_id: newPayment.quoteId,
+        quote_id: String(newPayment.quoteId).includes("-")
+  ? newPayment.quoteId
+  : currentCloudQuoteId,
         amount: newPayment.amount,
         type: newPayment.type,
         method: newPayment.method,
@@ -2489,7 +2491,7 @@ const existingDeposit = payments.some(
 
 if(amount > 0 && !existingDeposit){
    await addPayment({
-  quoteId: q.id,
+  quoteId: quote.cloudId || currentCloudQuoteId || quote.id,
   amount,
   type: "Deposit",
   method: val("soldPaymentMethod"),
