@@ -3248,6 +3248,28 @@ async function queueAutoSave() {
   }, 2000);
 }
 
+ function getAutoSaveQuoteStatus() {
+  const existingQuote = quotes.find(
+    q => String(q.cloudId || q.id) === String(currentCloudQuoteId)
+  );
+
+  const existingStatus = existingQuote?.status;
+
+  if (
+    ["Sold", "Scheduled", "Materials Ordered", "Ready to Install", "In Progress", "Complete", "Lost"]
+      .includes(existingStatus)
+  ) {
+    return existingStatus;
+  }
+
+  const selectedStatus = val("quoteSaveStatus");
+
+  if (selectedStatus && selectedStatus !== "Unsold") {
+    return selectedStatus;
+  }
+
+  return "Draft";
+}
 async function autoSaveCurrentQuoteDraft() {
   if (!currentUser) return;
 
@@ -3316,7 +3338,7 @@ if (customerError) {
       user_id: currentUser.id,
       customer_id: currentCloudCustomerId,
       estimate_number: val("estimateNumber"),
-      status: "Draft",
+      status: status: getAutoSaveQuoteStatus(),
       total: total,
       quote_data: quotePayload
     });
