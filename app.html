@@ -2036,7 +2036,10 @@ function renderScheduleQuoteSelect(){
  const sel=document.getElementById("scheduleQuoteSelect");
  if(!sel)return;
  const previous=sel.value;
- const sold=quotes.filter(q=>q.status==="Sold"||q.status==="Scheduled");
+ const sold = quotes.filter(q => {
+  const status = String(q.status || "").toLowerCase();
+  return ["sold", "scheduled", "materials ordered", "ready to install", "in progress", "complete"].includes(status);
+});
  sel.innerHTML=sold.length?sold.map(q=>{
    const c=getCustomer(q.customerId);
    const est=q.estimateNumber ? " #"+q.estimateNumber : "";
@@ -2409,7 +2412,8 @@ function renderMoneyTracker(){
      const c=getCustomer(q.customerId);
      const depReq=Number(q.depositRequired||quoteDepositRequired(q)||0);
      const depPaid=depositPaidForQuote(q.id);
-     const owed=Math.max(0,depReq-depPaid);
+     const depReq = Number(q.depositRequired || quoteDepositRequired(q) || 0);
+const owed = Math.max(0, Number(q.amount || 0) - Math.max(paid, depReq));
      if(owed<=0)return "";
      return `<div class="quote-card"><div class="title">${escapeHtml(c.name||"Unnamed")}</div><div>Deposit owed: <span class="money-warning">${dollars(owed)}</span></div><div class="small">Quote total: ${dollars(q.amount)}</div><button class="secondary" onclick="prefillPayment('${q.id}', ${owed.toFixed(2)}, 'Deposit')">Record Deposit</button></div>`;
    }).join("");
