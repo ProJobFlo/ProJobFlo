@@ -2353,7 +2353,18 @@ function renderCustomers(){
 function selectCustomer(id){const c=getCustomer(id);const qs=quotes.filter(q=>q.customerId===id).sort((a,b)=>b.createdAt-a.createdAt);const js=jobs.filter(j=>j.customerId===id).sort((a,b)=>a.date.localeCompare(b.date));document.getElementById("customerDetails").innerHTML=`<div class="customer-card"><div class="title">${escapeHtml(c.name||"Unnamed")}</div><div>${escapeHtml(c.phone||"")}<br>${escapeHtml(c.email||"")}<br>${escapeHtml(c.address||"")}</div></div><h3>Quote History</h3>${qs.length?qs.map(q=>`<div class="quote-card"><div>Quote: <strong>${dollars(q.amount)}</strong></div><div>Status: <span class="pill ${statusClass(q.status)}">${escapeHtml(q.status)}</span></div><div class="small">${new Date(q.createdAt).toLocaleString()}</div></div>`).join(""):"<p>No quote history.</p>"}<h3>Scheduled Jobs</h3>${js.length?js.map(j=>`<div class="job-card"><div>${escapeHtml(j.date)} • ${escapeHtml(j.crew)}</div><div>Status: ${escapeHtml(j.status)}</div></div>`).join(""):"<p>No scheduled jobs.</p>"}`;}
 function statusClass(status){if(status==="Materials Ordered")return"status-Ordered";if(status==="Ready to Install")return"status-Ready";if(status==="In Progress")return"status-Progress";return"status-"+String(status).replaceAll(" ","");}
 
+function isMoneyTrackedQuote(q) {
+  const status = String(q.status || "").toLowerCase();
 
+  return [
+    "sold",
+    "scheduled",
+    "materials ordered",
+    "ready to install",
+    "in progress",
+    "complete"
+  ].includes(status);
+}
 
 function quoteDepositRequired(q){
  return Number(q.amount||0) * ((num("depositPercent")||50)/100);
@@ -2375,14 +2386,14 @@ function depositPaidForQuote(quoteId){
 }
 
 function renderMoneyTracker(){
- const soldQuotes=quotes.filter(q=>q.status==="Sold"||q.status==="Scheduled");
+ const soldQuotes = quotes.filter(isMoneyTrackedQuote);
  let depositsDue=0, finalDue=0, collected=0;
  soldQuotes.forEach(q=>{
    const paid=totalPaidForQuote(q.id);
    const depPaid=depositPaidForQuote(q.id);
    const depReq=Number(q.depositRequired||quoteDepositRequired(q)||0);
    depositsDue += Math.max(0, depReq-depPaid);
-   finalDue += Math.max(0, Number(q.amount||0)-paid);
+   finalDue += Math.max(0, Number(q.amount || 0) - Math.max(paid, depReq));
  });
  collected = payments.reduce((s,p)=>s+Number(p.amount||0),0);
 
@@ -2410,7 +2421,8 @@ function renderMoneyTracker(){
    const items=soldQuotes.map(q=>{
      const c=getCustomer(q.customerId);
      const paid=totalPaidForQuote(q.id);
-     const owed=Math.max(0,Number(q.amount||0)-paid);
+     const depReq = Number(q.depositRequired || quoteDepositRequired(q) || 0);
+const owed = Math.max(0, Number(q.amount || 0) - Math.max(paid, depReq));
      if(owed<=0)return "";
      return `<div class="quote-card"><div class="title">${escapeHtml(c.name||"Unnamed")}</div><div>Balance owed: <span class="money-warning">${dollars(owed)}</span></div><div class="small">Paid so far: ${dollars(paid)}</div><button class="secondary" onclick="prefillPayment('${q.id}', ${owed.toFixed(2)}, 'Final Payment')">Record Final Payment</button></div>`;
    }).join("");
@@ -2426,7 +2438,7 @@ function renderPaymentSelectors(){
  selects.forEach(id=>{
    const sel=document.getElementById(id);
    if(!sel)return;
-   const sold=quotes.filter(q=>q.status==="Sold"||q.status==="Scheduled");
+   const sold = quotes.filter(isMoneyTrackedQuote);
    sel.innerHTML=sold.length?sold.map(q=>{const c=getCustomer(q.customerId);return `<option value="${q.id}">${escapeHtml(c.name||"Unnamed")} — ${dollars(q.amount)}</option>`;}).join(""):`<option value="">No sold jobs</option>`;
  });
 }
