@@ -1789,8 +1789,58 @@ function newQuote(){
   }, 500);
 }
 
-function saveAcceptedQuoteAsSold(){
+function saveAcceptedQuoteAsSold(savedQuote=null, savedCustomer=null, acceptedAtValue=acceptedAt){
  if(!val("customerName")){alert("Enter customer name first.");return null;}
+
+ if(savedQuote){
+   const payload = savedQuote.quote_data || {};
+   const customer = savedCustomer || {
+     id: savedQuote.customer_id,
+     name: payload.customer?.name || val("customerName"),
+     phone: payload.customer?.phone || val("customerPhone"),
+     email: payload.customer?.email || val("customerEmail"),
+     address: payload.customer?.address || val("jobAddress")
+   };
+   const existingCustomer = customers.find(c => String(c.id) === String(customer.id));
+   if(existingCustomer){
+     Object.assign(existingCustomer, customer);
+   } else {
+     customers.push(customer);
+   }
+
+   const quoteId = savedQuote.id;
+   const existingCloudQuote = quotes.find(q => String(q.cloudId || q.id) === String(quoteId));
+   const createdAt = savedQuote.created_at ? new Date(savedQuote.created_at).getTime() : nowMs();
+   const quoteData = {
+     id: quoteId,
+     cloudId: quoteId,
+     customerId: savedQuote.customer_id || customer.id,
+     estimateNumber: savedQuote.estimate_number || val("estimateNumber"),
+     amount: Number(savedQuote.total || getCurrentQuoteTotal()),
+     depositRequired: payload.depositRequired || (getCurrentQuoteTotal()*((num("depositPercent")||0)/100)).toFixed(2),
+     status: savedQuote.status || "Sold",
+     notes: payload.notes || val("notes"),
+     quoteText: payload.quoteText || document.getElementById("quotePreview").textContent,
+     profitSnapshot: payload.profitSnapshot || profitTotals(),
+     lineItemsSnapshot: payload.lineItems || lineItems,
+     roomsSnapshot: payload.rooms || rooms,
+     roomPhotosSnapshot: payload.roomPhotos || roomPhotos,
+     acceptedAt: payload.acceptedAt || acceptedAtValue,
+     createdAt,
+     lastFollowedUpAt: payload.lastFollowedUpAt || null,
+     nextFollowUpAt: payload.nextFollowUpAt || createdAt+(48*60*60*1000),
+     followUpHours: payload.followUpHours || 48,
+     quoteData: payload
+   };
+
+   if(existingCloudQuote){
+     Object.assign(existingCloudQuote, quoteData);
+     return existingCloudQuote;
+   }
+
+   quotes.push(quoteData);
+   return quoteData;
+ }
 
  const customer=getOrCreateCustomer();
  const existing = quotes.find(q => q.id === lastAcceptedQuoteId);
@@ -1837,23 +1887,27 @@ async function acceptQuote(){
  const ok = await requireLoggedIn();
  if(!ok) return;
 
- acceptedAt=new Date().toLocaleString();
- document.getElementById("acceptedStatus").textContent="Accepted by "+signedName+" on "+acceptedAt+".";
- document.getElementById("quoteSaveStatus").value="Sold";
+ const acceptedAtValue=new Date().toLocaleString();
+ const cloudSaved = await saveCurrentQuoteToCloud({
+   status: "Sold",
+   acceptedAt: acceptedAtValue,
+   skipReload: true
+ });
+ if(!cloudSaved || !cloudSaved.quote){
+   return;
+ }
 
- const quote = saveAcceptedQuoteAsSold();
- const cloudSaved = await saveCurrentQuoteToCloud();
-
-if (cloudSaved && currentCloudQuoteId) {
-  quote.cloudId = currentCloudQuoteId;
-  quote.id = currentCloudQuoteId;
-}
+ const quote = saveAcceptedQuoteAsSold(cloudSaved.quote, cloudSaved.customer, acceptedAtValue);
+ if(!quote) return;
 
  if(lastAcceptedQuoteId !== (quote.cloudId || quote.id)){
    advanceEstimateNumberCloud();
  }
 
  lastAcceptedQuoteId = quote.cloudId || quote.id;
+ acceptedAt=acceptedAtValue;
+ document.getElementById("acceptedStatus").textContent="Accepted by "+signedName+" on "+acceptedAt+".";
+ document.getElementById("quoteSaveStatus").value="Sold";
 
  document.getElementById("soldScreen").classList.remove("hidden");
  document.getElementById("soldTotal").textContent=dollars(quote.amount);
@@ -3034,7 +3088,7 @@ async function loadCustomersFromCloud() {
       "Logged in as " + currentUser.email + " — Cloud customers loaded: " + customers.length;
   }
 }
-async function saveCurrentQuoteToCloud() {
+async function saveCurrentQuoteToCloud(options = {}) {
   const ok = await requireLoggedIn();
   if (!ok) return;
 
@@ -3050,7 +3104,6 @@ async function saveCurrentQuoteToCloud() {
  let savedCustomer = null;
 
 const customerId = currentCloudCustomerId || crypto.randomUUID();
-currentCloudCustomerId = customerId;
 
 const { data: customerData, error: customerError } = await supabaseClient
   .from("customers")
@@ -3068,11 +3121,17 @@ savedCustomer = customerData;
     alert("Quote customer did not save: " + customerError.message);
     return;
   }
+  currentCloudCustomerId = customerId;
 
   const measured = getMeasuredSqft();
   const order = getOrderSqft();
   const totalText = document.getElementById("grandTotal").textContent || "$0";
   const total = Number(totalText.replace("$", "").replace(",", "")) || 0;
+  const depositRequired = (total*((num("depositPercent")||0)/100)).toFixed(2);
+  const quoteStatus = options.status || val("quoteSaveStatus");
+  const quoteAcceptedAt = Object.prototype.hasOwnProperty.call(options, "acceptedAt")
+    ? options.acceptedAt
+    : acceptedAt;
 
   const proposalRoomPhotos = await prepareRoomPhotosForProposalData();
 
@@ -3081,6 +3140,11 @@ savedCustomer = customerData;
     roomPhotos: proposalRoomPhotos,
     lineItems,
     notes: val("notes"),
+    quoteText: document.getElementById("quotePreview").textContent,
+    profitSnapshot: profitTotals(),
+    depositRequired,
+    acceptedAt: quoteAcceptedAt || null,
+    status: quoteStatus,
     company: {
       name: val("companyName"),
       phone: val("companyPhone"),
@@ -3099,22 +3163,16 @@ savedCustomer = customerData;
     }
   };
 
-  if (!currentCloudQuoteId) {
-  currentCloudQuoteId = crypto.randomUUID();
-}
-
-if (!currentCloudQuoteId) {
-  currentCloudQuoteId = crypto.randomUUID();
-}
+  const quoteId = currentCloudQuoteId || crypto.randomUUID();
 
 const { data, error } = await supabaseClient
   .from("quotes")
   .upsert({
-    id: currentCloudQuoteId,
+    id: quoteId,
     user_id: currentUser.id,
     customer_id: savedCustomer.id,
     estimate_number: val("estimateNumber"),
-    status: val("quoteSaveStatus"),
+    status: quoteStatus,
     total: total,
     quote_data: quotePayload
   })
@@ -3129,9 +3187,14 @@ const { data, error } = await supabaseClient
  
  currentCloudQuoteId = data.id;
 
- await loadCustomersFromCloud();
-await loadQuotesFromCloud();
-return true;
+ if(!options.skipReload){
+   await loadCustomersFromCloud();
+   await loadQuotesFromCloud();
+ }
+ return {
+   customer: savedCustomer,
+   quote: data
+ };
 }
 
 async function loadQuotesFromCloud() {
