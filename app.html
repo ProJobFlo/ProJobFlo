@@ -2394,39 +2394,37 @@ function renderMoneyTracker(){
    const depPaid=depositPaidForQuote(q.id);
    const depReq=Number(q.depositRequired||quoteDepositRequired(q)||0);
    depositsDue += Math.max(0, depReq-depPaid);
-   finalDue += Math.max(0, Number(q.amount || 0) - Math.max(paid, depReq));
+   finalDue += Math.max(0, Number(q.amount || 0) - paid);
  });
  collected = payments.reduce((s,p)=>s+Number(p.amount||0),0);
 
  const set=(id,val)=>{const el=document.getElementById(id); if(el) el.textContent=dollars(val);};
- set("moneyDepositsDue",depositsDue);
- set("moneyFinalDue",finalDue);
- set("moneyCollected",collected);
- set("moneyOutstanding",depositsDue+finalDue);
+  set("moneyDepositsDue",depositsDue);
+  set("moneyFinalDue",finalDue);
+  set("moneyCollected",collected);
+  set("moneyOutstanding",finalDue);
 
  const depositList=document.getElementById("depositOutstandingList");
- if(depositList){
-   const items=soldQuotes.map(q=>{
+  if(depositList){
+    const items=soldQuotes.map(q=>{
       const c=getCustomer(q.customerId);
       const depReq=Number(q.depositRequired||quoteDepositRequired(q)||0);
       const depPaid=depositPaidForQuote(q.id);
-      const paid=totalPaidForQuote(q.id);
-const owed = Math.max(0, Number(q.amount || 0) - Math.max(paid, depReq));
-     if(owed<=0)return "";
-     return `<div class="quote-card"><div class="title">${escapeHtml(c.name||"Unnamed")}</div><div>Deposit owed: <span class="money-warning">${dollars(owed)}</span></div><div class="small">Quote total: ${dollars(q.amount)}</div><button class="secondary" onclick="prefillPayment('${q.id}', ${owed.toFixed(2)}, 'Deposit')">Record Deposit</button></div>`;
+      const owed = Math.max(0, depReq - depPaid);
+      if(owed<=0)return "";
+      return `<div class="quote-card"><div class="title">${escapeHtml(c.name||"Unnamed")}</div><div>Deposit owed: <span class="money-warning">${dollars(owed)}</span></div><div class="small">Quote total: ${dollars(q.amount)}</div><button class="secondary" onclick="prefillPayment('${q.id}', ${owed.toFixed(2)}, 'Deposit')">Record Deposit</button></div>`;
    }).join("");
    depositList.innerHTML=items||"<p class='small'>No deposits outstanding.</p>";
  }
 
  const finalList=document.getElementById("finalOutstandingList");
  if(finalList){
-   const items=soldQuotes.map(q=>{
-     const c=getCustomer(q.customerId);
-     const paid=totalPaidForQuote(q.id);
-     const depReq = Number(q.depositRequired || quoteDepositRequired(q) || 0);
-const owed = Math.max(0, Number(q.amount || 0) - Math.max(paid, depReq));
-     if(owed<=0)return "";
-     return `<div class="quote-card"><div class="title">${escapeHtml(c.name||"Unnamed")}</div><div>Balance owed: <span class="money-warning">${dollars(owed)}</span></div><div class="small">Paid so far: ${dollars(paid)}</div><button class="secondary" onclick="prefillPayment('${q.id}', ${owed.toFixed(2)}, 'Final Payment')">Record Final Payment</button></div>`;
+    const items=soldQuotes.map(q=>{
+      const c=getCustomer(q.customerId);
+      const paid=totalPaidForQuote(q.id);
+      const owed = Math.max(0, Number(q.amount || 0) - paid);
+      if(owed<=0)return "";
+      return `<div class="quote-card"><div class="title">${escapeHtml(c.name||"Unnamed")}</div><div>Balance owed: <span class="money-warning">${dollars(owed)}</span></div><div class="small">Paid so far: ${dollars(paid)}</div><button class="secondary" onclick="prefillPayment('${q.id}', ${owed.toFixed(2)}, 'Final Payment')">Record Final Payment</button></div>`;
    }).join("");
    finalList.innerHTML=items||"<p class='small'>No final balances outstanding.</p>";
  }
