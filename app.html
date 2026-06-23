@@ -1834,6 +1834,8 @@ async function acceptQuote(){
  const signedName=val("customerSignatureName")||val("customerName");
  if(!signedName){alert("Enter customer's printed name first.");return;}
  if(!signatureComplete){alert("Please have the customer sign before accepting.");return;}
+ const ok = await requireLoggedIn();
+ if(!ok) return;
 
  acceptedAt=new Date().toLocaleString();
  document.getElementById("acceptedStatus").textContent="Accepted by "+signedName+" on "+acceptedAt+".";
@@ -2062,6 +2064,8 @@ async function scheduleSelectedQuote(){
  const selectedQuoteId = val("scheduleQuoteSelect");
 const q = quotes.find(q => String(q.cloudId || q.id) === String(selectedQuoteId));
  if(!q){alert("Select a sold quote first.");return;}
+ const ok = await requireLoggedIn();
+ if(!ok) return;
 
  const c=getCustomer(q.customerId);
 
@@ -2455,6 +2459,8 @@ async function recordPayment(){
  if(!quoteId){alert("Select a job/quote first.");return;}
  const amount=Number(val("paymentAmount"))||0;
  if(amount<=0){alert("Enter payment amount.");return;}
+ const ok = await requireLoggedIn();
+ if(!ok) return;
  await addPayment({
   quoteId,
   amount,
@@ -2919,7 +2925,7 @@ async function resetPassword() {
   const { data, error } = await supabaseClient.auth.getUser();
 
   if (error || !data.user) {
-    alert("Please login first.");
+    alert("Please log in first.");
     return false;
   }
 
