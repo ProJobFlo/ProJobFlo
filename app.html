@@ -2407,10 +2407,10 @@ function renderMoneyTracker(){
  const depositList=document.getElementById("depositOutstandingList");
  if(depositList){
    const items=soldQuotes.map(q=>{
-     const c=getCustomer(q.customerId);
-     const depReq=Number(q.depositRequired||quoteDepositRequired(q)||0);
-     const depPaid=depositPaidForQuote(q.id);
-     const depReq = Number(q.depositRequired || quoteDepositRequired(q) || 0);
+      const c=getCustomer(q.customerId);
+      const depReq=Number(q.depositRequired||quoteDepositRequired(q)||0);
+      const depPaid=depositPaidForQuote(q.id);
+      const paid=totalPaidForQuote(q.id);
 const owed = Math.max(0, Number(q.amount || 0) - Math.max(paid, depReq));
      if(owed<=0)return "";
      return `<div class="quote-card"><div class="title">${escapeHtml(c.name||"Unnamed")}</div><div>Deposit owed: <span class="money-warning">${dollars(owed)}</span></div><div class="small">Quote total: ${dollars(q.amount)}</div><button class="secondary" onclick="prefillPayment('${q.id}', ${owed.toFixed(2)}, 'Deposit')">Record Deposit</button></div>`;
@@ -3338,7 +3338,7 @@ if (customerError) {
       user_id: currentUser.id,
       customer_id: currentCloudCustomerId,
       estimate_number: val("estimateNumber"),
-      status: status: getAutoSaveQuoteStatus(),
+      status: getAutoSaveQuoteStatus(),
       total: total,
       quote_data: quotePayload
     });
