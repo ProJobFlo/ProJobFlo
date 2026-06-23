@@ -2068,12 +2068,14 @@ const q = quotes.find(q => String(q.cloudId || q.id) === String(selectedQuoteId)
  if(!ok) return;
 
  const c=getCustomer(q.customerId);
+ const quoteId = q.cloudId || q.id;
+ const customerId = c.cloudId || c.id;
 
  const job={
   id:Date.now()+Math.random(),
   cloudId:null,
-  quoteId: q.cloudId || q.id,
-customerId: c.cloudId || c.id,
+  quoteId,
+  customerId,
   customer:c.name,
   address:c.address,
   total:q.amount,
@@ -2087,40 +2089,60 @@ customerId: c.cloudId || c.id,
 
  if(!job.date){alert("Choose install date.");return;}
 
- jobs.push(job);
- q.status="Scheduled";
- editingJobId=job.id;
+ const { data, error } = await supabaseClient
+   .from("jobs")
+   .insert({
+     user_id: currentUser.id,
+     quote_id: quoteId,
+     customer_id: customerId,
+     start_date: job.date,
+     duration_days: Number(job.duration || 1),
+     crew: job.crew || "",
+     status: job.status || "Scheduled",
+     notes: job.notes || ""
+   })
+   .select()
+   .single();
 
- if(currentUser){
-   const { data, error } = await supabaseClient
-     .from("jobs")
-     .insert({
-       user_id: currentUser.id,
-       quote_id: q.cloudId || q.id,
-customer_id: c.cloudId || c.id,
-       start_date: job.date,
-       duration_days: Number(job.duration || 1),
-       crew: job.crew || "",
-       status: job.status || "Scheduled",
-       notes: job.notes || ""
-     })
-     .select()
-     .single();
-
-   if(error){
-     console.error(error);
-     alert("Job scheduled locally, but cloud save failed: " + error.message);
-   } else if(data){
-     job.id = data.id;
-     job.cloudId = data.id;
-     editingJobId = job.id;
-   }
-
-   await updateQuoteStatusCloud(q.cloudId || q.id, { status:"Scheduled" });
+ if(error){
+   console.error(error);
+   alert("Job did not save to cloud: " + error.message);
+   return;
  }
 
+ const savedJob = {
+   ...job,
+   id: data?.id || job.id,
+   cloudId: data?.id || job.cloudId,
+   quoteId: data?.quote_id || quoteId,
+   customerId: data?.customer_id || customerId,
+   date: data?.start_date || job.date,
+   startDate: data?.start_date || job.date,
+   duration: data?.duration_days || job.duration,
+   durationDays: data?.duration_days || job.duration,
+   crew: data?.crew || job.crew,
+   status: data?.status || job.status || "Scheduled",
+   notes: data?.notes || job.notes
+ };
+
+ const { error: quoteError } = await supabaseClient
+   .from("quotes")
+   .update({ status:"Scheduled" })
+   .eq("id", quoteId)
+   .eq("user_id", currentUser.id);
+
+ if(quoteError){
+   console.error(quoteError);
+   alert("Job saved, but quote status did not update: " + quoteError.message);
+   return;
+ }
+
+ jobs.push(savedJob);
+ q.status="Scheduled";
+ editingJobId=savedJob.id;
+
  document.getElementById("scheduleEditStatus").textContent=
-   "Editing scheduled job for "+(job.customer||"customer")+".";
+   "Editing scheduled job for "+(savedJob.customer||"customer")+".";
 
  renderAll();
  alert("Job scheduled.");
