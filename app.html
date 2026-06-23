@@ -2461,7 +2461,7 @@ async function recordPayment(){
  if(amount<=0){alert("Enter payment amount.");return;}
  const ok = await requireLoggedIn();
  if(!ok) return;
- await addPayment({
+ const saved = await addPayment({
   quoteId,
   amount,
   type: val("paymentType"),
@@ -2469,9 +2469,9 @@ async function recordPayment(){
   notes: val("paymentNotes"),
   date: new Date().toISOString()
 });
+ if(!saved) return;
  document.getElementById("paymentAmount").value="";
  document.getElementById("paymentNotes").value="";
- renderAll();
  alert("Payment recorded.");
 }
 
@@ -2488,35 +2488,50 @@ async function addPayment(payment) {
     currentCloudQuoteId ||
     payment.quoteId;
 
-  const newPayment = {
-  ...payment,
-  id: crypto.randomUUID(),
-  quoteId: resolvedQuoteId
-};
-
-  payments.push(newPayment);
-
-  if (currentUser) {
-    const { error } = await supabaseClient
-      .from("payments")
-      .insert({
-        id: newPayment.id,
-        user_id: currentUser.id,
-        quote_id: resolvedQuoteId,
-        amount: newPayment.amount,
-        type: newPayment.type,
-        method: newPayment.method,
-        notes: newPayment.notes,
-        paid_at: newPayment.date
-      });
-
-    if (error) {
-      console.error(error);
-      alert("Payment saved on screen, but cloud save failed: " + error.message);
-    }
+  if (!currentUser) {
+    alert("Please log in first.");
+    return false;
   }
 
+  const newPayment = {
+    ...payment,
+    id: crypto.randomUUID(),
+    quoteId: resolvedQuoteId
+  };
+
+  const { data, error } = await supabaseClient
+    .from("payments")
+    .insert({
+      id: newPayment.id,
+      user_id: currentUser.id,
+      quote_id: resolvedQuoteId,
+      amount: newPayment.amount,
+      type: newPayment.type,
+      method: newPayment.method,
+      notes: newPayment.notes,
+      paid_at: newPayment.date
+    })
+    .select()
+    .single();
+
+  if (error) {
+    console.error(error);
+    alert("Payment did not save to cloud: " + error.message);
+    return false;
+  }
+
+  payments.push({
+    id: data?.id || newPayment.id,
+    quoteId: data?.quote_id || resolvedQuoteId,
+    amount: Number(data?.amount ?? newPayment.amount),
+    type: data?.type || newPayment.type,
+    method: data?.method || newPayment.method,
+    notes: data?.notes || newPayment.notes,
+    date: data?.paid_at || data?.created_at || newPayment.date
+  });
+
   renderAll();
+  return true;
 }
 
  async function loadPaymentsFromCloud() {
