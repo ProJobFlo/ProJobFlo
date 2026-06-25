@@ -1719,7 +1719,9 @@ async function saveCurrentQuote(){
   const ok = await requireLoggedIn();
   if(!ok) return;
 
-  const saved = await saveCurrentQuoteToCloud();
+  const saved = await saveCurrentQuoteToCloud({
+    status: val("quoteSaveStatus") || "Unsold"
+  });
 
 if (!saved) return;
 
@@ -2180,21 +2182,9 @@ const q = quotes.find(q => String(q.cloudId || q.id) === String(selectedQuoteId)
    notes: data?.notes || job.notes
  };
 
- const { error: quoteError } = await supabaseClient
-   .from("quotes")
-   .update({ status:"Scheduled" })
-   .eq("id", quoteId)
-   .eq("user_id", currentUser.id);
-
- if(quoteError){
-   console.error(quoteError);
-   alert("Job saved, but quote status did not update: " + quoteError.message);
-   return;
- }
-
- jobs.push(savedJob);
- q.status="Scheduled";
- editingJobId=savedJob.id;
+  jobs.push(savedJob);
+  q.status="Sold";
+  editingJobId=savedJob.id;
 
  document.getElementById("scheduleEditStatus").textContent=
    "Editing scheduled job for "+(savedJob.customer||"customer")+".";
@@ -2250,8 +2240,8 @@ async function updateScheduledJob(){
  job.crew=val("crew");
  job.status=val("jobStatus");
  job.notes=val("scheduleNotes");
- const q=quotes.find(q=>q.id===job.quoteId);
- if(q) q.status=job.status==="Complete" ? "Scheduled" : "Scheduled";
+  const q=quotes.find(q=>q.id===job.quoteId);
+  if(q) q.status="Sold";
  document.getElementById("scheduleEditStatus").textContent="Updated scheduled job for "+(job.customer||"customer")+".";
  await saveScheduledJobCloud(job);
  renderAll();
@@ -2346,7 +2336,7 @@ async function markJobInProgress(jobId) {
   job.status = "In Progress";
 
   const quote = quotes.find(q => String(q.id) === String(job.quoteId));
-  if (quote) quote.status = "Scheduled";
+  if (quote) quote.status = "Sold";
 
   editingJobId = job.id;
  await saveScheduledJobCloud(job);
@@ -2387,7 +2377,7 @@ async function markJobComplete(jobId) {
   job.status = "Complete";
 
   const quote = quotes.find(q => String(q.id) === String(job.quoteId));
-  if (quote) quote.status = "Scheduled";
+  if (quote) quote.status = "Sold";
 
   editingJobId = job.id;
  await saveScheduledJobCloud(job);
@@ -3360,16 +3350,13 @@ async function queueAutoSave() {
 
   const existingStatus = existingQuote?.status;
 
-  if (
-    ["Sold", "Scheduled", "Materials Ordered", "Ready to Install", "In Progress", "Complete", "Lost"]
-      .includes(existingStatus)
-  ) {
+  if (["Sold", "Lost"].includes(existingStatus)) {
     return existingStatus;
   }
 
   const selectedStatus = val("quoteSaveStatus");
 
-  if (selectedStatus && selectedStatus !== "Unsold") {
+  if (selectedStatus) {
     return selectedStatus;
   }
 
