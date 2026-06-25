@@ -88,6 +88,29 @@
   #liveNumbersCard .final { background:linear-gradient(135deg,#eff6ff,#dbeafe 58%,#ccfbf1); border:1px solid #93c5fd; box-shadow:0 14px 30px rgba(37,99,235,.16); }
   #liveNumbersCard .final .stat-label { color:#1e40af; }
   #liveNumbersCard .final .stat-value { color:#0f172a; text-shadow:none; }
+  #viewQuote > .grid > div:first-child { counter-reset: quoteStep; }
+  #viewQuote > .grid > div:first-child > .card { counter-increment: quoteStep; padding:22px; margin-bottom:22px; border-color:rgba(148,163,184,.42); box-shadow:0 18px 45px rgba(15,23,42,.08); }
+  #viewQuote > .grid > div:first-child > .card:first-child { background:linear-gradient(135deg,#ffffff 0%,#f8fbff 62%,#eef6ff 100%); border-color:#bfdbfe; box-shadow:0 24px 60px rgba(37,99,235,.10); }
+  #viewQuote > .grid > div:first-child > .card h2:first-of-type { display:flex; align-items:center; gap:10px; margin-bottom:16px; font-size:19px; }
+  #viewQuote > .grid > div:first-child > .card h2:first-of-type::before { content:counter(quoteStep); display:inline-grid; place-items:center; width:28px; height:28px; flex:0 0 28px; border-radius:999px; background:linear-gradient(135deg,#2563eb,#0f766e); color:white; font-size:13px; font-weight:900; box-shadow:0 10px 18px rgba(37,99,235,.20); }
+  #viewQuote > .grid > div:first-child > .card p.small { margin:-4px 0 14px; max-width:66ch; }
+  #viewQuote .form-grid { gap:12px; margin-bottom:12px; }
+  #viewQuote .card > div[style*="display:flex"] { flex-wrap:wrap; }
+  #viewQuote input, #viewQuote select, #viewQuote textarea { border-color:#d7dee8; background:linear-gradient(180deg,#fff,#fbfdff); box-shadow:inset 0 1px 1px rgba(15,23,42,.03), 0 1px 0 rgba(255,255,255,.9); }
+  #viewQuote input:focus, #viewQuote select:focus, #viewQuote textarea:focus { background:#fff; }
+  #viewQuote .field label { color:#334155; }
+  #viewQuote .subtle-card { background:linear-gradient(180deg,#ffffff,#f8fafc); border-color:#dbe3ee; box-shadow:0 10px 22px rgba(15,23,42,.05); }
+  #viewQuote .room-type-grid button, #viewQuote button.secondary { box-shadow:0 4px 12px rgba(15,23,42,.06); }
+  #viewQuote button.success, #viewQuote button.warning { box-shadow:0 12px 24px rgba(37,99,235,.14); }
+  #viewQuote .room-row, #lineItems .item-row { background:linear-gradient(180deg,#ffffff,#f9fbff); border-color:#dbe3ee; box-shadow:0 8px 18px rgba(15,23,42,.05); }
+  #viewQuote .room-row input, #lineItems .item-row input, #lineItems .item-row select { margin-bottom:0; }
+  #viewQuote .item-row.hide-mobile { padding:0 8px 6px; margin-bottom:8px; border-bottom:1px solid var(--border); }
+  #quotePreview { background:linear-gradient(180deg,#ffffff,#fbfdff); border:1px solid #dbe3ee; border-left:5px solid var(--primary); box-shadow:inset 0 1px 0 rgba(255,255,255,.9), 0 14px 32px rgba(15,23,42,.06); font-family:ui-monospace, "SFMono-Regular", Consolas, "Liberation Mono", monospace; font-size:13px; }
+  #agreementCard { background:linear-gradient(135deg,#ffffff 0%,#f8fffc 62%,#ecfdf5 100%); border-color:#bbf7d0; }
+  #agreementCard .agreement-text { background:rgba(255,255,255,.75); border-color:#bbf7d0; box-shadow:inset 0 1px 0 rgba(255,255,255,.75); }
+  #agreementCard .signature-box { background:linear-gradient(180deg,#ffffff,#f8fafc); border-color:#94a3b8; box-shadow:inset 0 2px 8px rgba(15,23,42,.04); }
+  #viewQuote > .grid > div:first-child > .card:last-child { background:linear-gradient(135deg,#fff7ed,#ffffff 54%,#f8fafc); border-color:#fed7aa; box-shadow:0 22px 52px rgba(180,83,9,.10); }
+  #viewQuote > .grid > div:first-child > .card:last-child h2:first-of-type::before { background:linear-gradient(135deg,#d97706,#b45309); box-shadow:0 10px 18px rgba(180,83,9,.20); }
   .pill { display:inline-block; padding:5px 9px; border-radius:999px; font-size:12px; font-weight:800; margin:2px 4px 2px 0; border:1px solid rgba(15,23,42,.08); }
   .status-Unsold { background:#fef3c7; color:#92400e; }
   .status-FollowUpDue { background:#fee2e2; color:#991b1b; }
@@ -177,6 +200,10 @@
     .tabs { flex-wrap:nowrap; overflow-x:auto; gap:6px; margin-bottom:14px; }
     .tabs .tab { width:auto; flex:0 0 auto; white-space:nowrap; }
     .card { padding:15px; margin-bottom:14px; }
+    #viewQuote > .grid > div:first-child > .card { padding:16px; margin-bottom:16px; }
+    #viewQuote > .grid > div:first-child > .card h2:first-of-type { font-size:17px; gap:8px; margin-bottom:14px; }
+    #viewQuote > .grid > div:first-child > .card h2:first-of-type::before { width:26px; height:26px; flex-basis:26px; font-size:12px; }
+    #quotePreview { font-size:12px; padding:15px; }
     #liveNumbersCard { position:static; max-height:none; overflow:visible; }
     .room-row,.item-row,.doc-row { grid-template-columns:1fr 1fr; gap:8px; }
     .actions { gap:8px; }
@@ -368,7 +395,7 @@
         </div>
 
         <div class="card">
-          <h2>1. Scope Template</h2>
+          <h2>Scope Template</h2>
           <p class="small">Changing the scope updates line items only. Rooms, measurements, photos, and notes are preserved.</p>
           <div class="form-grid">
             <select id="templateSelect">
@@ -414,7 +441,7 @@
 
         <div class="card">
           <div style="display:flex; justify-content:space-between; gap:12px; align-items:center; margin-bottom:12px;">
-            <h2 style="margin:0;">2. Measure + Document Rooms</h2>
+            <h2 style="margin:0;">Measure + Document Rooms</h2>
             <button class="secondary" onclick="showRoomTypePicker()">+ Add Room</button>
           </div>
 
@@ -449,7 +476,7 @@
 
         
         <div class="card">
-          <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;"><h2>3. Line Items</h2><button class="secondary" onclick="addLineItem()">+ Add Line Item</button></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;"><h2>Line Items</h2><button class="secondary" onclick="addLineItem()">+ Add Line Item</button></div>
           <div class="item-row hide-mobile">
             <div class="muted-heading">Service</div><div class="muted-heading">Description</div><div class="muted-heading">Qty</div>
             <div class="muted-heading">Unit</div><div class="muted-heading">$ Rate</div><div class="muted-heading">Tax</div><div class="muted-heading">Amount</div><div></div>
@@ -458,7 +485,7 @@
         </div>
 
         <div class="card">
-          <h2>4. Quote Preview</h2>
+          <h2>Quote Preview</h2>
           <div id="quotePreview" class="quote-box"></div>
          <div class="actions" style="margin-top:10px;">
   <button class="success" onclick="generateQuotePDF()">Generate PDF Quote</button></div>
@@ -468,7 +495,7 @@
 </div>
         
         <div class="card" id="agreementCard">
-          <h2>5. Accept Quote Now</h2>
+          <h2>Accept Quote</h2>
           <div class="agreement-text">
   By signing below, the customer approves the quoted scope, total, and room photo documentation shown above.
 
