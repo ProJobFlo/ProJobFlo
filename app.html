@@ -288,6 +288,7 @@
               <label for="taxLocationSearch">Default Tax Location</label>
               <input id="taxLocationSearch" list="taxLocationOptions" placeholder="Search city/state, ex: Ocala, FL" oninput="applyTaxLocationSearch()" />
               <datalist id="taxLocationOptions"></datalist>
+            </div>
           </div>
           <div class="form-grid">
             <input id="customerName" placeholder="Customer name" oninput="calculateQuote()" />
@@ -401,18 +402,7 @@
   Send Proposal
 </button>
 </div>
-        </div>
-     <div class="card" id="liveNumbersCard">
-          <h2>Live Numbers</h2>
-          <div class="stat"><div class="stat-label">Measured Sqft</div><div id="measuredSqft" class="stat-value">0.00</div></div>
-          <div class="stat"><div class="stat-label">Order Sqft</div><div id="orderSqft" class="stat-value">0.00</div></div>
-          <div class="stat"><div class="stat-label">Photos</div><div id="photoCount" class="stat-value">0</div></div>
-          <div class="stat"><div class="stat-label">Subtotal</div><div id="subtotal" class="stat-value">$0.00</div></div>
-          <div class="stat"><div class="stat-label">Tax</div><div id="taxTotal" class="stat-value">$0.00</div></div>
-          <div class="final"><div class="stat-label">Final Quote</div><div id="grandTotal" class="stat-value">$0.00</div></div>
-          <div class="stat"><div class="stat-label">Deposit Due</div><div id="depositDue" class="stat-value">$0.00</div></div>
-        </div>
-
+        
         <div class="card" id="agreementCard">
           <h2>5. Accept Quote Now</h2>
           <div class="agreement-text">
@@ -447,6 +437,17 @@
       </div>
 
       <div>
+        <div class="card" id="liveNumbersCard">
+          <h2>Live Numbers</h2>
+          <div class="stat"><div class="stat-label">Measured Sqft</div><div id="measuredSqft" class="stat-value">0.00</div></div>
+          <div class="stat"><div class="stat-label">Order Sqft</div><div id="orderSqft" class="stat-value">0.00</div></div>
+          <div class="stat"><div class="stat-label">Photos</div><div id="photoCount" class="stat-value">0</div></div>
+          <div class="stat"><div class="stat-label">Subtotal</div><div id="subtotal" class="stat-value">$0.00</div></div>
+          <div class="stat"><div class="stat-label">Tax</div><div id="taxTotal" class="stat-value">$0.00</div></div>
+          <div class="final"><div class="stat-label">Final Quote</div><div id="grandTotal" class="stat-value">$0.00</div></div>
+          <div class="stat"><div class="stat-label">Deposit Due</div><div id="depositDue" class="stat-value">$0.00</div></div>
+        </div>
+
         <div class="card">
           <h2>Save Quote</h2>
           <p class="small">Save this as unsold for follow-up or sold for scheduling.</p>
