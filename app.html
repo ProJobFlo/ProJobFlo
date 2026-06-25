@@ -85,7 +85,9 @@
   #liveNumbersCard h2::after { content:"Live"; color:#1d4ed8; background:#dbeafe; border:1px solid #bfdbfe; border-radius:999px; padding:4px 8px; font-size:11px; font-weight:900; text-transform:uppercase; letter-spacing:.04em; }
   #liveNumbersCard .stat { background:rgba(255,255,255,.82); border-color:#dbeafe; box-shadow:0 8px 20px rgba(37,99,235,.06); }
   #liveNumbersCard .stat-value { color:#0f172a; }
-  #liveNumbersCard .final { background:linear-gradient(135deg,#0f172a,#1d4ed8 58%,#0f766e); box-shadow:0 16px 34px rgba(37,99,235,.22); }
+  #liveNumbersCard .final { background:linear-gradient(135deg,#eff6ff,#dbeafe 58%,#ccfbf1); border:1px solid #93c5fd; box-shadow:0 14px 30px rgba(37,99,235,.16); }
+  #liveNumbersCard .final .stat-label { color:#1e40af; }
+  #liveNumbersCard .final .stat-value { color:#0f172a; text-shadow:none; }
   .pill { display:inline-block; padding:5px 9px; border-radius:999px; font-size:12px; font-weight:800; margin:2px 4px 2px 0; border:1px solid rgba(15,23,42,.08); }
   .status-Unsold { background:#fef3c7; color:#92400e; }
   .status-FollowUpDue { background:#fee2e2; color:#991b1b; }
@@ -496,19 +498,6 @@
           </div>
           <div id="acceptedStatus" class="small" style="margin-top:10px;"></div>
         </div>
-      </div>
-
-      <div>
-        <div class="card" id="liveNumbersCard">
-          <h2>Live Numbers</h2>
-          <div class="stat"><div class="stat-label">Measured Sqft</div><div id="measuredSqft" class="stat-value">0.00</div></div>
-          <div class="stat"><div class="stat-label">Order Sqft</div><div id="orderSqft" class="stat-value">0.00</div></div>
-          <div class="stat"><div class="stat-label">Photos</div><div id="photoCount" class="stat-value">0</div></div>
-          <div class="stat"><div class="stat-label">Subtotal</div><div id="subtotal" class="stat-value">$0.00</div></div>
-          <div class="stat"><div class="stat-label">Tax</div><div id="taxTotal" class="stat-value">$0.00</div></div>
-          <div class="final"><div class="stat-label">Final Quote</div><div id="grandTotal" class="stat-value">$0.00</div></div>
-          <div class="stat"><div class="stat-label">Deposit Due</div><div id="depositDue" class="stat-value">$0.00</div></div>
-        </div>
 
         <div class="card">
           <h2>Save Quote</h2>
@@ -527,6 +516,19 @@
             <button class="warning" onclick="saveCurrentQuote()">Save Quote</button>
             <button class="secondary" onclick="newQuote()">New Quote</button>
           </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="card" id="liveNumbersCard">
+          <h2>Live Numbers</h2>
+          <div class="stat"><div class="stat-label">Measured Sqft</div><div id="measuredSqft" class="stat-value">0.00</div></div>
+          <div class="stat"><div class="stat-label">Order Sqft</div><div id="orderSqft" class="stat-value">0.00</div></div>
+          <div class="stat"><div class="stat-label">Photos</div><div id="photoCount" class="stat-value">0</div></div>
+          <div class="stat"><div class="stat-label">Subtotal</div><div id="subtotal" class="stat-value">$0.00</div></div>
+          <div class="stat"><div class="stat-label">Tax</div><div id="taxTotal" class="stat-value">$0.00</div></div>
+          <div class="final"><div class="stat-label">Final Quote</div><div id="grandTotal" class="stat-value">$0.00</div></div>
+          <div class="stat"><div class="stat-label">Deposit Due</div><div id="depositDue" class="stat-value">$0.00</div></div>
         </div>
 
         <div class="sold-screen hidden" id="soldScreen">
