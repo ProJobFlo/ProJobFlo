@@ -1181,6 +1181,79 @@
     padding:0;
     border-radius:999px;
   }
+  .job-activity-composer {
+    display:grid;
+    gap:10px;
+    margin-bottom:16px;
+  }
+  .job-activity-composer textarea {
+    min-height:86px;
+    resize:vertical;
+  }
+  .job-activity-timeline {
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+  }
+  .job-activity-card {
+    position:relative;
+    padding:14px 14px 14px 22px;
+    border:1px solid rgba(125,158,204,.22);
+    border-radius:14px;
+    background:rgba(5,14,29,.50);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
+  }
+  .job-activity-card:before {
+    content:"";
+    position:absolute;
+    left:7px;
+    top:16px;
+    bottom:16px;
+    width:3px;
+    border-radius:999px;
+    background:linear-gradient(180deg,rgba(96,165,250,.9),rgba(25,195,125,.75));
+  }
+  .job-activity-card.payment:before {
+    background:linear-gradient(180deg,#19c37d,#86efac);
+  }
+  .job-activity-card.schedule:before {
+    background:linear-gradient(180deg,#1f6fff,#60a5fa);
+  }
+  .job-activity-card.note:before {
+    background:linear-gradient(180deg,#facc15,#f59e0b);
+  }
+  .job-activity-card.status:before {
+    background:linear-gradient(180deg,#cbd5e1,#64748b);
+  }
+  .job-activity-top {
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:6px;
+  }
+  .job-activity-type {
+    color:#f8fafc;
+    font-size:14px;
+    font-weight:950;
+  }
+  .job-activity-time {
+    color:#91a3bd;
+    font-size:11px;
+    font-weight:850;
+    text-align:right;
+  }
+  .job-activity-description {
+    color:#dfe8f8;
+    font-size:13px;
+    line-height:1.45;
+    white-space:pre-wrap;
+  }
+  .job-activity-author {
+    margin-top:8px;
+    color:#91a3bd;
+    font-size:12px;
+  }
   @media (max-width: 980px) {
     #viewSchedule .grid {
       grid-template-columns:1fr;
@@ -1257,6 +1330,12 @@
     }
     .photo-lightbox-info {
       flex-direction:column;
+    }
+    .job-activity-top {
+      flex-direction:column;
+    }
+    .job-activity-time {
+      text-align:left;
     }
   }
 </style>
@@ -3086,11 +3165,12 @@ async function acceptQuote(){
    return;
  }
 
- const quote = saveAcceptedQuoteAsSold(cloudSaved.quote, cloudSaved.customer, acceptedAtValue);
- if(!quote) return;
+  const quote = saveAcceptedQuoteAsSold(cloudSaved.quote, cloudSaved.customer, acceptedAtValue);
+  if(!quote) return;
+  await appendJobActivity(null, quote, "Quote Accepted", "Quote accepted by " + signedName + ".");
 
- if(lastAcceptedQuoteId !== (quote.cloudId || quote.id)){
-   advanceEstimateNumberCloud();
+  if(lastAcceptedQuoteId !== (quote.cloudId || quote.id)){
+    advanceEstimateNumberCloud();
  }
 
  lastAcceptedQuoteId = quote.cloudId || quote.id;
@@ -3371,16 +3451,17 @@ const q = quotes.find(q => String(q.cloudId || q.id) === String(selectedQuoteId)
   jobs.push(savedJob);
   q.status="Sold";
   editingJobId=savedJob.id;
+  await appendJobActivity(savedJob, q, "Job Scheduled", "Job scheduled for " + savedJob.date + " with " + (savedJob.crew || "unassigned crew") + ".");
 
- document.getElementById("scheduleEditStatus").textContent=
-   "Editing scheduled job for "+(savedJob.customer||"customer")+".";
+  document.getElementById("scheduleEditStatus").textContent=
+    "Editing scheduled job for "+(savedJob.customer||"customer")+".";
 
  renderAll();
  alert("Job scheduled.");
 }
 
  async function saveScheduledJobCloud(job){
- if(!currentUser || !job || !job.cloudId) return;
+ if(!currentUser || !job || !job.cloudId) return false;
 
  const { error } = await supabaseClient
    .from("jobs")
@@ -3397,7 +3478,9 @@ const q = quotes.find(q => String(q.cloudId || q.id) === String(selectedQuoteId)
  if(error){
    console.error(error);
    alert("Job updated on screen, but cloud save failed: " + error.message);
- }
+   return false;
+  }
+  return true;
 }
 
 function editScheduledJob(jobId){
@@ -3421,17 +3504,33 @@ async function updateScheduledJob(){
  if(!editingJobId){alert("Select a calendar job first, then update it.");return;}
  const job=jobs.find(j=>String(j.id)===String(editingJobId));
  if(!job){alert("Could not find selected job.");return;}
- job.date=val("scheduleDate");
- job.duration=val("duration");
- job.crew=val("crew");
- job.status=val("jobStatus");
- job.notes=val("scheduleNotes");
-  const q=quotes.find(q=>String(q.id)===String(job.quoteId) || String(q.cloudId)===String(job.quoteId));
-  if(q) q.status="Sold";
+ const before={date:job.date,duration:job.duration,crew:job.crew,status:job.status,notes:job.notes};
+ const proposedJob={
+   ...job,
+   date:val("scheduleDate"),
+   duration:val("duration"),
+   crew:val("crew"),
+   status:val("jobStatus"),
+   notes:val("scheduleNotes")
+ };
+ const q=quotes.find(q=>String(q.id)===String(job.quoteId) || String(q.cloudId)===String(job.quoteId));
+ const savedSchedule = await saveScheduledJobCloud(proposedJob);
+ if(!savedSchedule) return;
+
+ Object.assign(job, proposedJob);
+ if(q) q.status="Sold";
  document.getElementById("scheduleEditStatus").textContent="Updated scheduled job for "+(job.customer||"customer")+".";
- await saveScheduledJobCloud(job);
- renderAll();
- alert("Job updated.");
+ if(q){
+    const changes=[];
+    if(String(before.date||"")!==String(job.date||"")) changes.push("date "+(before.date || "unset")+" -> "+(job.date || "unset"));
+    if(String(before.duration||"")!==String(job.duration||"")) changes.push("duration "+(before.duration || "unset")+" -> "+(job.duration || "unset"));
+    if(String(before.crew||"")!==String(job.crew||"")) changes.push("crew "+(before.crew || "unset")+" -> "+(job.crew || "unset"));
+    if(String(before.status||"")!==String(job.status||"")) changes.push("status "+(before.status || "unset")+" -> "+(job.status || "unset"));
+    if(String(before.notes||"")!==String(job.notes||"")) changes.push("schedule notes updated");
+    await appendJobActivity(job, q, "Schedule Changed", changes.length ? changes.join("; ")+"." : "Schedule details reviewed.");
+  }
+  renderAll();
+  alert("Job updated.");
 }
 
 async function deleteScheduledJob(){
@@ -4095,6 +4194,185 @@ function handlePhotoLightboxTouchEnd(event){
   else showNextProjectPhoto();
 }
 
+function activityTypeClass(type){
+  const lower=String(type || "").toLowerCase();
+  if(lower.includes("payment") || lower.includes("deposit")) return "payment";
+  if(lower.includes("schedule")) return "schedule";
+  if(lower.includes("note")) return "note";
+  return "status";
+}
+
+function formatActivityTime(timestamp){
+  const date=new Date(timestamp || "");
+  if(Number.isNaN(date.getTime())) return "Time not saved";
+  return date.toLocaleString();
+}
+
+function quoteActivityTimeline(quote){
+  const entries=quote?.quoteData?.jobActivityTimeline || quote?.jobActivityTimeline || [];
+  return Array.isArray(entries) ? entries.filter(Boolean) : [];
+}
+
+function activityIdentity(activity){
+  return activity.id || [
+    activity.timestamp || "",
+    activity.activityType || "",
+    activity.description || "",
+    activity.quoteId || "",
+    activity.jobId || ""
+  ].join("|");
+}
+
+function getActivityAuthor(){
+  return currentUser?.email || val("companyName") || "ProJobFlo";
+}
+
+function makeJobActivity(job,quote,type,description,timestamp){
+  return {
+    id: crypto.randomUUID(),
+    timestamp: timestamp || new Date().toISOString(),
+    activityType: type,
+    description,
+    author: getActivityAuthor(),
+    customerId: job?.customerId || quote?.customerId || "",
+    quoteId: quote?.cloudId || quote?.id || job?.quoteId || "",
+    jobId: job?.cloudId || job?.id || ""
+  };
+}
+
+function derivedJobActivities(job,quote){
+  const activities=[];
+  if(quote?.acceptedAt){
+    activities.push({
+      id:"derived-accepted-"+(quote.cloudId || quote.id),
+      timestamp: quote.acceptedAt,
+      activityType:"Quote Accepted",
+      description:"Quote was accepted and marked Sold.",
+      author:"",
+      customerId: job?.customerId || quote.customerId || "",
+      quoteId: quote.cloudId || quote.id || "",
+      jobId: job?.cloudId || job?.id || ""
+    });
+  }
+  if(job?.date){
+    activities.push({
+      id:"derived-scheduled-"+(job.cloudId || job.id),
+      timestamp: job.date+"T12:00:00",
+      activityType:"Job Scheduled",
+      description:"Job scheduled for "+job.date+" with "+(job.crew || "unassigned crew")+".",
+      author:"",
+      customerId: job.customerId || quote?.customerId || "",
+      quoteId: quote?.cloudId || quote?.id || job.quoteId || "",
+      jobId: job.cloudId || job.id || ""
+    });
+  }
+  paymentsForQuote(quote?.cloudId || quote?.id || job?.quoteId).forEach(payment=>{
+    activities.push({
+      id:"derived-payment-"+(payment.id || payment.date || Math.random()),
+      timestamp: payment.date || new Date().toISOString(),
+      activityType: payment.type === "Deposit" ? "Deposit Recorded" : payment.type === "Final Payment" ? "Final Payment Recorded" : "Payment Recorded",
+      description: (payment.type || "Payment")+" recorded for "+dollars(payment.amount || 0)+".",
+      author:"",
+      customerId: job?.customerId || quote?.customerId || "",
+      quoteId: quote?.cloudId || quote?.id || job?.quoteId || "",
+      jobId: job?.cloudId || job?.id || ""
+    });
+  });
+  return activities;
+}
+
+function jobActivityItems(job,quote){
+  const persisted=quoteActivityTimeline(quote);
+  const persistedTypes=new Set(persisted.map(activity=>activity.activityType || ""));
+  const persistedFingerprints=new Set(persisted.map(activity=>(activity.activityType || "")+"|"+(activity.description || "")));
+  const derived=derivedJobActivities(job,quote).filter(activity=>{
+    const type=activity.activityType || "";
+    const fingerprint=type+"|"+(activity.description || "");
+    const lower=type.toLowerCase();
+    if(lower.includes("payment") || lower.includes("deposit")){
+      return !persistedFingerprints.has(fingerprint);
+    }
+    return !persistedTypes.has(type);
+  });
+  const combined=[...persisted,...derived];
+  const seen=new Set();
+  return combined
+    .filter(activity=>{
+      const id=activityIdentity(activity);
+      if(seen.has(id)) return false;
+      seen.add(id);
+      return true;
+    })
+    .sort((a,b)=>new Date(b.timestamp || 0)-new Date(a.timestamp || 0));
+}
+
+async function persistJobActivityTimeline(job,quote,entries){
+  if(!quote) return false;
+  quote.quoteData=quote.quoteData || {};
+  quote.quoteData.jobActivityTimeline=entries;
+  quote.jobActivityTimeline=entries;
+
+  if(!currentUser) return true;
+  const quoteId=quote.cloudId || quote.id || job?.quoteId;
+  if(!quoteId) return true;
+
+  const { error } = await supabaseClient
+    .from("quotes")
+    .update({ quote_data: quote.quoteData })
+    .eq("id", quoteId)
+    .eq("user_id", currentUser.id);
+
+  if(error){
+    console.error(error);
+    alert("Activity timeline did not save: " + error.message);
+    return false;
+  }
+  return true;
+}
+
+async function appendJobActivity(job,quote,type,description,timestamp){
+  if(!quote) return false;
+  const entries=quoteActivityTimeline(quote);
+  entries.push(makeJobActivity(job,quote,type,description,timestamp));
+  return persistJobActivityTimeline(job,quote,entries);
+}
+
+async function addManualJobActivity(jobId){
+  const job=findScheduledJob(jobId);
+  const quote=getJobQuote(job);
+  if(!job || !quote){alert("Could not find this job file.");return;}
+  const input=document.getElementById("jobActivityNote-"+jobId);
+  const note=input ? input.value.trim() : "";
+  if(!note){alert("Add a job note first.");return;}
+  const saved=await appendJobActivity(job,quote,"Manual Note",note);
+  if(saved && input) input.value="";
+  if(saved) openJobFile(jobId);
+}
+
+function renderJobActivityTimeline(job,quote){
+  const jobId=escapeAttr(job.id);
+  const activities=jobActivityItems(job,quote);
+  return `<div class="job-file-section">
+    <h3>Activity Timeline</h3>
+    <div class="job-activity-composer">
+      <textarea id="jobActivityNote-${jobId}" placeholder="Add Job Note"></textarea>
+      <button class="success" type="button" onclick="addManualJobActivity('${jobId}')">Add Job Note</button>
+    </div>
+    <div class="job-activity-timeline">
+      ${activities.length ? activities.map(activity=>`
+        <div class="job-activity-card ${activityTypeClass(activity.activityType)}">
+          <div class="job-activity-top">
+            <div class="job-activity-type">${escapeHtml(activity.activityType || "Activity")}</div>
+            <div class="job-activity-time">${escapeHtml(formatActivityTime(activity.timestamp))}</div>
+          </div>
+          <div class="job-activity-description">${escapeHtml(activity.description || "")}</div>
+          ${activity.author ? `<div class="job-activity-author">By ${escapeHtml(activity.author)}</div>` : ""}
+        </div>
+      `).join("") : `<div class="job-file-empty">No activity has been recorded for this job yet.</div>`}
+    </div>
+  </div>`;
+}
+
 function renderJobFile(job){
   const quote=getJobQuote(job);
   const contact=jobContact(job);
@@ -4170,10 +4448,7 @@ function renderJobFile(job){
 
     ${renderProjectPhotoTimeline(job,quote)}
 
-    <div class="job-file-section">
-      <h3>Notes Timeline</h3>
-      ${scheduleNotes ? `<div class="job-file-stat"><div class="job-file-label">Schedule Note</div><div class="job-file-value">${escapeHtml(scheduleNotes)}</div></div>` : `<div class="job-file-empty">No job notes yet. Future timestamped notes can live here.</div>`}
-    </div>
+    ${renderJobActivityTimeline(job,quote)}
 
     <div class="job-file-section">
       <h3>Calendar Actions</h3>
@@ -4253,11 +4528,12 @@ async function markJobInProgress(jobId) {
 
   job.status = "In Progress";
 
-  const quote = quotes.find(q => String(q.id) === String(job.quoteId));
+  const quote = quotes.find(q => String(q.id) === String(job.quoteId) || String(q.cloudId) === String(job.quoteId));
   if (quote) quote.status = "Sold";
 
   editingJobId = job.id;
- await saveScheduledJobCloud(job);
+ const savedSchedule = await saveScheduledJobCloud(job);
+  if(savedSchedule) await appendJobActivity(job, quote, "Job Started", "Job marked In Progress.");
   renderAll();
   alert("Job marked In Progress.");
 }
@@ -4294,11 +4570,12 @@ async function markJobComplete(jobId) {
 
   job.status = "Complete";
 
-  const quote = quotes.find(q => String(q.id) === String(job.quoteId));
+  const quote = quotes.find(q => String(q.id) === String(job.quoteId) || String(q.cloudId) === String(job.quoteId));
   if (quote) quote.status = "Sold";
 
   editingJobId = job.id;
- await saveScheduledJobCloud(job);
+ const savedSchedule = await saveScheduledJobCloud(job);
+  if(savedSchedule) await appendJobActivity(job, quote, "Job Completed", "Job marked Complete.");
   renderAll();
   alert("Job marked Complete.");
 }
@@ -4514,6 +4791,17 @@ async function addPayment(payment) {
     notes: data?.notes || newPayment.notes,
     date: data?.paid_at || data?.created_at || newPayment.date
   });
+
+  const activityJob = jobs.find(j => String(j.quoteId) === String(resolvedQuoteId));
+  const activityQuote = matchingQuote || quotes.find(q => String(q.id) === String(resolvedQuoteId) || String(q.cloudId) === String(resolvedQuoteId));
+  const activityType = newPayment.type === "Deposit" ? "Deposit Recorded" : newPayment.type === "Final Payment" ? "Final Payment Recorded" : "Payment Recorded";
+  await appendJobActivity(
+    activityJob,
+    activityQuote,
+    activityType,
+    (newPayment.type || "Payment") + " recorded for " + dollars(newPayment.amount || 0) + (newPayment.method ? " via " + newPayment.method : "") + ".",
+    newPayment.date
+  );
 
   renderAll();
   return true;
