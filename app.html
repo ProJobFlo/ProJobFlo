@@ -1008,6 +1008,179 @@
     color:#c9d6e8;
     font-size:12px;
   }
+  .project-photo-timeline {
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+  }
+  .project-photo-stage {
+    position:relative;
+    padding:16px 16px 16px 22px;
+    border:1px solid rgba(125,158,204,.22);
+    border-radius:16px;
+    background:
+      radial-gradient(circle at 100% 0,rgba(31,111,255,.12),transparent 18rem),
+      rgba(5,14,29,.50);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
+  }
+  .project-photo-stage:before {
+    content:"";
+    position:absolute;
+    left:7px;
+    top:18px;
+    bottom:18px;
+    width:3px;
+    border-radius:999px;
+    background:linear-gradient(180deg,#1f6fff,#19c37d);
+    box-shadow:0 0 22px rgba(31,111,255,.35);
+  }
+  .project-photo-stage-head {
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:12px;
+  }
+  .project-photo-stage-title {
+    margin:0;
+    color:#f8fafc;
+    font-size:16px;
+    font-weight:950;
+  }
+  .project-photo-stage-description {
+    margin:4px 0 0;
+    color:#9fb0c8;
+    font-size:13px;
+    line-height:1.45;
+  }
+  .project-photo-upload {
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    justify-content:flex-end;
+  }
+  .project-photo-dropzone {
+    margin-top:10px;
+    padding:14px;
+    border:1px dashed rgba(96,165,250,.38);
+    border-radius:14px;
+    background:rgba(2,8,23,.42);
+    color:#9fb0c8;
+    text-align:center;
+    font-size:13px;
+  }
+  .project-photo-dropzone.dragging {
+    border-color:#60a5fa;
+    background:rgba(31,111,255,.16);
+    color:#dbeafe;
+  }
+  .project-photo-gallery {
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
+    gap:12px;
+    margin-top:12px;
+  }
+  .project-photo-thumb {
+    padding:0;
+    overflow:hidden;
+    text-align:left;
+    border:1px solid rgba(125,158,204,.22);
+    border-radius:14px;
+    background:rgba(3,10,24,.72);
+    box-shadow:0 14px 32px rgba(0,0,0,.24);
+    cursor:pointer;
+  }
+  .project-photo-thumb img {
+    display:block;
+    width:100%;
+    height:126px;
+    object-fit:cover;
+    background:#020817;
+  }
+  .project-photo-thumb-meta {
+    padding:10px;
+    color:#dfe8f8;
+    font-size:12px;
+    line-height:1.35;
+  }
+  .project-photo-thumb-meta strong {
+    display:block;
+    color:#f8fafc;
+    font-size:12px;
+    margin-bottom:4px;
+  }
+  .project-photo-empty {
+    margin-top:10px;
+    padding:16px;
+    border:1px dashed rgba(125,158,204,.30);
+    border-radius:14px;
+    background:rgba(5,14,29,.36);
+    color:#9fb0c8;
+  }
+  .project-photo-empty strong {
+    display:block;
+    color:#dfe8f8;
+    margin-bottom:4px;
+  }
+  .photo-lightbox-overlay {
+    position:fixed;
+    inset:0;
+    z-index:9400;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+    background:rgba(0,6,18,.88);
+    backdrop-filter:blur(14px);
+  }
+  .photo-lightbox-overlay.hidden {
+    display:none !important;
+  }
+  .photo-lightbox {
+    width:min(1040px,100%);
+    max-height:92vh;
+    display:grid;
+    grid-template-columns:auto minmax(0,1fr) auto;
+    gap:14px;
+    align-items:center;
+  }
+  .photo-lightbox-main {
+    min-width:0;
+    overflow:hidden;
+    border:1px solid rgba(125,158,204,.26);
+    border-radius:18px;
+    background:
+      radial-gradient(circle at 100% 0,rgba(31,111,255,.14),transparent 20rem),
+      rgba(5,14,29,.92);
+    box-shadow:0 28px 90px rgba(0,0,0,.48);
+  }
+  .photo-lightbox-main img {
+    display:block;
+    width:100%;
+    max-height:72vh;
+    object-fit:contain;
+    background:#020817;
+  }
+  .photo-lightbox-info {
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:14px;
+    padding:14px;
+    color:#c9d6e8;
+  }
+  .photo-lightbox-info strong {
+    display:block;
+    color:#f8fafc;
+    font-size:15px;
+    margin-bottom:4px;
+  }
+  .photo-lightbox-nav {
+    width:46px;
+    height:46px;
+    padding:0;
+    border-radius:999px;
+  }
   @media (max-width: 980px) {
     #viewSchedule .grid {
       grid-template-columns:1fr;
@@ -1050,6 +1223,40 @@
     }
     .job-file-title {
       font-size:24px;
+    }
+    .project-photo-stage-head {
+      flex-direction:column;
+    }
+    .project-photo-upload {
+      width:100%;
+      justify-content:stretch;
+    }
+    .project-photo-upload button {
+      width:100%;
+    }
+    .project-photo-dropzone {
+      display:none;
+    }
+    .project-photo-gallery {
+      grid-template-columns:1fr;
+    }
+    .project-photo-thumb img {
+      height:210px;
+    }
+    .photo-lightbox-overlay {
+      padding:10px;
+    }
+    .photo-lightbox {
+      grid-template-columns:1fr;
+    }
+    .photo-lightbox-nav {
+      width:100%;
+    }
+    .photo-lightbox-main img {
+      max-height:62vh;
+    }
+    .photo-lightbox-info {
+      flex-direction:column;
     }
   }
 </style>
@@ -1730,6 +1937,23 @@ Preset rates are only starting points:
 <div id="jobFileOverlay" class="job-file-overlay hidden" onclick="handleJobFileBackdrop(event)">
   <div class="job-file-panel" role="dialog" aria-modal="true" aria-labelledby="jobFileTitle">
     <div id="jobFileContent"></div>
+  </div>
+</div>
+
+<div id="photoLightboxOverlay" class="photo-lightbox-overlay hidden" onclick="handlePhotoLightboxBackdrop(event)" ontouchstart="handlePhotoLightboxTouchStart(event)" ontouchend="handlePhotoLightboxTouchEnd(event)">
+  <div class="photo-lightbox" role="dialog" aria-modal="true" aria-labelledby="photoLightboxTitle">
+    <button class="secondary photo-lightbox-nav" type="button" onclick="event.stopPropagation(); showPreviousProjectPhoto()">Prev</button>
+    <div class="photo-lightbox-main" onclick="event.stopPropagation()">
+      <img id="photoLightboxImage" alt="Project photo">
+      <div class="photo-lightbox-info">
+        <div>
+          <strong id="photoLightboxTitle">Project Photo</strong>
+          <div id="photoLightboxMeta" class="small"></div>
+        </div>
+        <button class="secondary" type="button" onclick="closeProjectPhotoLightbox()">Close</button>
+      </div>
+    </div>
+    <button class="secondary photo-lightbox-nav" type="button" onclick="event.stopPropagation(); showNextProjectPhoto()">Next</button>
   </div>
 </div>
 
@@ -3533,6 +3757,344 @@ function jobFileRenderStat(label,value,extraClass=""){
   </div>`;
 }
 
+const PROJECT_PHOTO_STAGES = [
+  {
+    key:"estimate",
+    title:"Estimate Photos",
+    icon:"Estimate",
+    description:"Measurements, existing conditions, product samples, and quote documentation captured before the job is sold."
+  },
+  {
+    key:"before-demo",
+    title:"Before Demo",
+    icon:"Before",
+    description:"The site before demolition starts, including protection details, damage, access, and prep conditions."
+  },
+  {
+    key:"installation-progress",
+    title:"Installation Progress",
+    icon:"Progress",
+    description:"Work-in-progress proof, substrate prep, installation milestones, and anything the crew should document mid-project."
+  },
+  {
+    key:"finished-project",
+    title:"Finished Project",
+    icon:"Finished",
+    description:"Final completion photos that show the finished work, cleanup, transitions, and punch-list closeout."
+  }
+];
+
+let activeProjectPhotos = [];
+let activeProjectPhotoIndex = 0;
+let photoLightboxTouchX = null;
+
+function projectPhotoStageByKey(stageKey){
+  return PROJECT_PHOTO_STAGES.find(stage=>stage.key===stageKey) || PROJECT_PHOTO_STAGES[0];
+}
+
+function emptyProjectTimeline(){
+  return PROJECT_PHOTO_STAGES.reduce((timeline,stage)=>{
+    timeline[stage.key]=[];
+    return timeline;
+  },{});
+}
+
+function quoteProjectTimeline(quote){
+  const timeline={
+    ...emptyProjectTimeline(),
+    ...(quote?.quoteData?.projectPhotoTimeline || quote?.projectPhotoTimeline || {})
+  };
+  PROJECT_PHOTO_STAGES.forEach(stage=>{
+    if(!Array.isArray(timeline[stage.key])) timeline[stage.key]=[];
+  });
+  return timeline;
+}
+
+function formatProjectPhotoDate(iso){
+  if(!iso) return "Upload date not saved";
+  const date=new Date(iso);
+  if(Number.isNaN(date.getTime())) return "Upload date not saved";
+  return date.toLocaleString();
+}
+
+function projectTimelineStagePhotos(quote){
+  const timeline=quoteProjectTimeline(quote);
+  const seen=new Set();
+
+  PROJECT_PHOTO_STAGES.forEach(stage=>{
+    timeline[stage.key]=(timeline[stage.key] || []).filter(Boolean).map(photo=>{
+      const stageInfo=projectPhotoStageByKey(photo.timelineStage || stage.key);
+      const id=photo.id || photo.cloudPath || photo.url || crypto.randomUUID();
+      seen.add(photo.cloudPath || id);
+      return {
+        ...photo,
+        id,
+        timelineStage: stageInfo.key,
+        stageTitle: stageInfo.title
+      };
+    });
+  });
+
+  jobFilePhotos(quote).forEach(photo=>{
+    const identity=photo.cloudPath || photo.id || photo.url || photo.dataUrl || photo.src || "";
+    if(identity && seen.has(identity)) return;
+    if(identity) seen.add(identity);
+    timeline.estimate.push({
+      ...photo,
+      id: photo.id || identity || crypto.randomUUID(),
+      timelineStage:"estimate",
+      stageTitle:"Estimate Photos",
+      caption: photo.caption || photo.category || photo.roomName || "Quote documentation",
+      uploadedAt: photo.uploadedAt || photo.createdAt || "",
+      legacyRoomPhoto:true
+    });
+  });
+
+  return timeline;
+}
+
+async function hydrateProjectTimelinePhotoUrls(quote){
+  if(!quote) return;
+  const timeline=quoteProjectTimeline(quote);
+  const legacyPhotos=quote?.roomPhotosSnapshot || quote?.quoteData?.roomPhotos || quote?.roomPhotos || {};
+  for(const roomId of Object.keys(legacyPhotos || {})){
+    for(const photo of legacyPhotos[roomId] || []){
+      if(photo.cloudPath && !photo.url){
+        photo.url=await getCloudPhotoUrl(photo.cloudPath);
+      }
+    }
+  }
+  for(const stage of PROJECT_PHOTO_STAGES){
+    for(const photo of timeline[stage.key] || []){
+      if(photo.cloudPath && !photo.url){
+        photo.url=await getCloudPhotoUrl(photo.cloudPath);
+      }
+    }
+  }
+  quote.projectPhotoTimeline=timeline;
+  quote.quoteData=quote.quoteData || {};
+  quote.quoteData.projectPhotoTimeline=timeline;
+}
+
+function renderProjectPhotoTimeline(job, quote){
+  const timeline=projectTimelineStagePhotos(quote);
+  const jobId=escapeAttr(job.id);
+  let flatIndex=0;
+
+  return `<div class="job-file-section">
+    <h3>Project Photo Timeline</h3>
+    <div class="project-photo-timeline">
+      ${PROJECT_PHOTO_STAGES.map(stage=>{
+        const photos=timeline[stage.key] || [];
+        const inputId=`projectPhotoInput-${jobId}-${stage.key}`;
+        const cameraInputId=`projectCameraInput-${jobId}-${stage.key}`;
+        const captionId=`projectPhotoCaption-${jobId}-${stage.key}`;
+        return `<div class="project-photo-stage" ondragover="handleProjectPhotoDragOver(event)" ondragleave="handleProjectPhotoDragLeave(event)" ondrop="handleProjectPhotoDrop(event,'${jobId}','${stage.key}')">
+          <div class="project-photo-stage-head">
+            <div>
+              <h4 class="project-photo-stage-title">${escapeHtml(stage.title)}</h4>
+              <p class="project-photo-stage-description">${escapeHtml(stage.description)}</p>
+            </div>
+            <div class="project-photo-upload">
+              <button class="success" type="button" onclick="document.getElementById('${inputId}').click()">Upload</button>
+              <button class="secondary" type="button" onclick="document.getElementById('${cameraInputId}').click()">Camera</button>
+            </div>
+          </div>
+          <input id="${captionId}" placeholder="Optional caption for new uploads..." />
+          <input id="${inputId}" class="hidden" type="file" accept="image/*" multiple onchange="handleJobTimelineUpload('${jobId}','${stage.key}',this.files); this.value='';" />
+          <input id="${cameraInputId}" class="hidden" type="file" accept="image/*" capture="environment" onchange="handleJobTimelineUpload('${jobId}','${stage.key}',this.files); this.value='';" />
+          <div class="project-photo-dropzone">Drag project photos here for ${escapeHtml(stage.title)}.</div>
+          ${photos.length ? `<div class="project-photo-gallery">${photos.map(photo=>{
+            const url=jobPhotoUrl(photo);
+            const caption=photo.caption || photo.category || "Project documentation";
+            if(!url) return "";
+            const index=flatIndex++;
+            return url ? `<button class="project-photo-thumb" type="button" onclick="openProjectPhotoLightbox('${jobId}',${index})">
+              <img src="${escapeAttr(url)}" alt="${escapeAttr(caption)}">
+              <span class="project-photo-thumb-meta">
+                <strong>${escapeHtml(formatProjectPhotoDate(photo.uploadedAt))}</strong>
+                ${escapeHtml(stage.title)}<br>${escapeHtml(caption)}
+              </span>
+            </button>` : "";
+          }).join("")}</div>` : `<div class="project-photo-empty"><strong>No ${escapeHtml(stage.title)} photos yet.</strong>Upload photos here to build the project history.</div>`}
+        </div>`;
+      }).join("")}
+    </div>
+  </div>`;
+}
+
+function flatProjectTimelinePhotos(quote){
+  const timeline=projectTimelineStagePhotos(quote);
+  return PROJECT_PHOTO_STAGES.flatMap(stage =>
+    (timeline[stage.key] || []).map(photo => ({
+      ...photo,
+      timelineStage: stage.key,
+      stageTitle: stage.title
+    })).filter(photo => jobPhotoUrl(photo))
+  );
+}
+
+async function handleJobTimelineUpload(jobId,stageKey,files){
+  const job=findScheduledJob(jobId);
+  const quote=getJobQuote(job);
+  if(!job || !quote){alert("Could not find this job file.");return;}
+  const list=Array.from(files || []);
+  if(!list.length) return;
+
+  const ok=await requireLoggedIn();
+  if(!ok) return;
+
+  const stage=projectPhotoStageByKey(stageKey);
+  const captionEl=document.getElementById(`projectPhotoCaption-${jobId}-${stageKey}`);
+  const caption=captionEl ? captionEl.value.trim() : "";
+  const timeline=quoteProjectTimeline(quote);
+
+  for(const file of list){
+    const uploadedAt=new Date().toISOString();
+    const cloudPhoto=await uploadPhotoToCloud(file,"timeline-"+stageKey,stage.title);
+    if(!cloudPhoto) continue;
+
+    timeline[stageKey].push({
+      id: crypto.randomUUID(),
+      name: file.name,
+      fileName: file.name,
+      cloudPath: cloudPhoto.cloudPath,
+      url: URL.createObjectURL(file),
+      category: stage.title,
+      caption,
+      customerId: job.customerId || quote.customerId || "",
+      quoteId: quote.cloudId || quote.id || job.quoteId || "",
+      jobId: job.cloudId || job.id || "",
+      timelineStage: stageKey,
+      stageTitle: stage.title,
+      uploadedAt,
+      source:"projectPhotoTimeline"
+    });
+  }
+
+  if(captionEl) captionEl.value="";
+  await persistProjectPhotoTimeline(job,quote,timeline);
+  openJobFile(jobId);
+}
+
+async function persistProjectPhotoTimeline(job,quote,timeline){
+  quote.projectPhotoTimeline=timeline;
+  quote.quoteData=quote.quoteData || {};
+  quote.quoteData.projectPhotoTimeline=timeline;
+
+  if(!currentUser) return;
+
+  const quoteId=quote.cloudId || quote.id || job.quoteId;
+  if(!quoteId) return;
+
+  const persistedTimeline={};
+  PROJECT_PHOTO_STAGES.forEach(stage=>{
+    persistedTimeline[stage.key]=(timeline[stage.key] || []).map(photo=>{
+      const copy={...photo};
+      if(copy.url && String(copy.url).startsWith("blob:")) delete copy.url;
+      delete copy.dataUrl;
+      delete copy.previewUrl;
+      delete copy.localUrl;
+      return copy;
+    });
+  });
+
+  quote.quoteData.projectPhotoTimeline=persistedTimeline;
+  quote.projectPhotoTimeline=persistedTimeline;
+
+  const { error } = await supabaseClient
+    .from("quotes")
+    .update({ quote_data: quote.quoteData })
+    .eq("id", quoteId)
+    .eq("user_id", currentUser.id);
+
+  if(error){
+    console.error(error);
+    alert("Project photos uploaded, but the timeline did not save to the quote: " + error.message);
+  }
+}
+
+function handleProjectPhotoDragOver(event){
+  event.preventDefault();
+  event.currentTarget.querySelector(".project-photo-dropzone")?.classList.add("dragging");
+}
+
+function handleProjectPhotoDragLeave(event){
+  event.currentTarget.querySelector(".project-photo-dropzone")?.classList.remove("dragging");
+}
+
+function handleProjectPhotoDrop(event,jobId,stageKey){
+  event.preventDefault();
+  event.currentTarget.querySelector(".project-photo-dropzone")?.classList.remove("dragging");
+  handleJobTimelineUpload(jobId,stageKey,event.dataTransfer?.files);
+}
+
+async function openProjectPhotoLightbox(jobId,index){
+  const job=findScheduledJob(jobId);
+  const quote=getJobQuote(job);
+  if(!quote) return;
+  await hydrateProjectTimelinePhotoUrls(quote);
+  activeProjectPhotos=flatProjectTimelinePhotos(quote);
+  activeProjectPhotoIndex=Math.max(0,Math.min(Number(index)||0,activeProjectPhotos.length-1));
+  renderProjectPhotoLightbox();
+  const overlay=document.getElementById("photoLightboxOverlay");
+  if(overlay) overlay.classList.remove("hidden");
+  document.addEventListener("keydown",handleProjectPhotoLightboxKey);
+}
+
+function renderProjectPhotoLightbox(){
+  const photo=activeProjectPhotos[activeProjectPhotoIndex];
+  if(!photo) return;
+  const image=document.getElementById("photoLightboxImage");
+  const title=document.getElementById("photoLightboxTitle");
+  const meta=document.getElementById("photoLightboxMeta");
+  if(image) image.src=jobPhotoUrl(photo);
+  if(title) title.textContent=photo.caption || photo.category || "Project Photo";
+  if(meta) meta.textContent=(photo.stageTitle || projectPhotoStageByKey(photo.timelineStage).title) + " - " + formatProjectPhotoDate(photo.uploadedAt);
+}
+
+function closeProjectPhotoLightbox(){
+  const overlay=document.getElementById("photoLightboxOverlay");
+  if(overlay) overlay.classList.add("hidden");
+  document.removeEventListener("keydown",handleProjectPhotoLightboxKey);
+}
+
+function handlePhotoLightboxBackdrop(event){
+  if(event.target && event.target.id==="photoLightboxOverlay") closeProjectPhotoLightbox();
+}
+
+function showPreviousProjectPhoto(){
+  if(!activeProjectPhotos.length) return;
+  activeProjectPhotoIndex=(activeProjectPhotoIndex-1+activeProjectPhotos.length)%activeProjectPhotos.length;
+  renderProjectPhotoLightbox();
+}
+
+function showNextProjectPhoto(){
+  if(!activeProjectPhotos.length) return;
+  activeProjectPhotoIndex=(activeProjectPhotoIndex+1)%activeProjectPhotos.length;
+  renderProjectPhotoLightbox();
+}
+
+function handleProjectPhotoLightboxKey(event){
+  if(event.key==="Escape") closeProjectPhotoLightbox();
+  if(event.key==="ArrowLeft") showPreviousProjectPhoto();
+  if(event.key==="ArrowRight") showNextProjectPhoto();
+}
+
+function handlePhotoLightboxTouchStart(event){
+  photoLightboxTouchX=event.changedTouches && event.changedTouches[0] ? event.changedTouches[0].clientX : null;
+}
+
+function handlePhotoLightboxTouchEnd(event){
+  if(photoLightboxTouchX===null) return;
+  const endX=event.changedTouches && event.changedTouches[0] ? event.changedTouches[0].clientX : photoLightboxTouchX;
+  const delta=endX-photoLightboxTouchX;
+  photoLightboxTouchX=null;
+  if(Math.abs(delta)<40) return;
+  if(delta>0) showPreviousProjectPhoto();
+  else showNextProjectPhoto();
+}
+
 function renderJobFile(job){
   const quote=getJobQuote(job);
   const contact=jobContact(job);
@@ -3540,7 +4102,6 @@ function renderJobFile(job){
   const paid=totalPaidForQuote(job.quoteId);
   const deposit=depositPaidForQuote(job.quoteId);
   const balance=Math.max(0,total-paid);
-  const photos=jobFilePhotos(quote);
   const preview=jobFilePreviewText(quote);
   const status=job.status || "Scheduled";
   const quoteStatus=quote.status || "Sold";
@@ -3607,14 +4168,7 @@ function renderJobFile(job){
       ${preview ? `<div class="job-file-preview" style="margin-top:10px;">${escapeHtml(preview)}</div>` : `<div class="job-file-empty" style="margin-top:10px;">No proposal preview is saved for this job yet.</div>`}
     </div>
 
-    <div class="job-file-section">
-      <h3>Photos</h3>
-      ${photos.length ? `<div class="job-file-photo-grid">${photos.map(photo=>{
-        const url=jobPhotoUrl(photo);
-        const label=photo.roomName || photo.room || photo.name || "Job photo";
-        return url ? `<div class="job-file-photo"><img src="${escapeAttr(url)}" alt="${escapeAttr(label)}"><div>${escapeHtml(label)}</div></div>` : "";
-      }).join("")}</div>` : `<div class="job-file-empty">No quote or room photos are attached yet.</div>`}
-    </div>
+    ${renderProjectPhotoTimeline(job,quote)}
 
     <div class="job-file-section">
       <h3>Notes Timeline</h3>
@@ -3642,9 +4196,10 @@ function renderJobFile(job){
   `;
 }
 
-function openJobFile(jobId){
+async function openJobFile(jobId){
   const job=findScheduledJob(jobId);
   if(!job){alert("Could not find this scheduled job.");return;}
+  await hydrateProjectTimelinePhotoUrls(getJobQuote(job));
   const overlay=document.getElementById("jobFileOverlay");
   const content=document.getElementById("jobFileContent");
   if(!overlay || !content) return;
