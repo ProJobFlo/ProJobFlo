@@ -121,6 +121,9 @@
   .status-Ready { background:#dcfce7; color:#166534; }
   .status-Progress { background:#ffedd5; color:#9a3412; }
   .status-Complete { background:#e5e7eb; color:#374151; }
+  .status-MaterialsOrdered { background:#ede9fe; color:#5b21b6; }
+  .status-ReadytoInstall { background:#dcfce7; color:#166534; }
+  .status-InProgress { background:#ffedd5; color:#9a3412; }
   .room-row { display:grid; grid-template-columns:1.8fr .75fr .75fr .75fr .75fr 1fr auto; gap:10px; align-items:center; margin-bottom:10px; padding:8px; border:1px solid var(--border); border-radius:var(--radius); background:var(--surface-soft); }
   .item-row { display:grid; grid-template-columns:1.2fr 1.7fr .8fr .7fr .8fr .7fr .8fr auto; gap:10px; align-items:center; margin-bottom:10px; }
   #lineItems .item-row { padding:8px; border:1px solid var(--border); border-radius:var(--radius); background:var(--surface-soft); }
@@ -702,6 +705,183 @@
     select,
     textarea {
       font-size:16px;
+    }
+  }
+
+  #viewSchedule .grid {
+    grid-template-columns:minmax(320px,.82fr) minmax(520px,1.18fr);
+    gap:22px;
+  }
+  #viewSchedule .card {
+    background:
+      radial-gradient(circle at 0 0,rgba(31,111,255,.12),transparent 22rem),
+      linear-gradient(145deg,rgba(17,33,58,.96),rgba(7,17,33,.96));
+    border-color:rgba(96,165,250,.26);
+  }
+  #viewSchedule .calendar-header {
+    padding-bottom:12px;
+    border-bottom:1px solid rgba(148,163,184,.16);
+  }
+  #viewSchedule .calendar-title {
+    color:#f8fafc;
+    font-size:26px;
+    letter-spacing:0;
+  }
+  #viewSchedule .calendar {
+    gap:9px;
+  }
+  #viewSchedule .dow {
+    color:#b9c7dc;
+    background:rgba(15,29,52,.72);
+    border:1px solid rgba(125,158,204,.18);
+    border-radius:10px;
+  }
+  #viewSchedule .day {
+    min-height:126px;
+    background:linear-gradient(180deg,rgba(10,23,43,.86),rgba(6,16,31,.88));
+    border-color:rgba(125,158,204,.20);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.03);
+  }
+  #viewSchedule .day:hover {
+    border-color:rgba(96,165,250,.42);
+  }
+  #viewSchedule .day.today {
+    border-color:rgba(34,197,94,.58);
+    box-shadow:0 0 0 1px rgba(34,197,94,.18), inset 0 1px 0 rgba(255,255,255,.04);
+  }
+  #viewSchedule .day.selected {
+    outline:0;
+    border-color:#60a5fa;
+    box-shadow:0 0 0 2px rgba(31,111,255,.34), 0 18px 34px rgba(0,0,0,.24);
+  }
+  #viewSchedule .day-number {
+    color:#f8fafc;
+    font-size:13px;
+  }
+  #viewSchedule .day.muted {
+    opacity:.62;
+  }
+  #viewSchedule .event {
+    border:1px solid rgba(255,255,255,.12);
+    border-left-width:4px;
+    box-shadow:0 10px 20px rgba(0,0,0,.20);
+  }
+  .schedule-job-card {
+    position:relative;
+    overflow:hidden;
+    padding:18px;
+    border:1px solid rgba(125,158,204,.24);
+    border-radius:var(--radius);
+    background:
+      radial-gradient(circle at 88% 0,rgba(31,111,255,.16),transparent 18rem),
+      linear-gradient(145deg,rgba(14,29,54,.96),rgba(7,17,33,.96));
+    box-shadow:0 18px 48px rgba(0,0,0,.26), inset 0 1px 0 rgba(255,255,255,.04);
+    margin-bottom:14px;
+  }
+  .schedule-job-card::before {
+    content:"";
+    position:absolute;
+    inset:0 0 auto;
+    height:1px;
+    background:linear-gradient(90deg,#1f6fff,rgba(34,197,94,.66),transparent);
+  }
+  .schedule-job-top {
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:14px;
+    margin-bottom:14px;
+  }
+  .schedule-job-title {
+    color:#f8fafc;
+    font-size:18px;
+    line-height:1.2;
+    font-weight:900;
+  }
+  .schedule-job-subtitle {
+    color:#9fb0c8;
+    font-size:13px;
+    margin-top:4px;
+  }
+  .schedule-detail-grid {
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:10px;
+    margin:12px 0;
+  }
+  .schedule-detail {
+    min-height:68px;
+    padding:11px 12px;
+    border:1px solid rgba(125,158,204,.20);
+    border-radius:12px;
+    background:rgba(5,14,29,.58);
+  }
+  .schedule-detail-label {
+    color:#91a3bd;
+    font-size:11px;
+    font-weight:900;
+    letter-spacing:.05em;
+    text-transform:uppercase;
+    margin-bottom:5px;
+  }
+  .schedule-detail-value {
+    color:#f8fafc;
+    font-size:14px;
+    line-height:1.35;
+    overflow-wrap:anywhere;
+  }
+  .schedule-notes {
+    padding:12px;
+    border:1px solid rgba(125,158,204,.20);
+    border-radius:12px;
+    background:rgba(5,14,29,.46);
+    color:#c9d6e8;
+    white-space:pre-wrap;
+  }
+  .schedule-actions {
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(132px,1fr));
+    gap:9px;
+    margin-top:14px;
+  }
+  .schedule-actions button {
+    width:100%;
+    min-height:42px;
+  }
+  .schedule-meta-actions {
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-top:12px;
+  }
+  .schedule-meta-actions button {
+    min-height:38px;
+  }
+  @media (max-width: 980px) {
+    #viewSchedule .grid {
+      grid-template-columns:1fr;
+    }
+    #viewSchedule .calendar {
+      grid-template-columns:repeat(7,minmax(38px,1fr));
+      gap:6px;
+    }
+    #viewSchedule .day {
+      min-height:86px;
+      padding:6px;
+    }
+    #viewSchedule .event {
+      padding:5px;
+      font-size:11px;
+    }
+    .schedule-detail-grid {
+      grid-template-columns:1fr;
+    }
+    .schedule-actions,
+    .schedule-meta-actions {
+      grid-template-columns:1fr;
+    }
+    .schedule-meta-actions button {
+      width:100%;
     }
   }
 </style>
@@ -2823,7 +3003,7 @@ const q = quotes.find(q => String(q.cloudId || q.id) === String(selectedQuoteId)
 }
 
 function editScheduledJob(jobId){
- const job=jobs.find(j=>j.id===jobId);
+ const job=jobs.find(j=>String(j.id)===String(jobId));
  if(!job)return;
  editingJobId=job.id;
  document.getElementById("scheduleDate").value=job.date;
@@ -2841,14 +3021,14 @@ function editScheduledJob(jobId){
 
 async function updateScheduledJob(){
  if(!editingJobId){alert("Select a calendar job first, then update it.");return;}
- const job=jobs.find(j=>j.id===editingJobId);
+ const job=jobs.find(j=>String(j.id)===String(editingJobId));
  if(!job){alert("Could not find selected job.");return;}
  job.date=val("scheduleDate");
  job.duration=val("duration");
  job.crew=val("crew");
  job.status=val("jobStatus");
  job.notes=val("scheduleNotes");
-  const q=quotes.find(q=>q.id===job.quoteId);
+  const q=quotes.find(q=>String(q.id)===String(job.quoteId) || String(q.cloudId)===String(job.quoteId));
   if(q) q.status="Sold";
  document.getElementById("scheduleEditStatus").textContent="Updated scheduled job for "+(job.customer||"customer")+".";
  await saveScheduledJobCloud(job);
@@ -2858,7 +3038,7 @@ async function updateScheduledJob(){
 
 async function deleteScheduledJob(){
  if(!editingJobId){alert("Select a calendar job first, then delete it.");return;}
- const job=jobs.find(j=>j.id===editingJobId);
+ const job=jobs.find(j=>String(j.id)===String(editingJobId));
  const name=job ? job.customer : "this job";
  if(!confirm("Delete scheduled job for "+name+"?"))return;
  if(currentUser && job && job.cloudId){
@@ -2874,7 +3054,7 @@ async function deleteScheduledJob(){
     return;
   }
 }
- jobs=jobs.filter(j=>j.id!==editingJobId);
+ jobs=jobs.filter(j=>String(j.id)!==String(editingJobId));
  editingJobId=null;
  document.getElementById("scheduleEditStatus").textContent="Scheduled job deleted. Select another calendar job to edit.";
  renderAll();
@@ -2916,6 +3096,230 @@ function renderSelectedJobs(){
       </div>
     </div>
   `).join("");
+}
+
+function getJobCustomer(job){
+  if(!job) return {};
+  return customers.find(c =>
+    String(c.id) === String(job.customerId) ||
+    String(c.cloudId) === String(job.customerId)
+  ) || {};
+}
+function getJobQuote(job){
+  if(!job) return {};
+  return quotes.find(q =>
+    String(q.id) === String(job.quoteId) ||
+    String(q.cloudId) === String(job.quoteId)
+  ) || {};
+}
+function jobContact(job){
+  const customer=getJobCustomer(job);
+  const quote=getJobQuote(job);
+  return {
+    name: job?.customer || customer.name || quote.customer || "Unnamed Customer",
+    address: job?.address || customer.address || quote.address || "",
+    phone: customer.phone || quote.customerPhone || quote.phone || "",
+    email: customer.email || quote.customerEmail || quote.email || "",
+    company: val("companyName") || "ProJobFlo",
+    notes: job?.notes || ""
+  };
+}
+function plusDaysIso(iso,days){
+  const date=new Date((iso || fmtDate(new Date()))+"T00:00:00");
+  date.setDate(date.getDate()+Number(days || 0));
+  return fmtDate(date);
+}
+function icsDate(iso){return String(iso||"").replaceAll("-","");}
+function icsText(text){
+  return String(text||"")
+    .replace(/\\/g,"\\\\")
+    .replace(/\r?\n/g,"\\n")
+    .replace(/,/g,"\\,")
+    .replace(/;/g,"\\;");
+}
+function foldIcsLine(line){
+  const limit=72;
+  let out="";
+  let rest=String(line);
+  while(rest.length>limit){
+    out+=rest.slice(0,limit)+"\r\n ";
+    rest=rest.slice(limit);
+  }
+  return out+rest;
+}
+function buildIcsForJob(job){
+  const contact=jobContact(job);
+  const duration=Math.max(1,Number(job.duration)||1);
+  const start=job.date || fmtDate(new Date());
+  const end=plusDaysIso(start,duration);
+  const uid=String(job.cloudId || job.id || Date.now())+"@projobflo";
+  const description=[
+    "Customer: "+contact.name,
+    "Phone: "+contact.phone,
+    "Email: "+contact.email,
+    "Address: "+contact.address,
+    "Crew: "+(job.crew || ""),
+    "Duration: "+duration+" day(s)",
+    "Company: "+contact.company,
+    "",
+    "Notes:",
+    contact.notes
+  ].join("\n");
+  const lines=[
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    "PRODID:-//ProJobFlo//Scheduling//EN",
+    "CALSCALE:GREGORIAN",
+    "METHOD:PUBLISH",
+    "BEGIN:VEVENT",
+    "UID:"+icsText(uid),
+    "DTSTAMP:"+new Date().toISOString().replace(/[-:]/g,"").replace(/\.\d{3}Z$/,"Z"),
+    "DTSTART;VALUE=DATE:"+icsDate(start),
+    "DTEND;VALUE=DATE:"+icsDate(end),
+    "SUMMARY:"+icsText("Install - "+contact.name),
+    "LOCATION:"+icsText(contact.address),
+    "DESCRIPTION:"+icsText(description),
+    "STATUS:CONFIRMED",
+    "END:VEVENT",
+    "END:VCALENDAR"
+  ];
+  return lines.map(foldIcsLine).join("\r\n")+"\r\n";
+}
+function scheduleFileName(job){
+  const contact=jobContact(job);
+  const base=(job.date || "scheduled-job")+"-"+(contact.name || "customer");
+  return base.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,80)+".ics";
+}
+function downloadJobIcs(jobId){
+  const job=jobs.find(j=>String(j.id)===String(jobId));
+  if(!job){alert("Could not find this scheduled job.");return;}
+  if(!job.date){alert("This job needs an install date first.");return;}
+  const blob=new Blob([buildIcsForJob(job)],{type:"text/calendar;charset=utf-8"});
+  const url=URL.createObjectURL(blob);
+  const link=document.createElement("a");
+  link.href=url;
+  link.download=scheduleFileName(job);
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+function openJobMaps(jobId){
+  const job=jobs.find(j=>String(j.id)===String(jobId));
+  const address=jobContact(job).address;
+  if(!address){alert("No address for this job.");return;}
+  window.open("https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(address),"_blank");
+}
+function callJobCustomer(jobId){
+  const phone=jobContact(jobs.find(j=>String(j.id)===String(jobId))).phone;
+  if(!phone){alert("No phone number for this customer.");return;}
+  window.location.href="tel:"+phone.replace(/[^\d+]/g,"");
+}
+function textJobCustomer(jobId){
+  const job=jobs.find(j=>String(j.id)===String(jobId));
+  const contact=jobContact(job);
+  if(!contact.phone){alert("No phone number for this customer.");return;}
+  const msg="Hi "+(contact.name||"there").split(" ")[0]+", this is confirming your scheduled install for "+(job.date||"the scheduled date")+".";
+  window.location.href="sms:"+encodeURIComponent(contact.phone)+"?&body="+encodeURIComponent(msg);
+}
+function emailJobCustomer(jobId){
+  const job=jobs.find(j=>String(j.id)===String(jobId));
+  const contact=jobContact(job);
+  if(!contact.email){alert("No email for this customer.");return;}
+  const subject="Scheduled install for "+(job.date||"your project");
+  const body="Hi "+(contact.name||"there")+",\n\nThis is confirming your scheduled install.\n\nDate: "+(job.date||"")+"\nDuration: "+(job.duration||1)+" day(s)\nAddress: "+(contact.address||"")+"\nCrew: "+(job.crew||"")+"\n\n"+(job.notes||"");
+  window.location.href="mailto:"+encodeURIComponent(contact.email)+"?subject="+encodeURIComponent(subject)+"&body="+encodeURIComponent(body);
+}
+function scheduleStatusClass(status){
+  return "status-"+String(status || "Scheduled").replace(/\s+/g,"");
+}
+function renderCalendar(){
+  const title=currentMonth.toLocaleDateString(undefined,{month:"long",year:"numeric"});
+  document.getElementById("calendarTitle").textContent=title;
+  const cal=document.getElementById("calendar");
+  if(!cal)return;
+  cal.innerHTML="";
+  const year=currentMonth.getFullYear();
+  const month=currentMonth.getMonth();
+  const first=new Date(year,month,1);
+  const start=new Date(first);
+  const today=fmtDate(new Date());
+  start.setDate(first.getDate()-first.getDay());
+  for(let i=0;i<42;i++){
+    const day=new Date(start);
+    day.setDate(start.getDate()+i);
+    const iso=fmtDate(day);
+    const div=document.createElement("div");
+    div.className="day";
+    if(day.getMonth()!==month)div.classList.add("muted");
+    if(iso===selectedDate)div.classList.add("selected");
+    if(iso===today)div.classList.add("today");
+    div.onclick=function(){setSelectedDate(iso);};
+    const number=document.createElement("div");
+    number.className="day-number";
+    number.textContent=day.getDate();
+    div.appendChild(number);
+    jobs.filter(j=>jobCoversDate(j,iso)).forEach(job=>{
+      const event=document.createElement("div");
+      event.className="event "+calendarStatusClass(job.status);
+      const dayNum=getJobDayNumber(job,iso);
+      event.innerHTML="<strong>"+escapeHtml(job.customer||"Unnamed")+"</strong><br>"+escapeHtml(job.status)+" - "+escapeHtml(job.crew)+" - Day "+dayNum+"/"+(Number(job.duration)||1);
+      event.onclick=function(e){e.stopPropagation();editScheduledJob(job.id);};
+      div.appendChild(event);
+    });
+    cal.appendChild(div);
+  }
+}
+function renderSelectedJobs(){
+  const box=document.getElementById("selectedJobs");
+  if(!box) return;
+  const dayJobs=jobs.filter(j=>jobCoversDate(j,selectedDate));
+  if(!dayJobs.length){
+    box.innerHTML="<p class='small'>No jobs scheduled for this date.</p>";
+    return;
+  }
+  box.innerHTML=dayJobs.map(j=>{
+    const contact=jobContact(j);
+    const jobId=escapeAttr(j.id);
+    const duration=Number(j.duration || 1);
+    return `
+      <div class="schedule-job-card">
+        <div class="schedule-job-top">
+          <div>
+            <div class="schedule-job-title">${escapeHtml(contact.name)}</div>
+            <div class="schedule-job-subtitle">${escapeHtml(contact.address || "No address saved")}</div>
+          </div>
+          <span class="pill ${scheduleStatusClass(j.status)}">${escapeHtml(j.status || "Scheduled")}</span>
+        </div>
+        <div class="schedule-detail-grid">
+          <div class="schedule-detail"><div class="schedule-detail-label">Install Date</div><div class="schedule-detail-value">${escapeHtml(j.date || "Not scheduled")}</div></div>
+          <div class="schedule-detail"><div class="schedule-detail-label">Duration</div><div class="schedule-detail-value">${duration} day(s)</div></div>
+          <div class="schedule-detail"><div class="schedule-detail-label">Customer</div><div class="schedule-detail-value">${escapeHtml(contact.name)}</div></div>
+          <div class="schedule-detail"><div class="schedule-detail-label">Crew</div><div class="schedule-detail-value">${escapeHtml(j.crew || "Unassigned")}</div></div>
+          <div class="schedule-detail"><div class="schedule-detail-label">Phone</div><div class="schedule-detail-value">${escapeHtml(contact.phone || "No phone saved")}</div></div>
+          <div class="schedule-detail"><div class="schedule-detail-label">Email</div><div class="schedule-detail-value">${escapeHtml(contact.email || "No email saved")}</div></div>
+          <div class="schedule-detail"><div class="schedule-detail-label">Address</div><div class="schedule-detail-value">${escapeHtml(contact.address || "No address saved")}</div></div>
+          <div class="schedule-detail"><div class="schedule-detail-label">Total</div><div class="schedule-detail-value">${dollars(j.total || 0)}</div></div>
+        </div>
+        <div class="schedule-notes"><strong>Notes</strong><br>${escapeHtml(contact.notes || "No notes saved.")}</div>
+        <div class="schedule-actions">
+          <button class="secondary" onclick="openJobMaps('${jobId}')">Open Maps</button>
+          <button class="secondary" onclick="callJobCustomer('${jobId}')">Call Customer</button>
+          <button class="secondary" onclick="textJobCustomer('${jobId}')">Text Customer</button>
+          <button class="secondary" onclick="emailJobCustomer('${jobId}')">Email Customer</button>
+          <button class="success" onclick="downloadJobIcs('${jobId}')">Add to Calendar</button>
+          <button class="secondary" onclick="openGoogleCalendarForJob('${jobId}')">Open Google Calendar</button>
+        </div>
+        <div class="schedule-meta-actions">
+          <button class="secondary" onclick="recordPaymentForJob('${jobId}')">Record Payment</button>
+          <button class="secondary" onclick="markJobInProgress('${jobId}')">Mark In Progress</button>
+          <button class="secondary" onclick="markJobComplete('${jobId}')">Mark Complete</button>
+          <button class="secondary" onclick="editScheduledJob('${jobId}')">Edit</button>
+          <button class="danger" onclick="editingJobId='${jobId}'; deleteScheduledJob();">Delete</button>
+        </div>
+      </div>
+    `;
+  }).join("");
 }
 
  function recordPaymentForJob(jobId) {
@@ -3485,23 +3889,28 @@ function googleCalendarDateRange(startIso, durationDays) {
 }
 
 function buildGoogleCalendarUrl(job) {
-  const title = "ProJobFlo Job - " + (job.customer || "Customer");
+  const contact = jobContact(job);
+  const title = "ProJobFlo Install - " + (contact.name || "Customer");
   const dates = googleCalendarDateRange(job.date, job.duration);
 
   const details =
-    "Customer: " + (job.customer || "") + "\n" +
-    "Address: " + (job.address || "") + "\n" +
+    "Customer: " + (contact.name || "") + "\n" +
+    "Address: " + (contact.address || "") + "\n" +
+    "Phone: " + (contact.phone || "") + "\n" +
+    "Email: " + (contact.email || "") + "\n" +
+    "Company: " + (contact.company || "") + "\n" +
     "Crew: " + (job.crew || "") + "\n" +
+    "Duration: " + (job.duration || 1) + " day(s)\n" +
     "Status: " + (job.status || "") + "\n" +
     "Total: " + dollars(job.total || 0) + "\n\n" +
-    "Notes:\n" + (job.notes || "");
+    "Notes:\n" + (contact.notes || "");
 
   const params = new URLSearchParams({
     action: "TEMPLATE",
     text: title,
     dates: dates,
     details: details,
-    location: job.address || ""
+    location: contact.address || ""
   });
 
   return "https://calendar.google.com/calendar/render?" + params.toString();
