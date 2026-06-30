@@ -180,6 +180,16 @@
   .trade-hidden { display:none !important; }
   .room-type-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:10px; margin-top:10px; }
   .room-type-grid button { width:100%; }
+  .feedback-button { position:fixed; right:18px; bottom:18px; z-index:9000; background:linear-gradient(180deg,#3b82f6,var(--primary)); box-shadow:0 18px 34px rgba(37,99,235,.26); }
+  .feedback-overlay { position:fixed; inset:0; z-index:9100; display:flex; align-items:flex-end; justify-content:flex-end; padding:18px; background:rgba(15,23,42,.28); }
+  .feedback-overlay.hidden { display:none !important; }
+  .feedback-modal { width:min(420px,100%); background:white; border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow-lg); padding:18px; }
+  .feedback-modal-header { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:12px; }
+  .feedback-modal h2 { margin:0 0 4px; padding:0; border:0; }
+  .feedback-modal textarea { min-height:130px; }
+  .feedback-status { min-height:18px; }
+  .feedback-mailto { display:inline-block; margin-top:4px; color:var(--primary); font-weight:800; text-decoration:none; }
+  .feedback-mailto.hidden { display:none !important; }
   @media (min-width: 981px) {
     #viewQuote > .grid > div:last-child { align-self:stretch; }
     #viewQuote #liveNumbersCard { position:sticky; top:18px; max-height:calc(100vh - 36px); overflow:auto; }
@@ -209,6 +219,8 @@
     .actions { gap:8px; }
     button { width:100%; }
     .tabs button { width:auto; }
+    .feedback-button { width:auto; right:12px; bottom:12px; }
+    .feedback-overlay { align-items:flex-end; padding:12px; }
     .hide-mobile { display:none; }
     .day { min-height:95px; padding:6px; }
   }
@@ -890,6 +902,37 @@ Preset rates are only starting points:
         <div id="customerDetails" class="small">Select a customer to view history.</div>
       </div>
     </div>
+  </div>
+</div>
+
+<button id="feedbackButton" class="feedback-button" onclick="openFeedbackModal()">Send Feedback</button>
+<div id="feedbackOverlay" class="feedback-overlay hidden" onclick="handleFeedbackBackdrop(event)">
+  <div class="feedback-modal" role="dialog" aria-modal="true" aria-labelledby="feedbackTitle">
+    <div class="feedback-modal-header">
+      <div>
+        <h2 id="feedbackTitle">Send Feedback</h2>
+        <p class="small">Tell us what would make ProJobFlo better for your workflow.</p>
+      </div>
+      <button class="secondary" type="button" onclick="closeFeedbackModal()">Close</button>
+    </div>
+    <div class="field">
+      <label for="feedbackSection">Current section</label>
+      <input id="feedbackSection" readonly />
+    </div>
+    <div class="field">
+      <label for="feedbackEmail">Email</label>
+      <input id="feedbackEmail" type="email" placeholder="you@example.com" />
+    </div>
+    <div class="field">
+      <label for="feedbackMessage">Feedback</label>
+      <textarea id="feedbackMessage" placeholder="What should we improve, fix, or add?"></textarea>
+    </div>
+    <div class="actions">
+      <button class="success" type="button" onclick="submitFeedback()">Submit Feedback</button>
+      <button class="secondary" type="button" onclick="closeFeedbackModal()">Cancel</button>
+    </div>
+    <p id="feedbackStatus" class="small feedback-status"></p>
+    <a id="feedbackMailtoLink" class="feedback-mailto hidden" href="#">Open email draft</a>
   </div>
 </div>
 
@@ -3010,6 +3053,81 @@ async function copyText(text){await navigator.clipboard.writeText(text);alert("C
 function openSms(phone,msg){if(!phone){alert("No phone number.");return;}window.location.href="sms:"+encodeURIComponent(phone)+"?&body="+encodeURIComponent(msg);}
 function openEmail(email,msg){if(!email){alert("No email.");return;}window.location.href="mailto:"+encodeURIComponent(email)+"?subject="+encodeURIComponent("Following up on your flooring quote")+"&body="+encodeURIComponent(msg);}
 function copyQuote(){copyText(document.getElementById("quotePreview").textContent);}
+function currentFeedbackSection(){
+ const active=document.querySelector(".tab.active");
+ return active ? active.textContent.trim() : "Quote";
+}
+function openFeedbackModal(){
+ const overlay=document.getElementById("feedbackOverlay");
+ const section=document.getElementById("feedbackSection");
+ const email=document.getElementById("feedbackEmail");
+ const status=document.getElementById("feedbackStatus");
+ const mailto=document.getElementById("feedbackMailtoLink");
+ if(section) section.value=currentFeedbackSection();
+ if(email && !email.value) email.value=(currentUser && currentUser.email) || val("authEmail") || "";
+ if(status) status.textContent="";
+ if(mailto){mailto.classList.add("hidden"); mailto.removeAttribute("href");}
+ if(overlay) overlay.classList.remove("hidden");
+ setTimeout(()=>{const msg=document.getElementById("feedbackMessage"); if(msg) msg.focus();},50);
+}
+function closeFeedbackModal(){
+ const overlay=document.getElementById("feedbackOverlay");
+ if(overlay) overlay.classList.add("hidden");
+}
+function handleFeedbackBackdrop(event){
+ if(event.target && event.target.id==="feedbackOverlay") closeFeedbackModal();
+}
+function feedbackMailtoUrl(payload){
+ const body=[
+  "Feedback:",
+  payload.message,
+  "",
+  "Section: "+payload.section,
+  "Email: "+(payload.email || "Not provided"),
+  "URL: "+payload.page_url
+ ].join("\n");
+ return "mailto:hello@projobflo.com?subject="+encodeURIComponent("ProJobFlo Feedback")+"&body="+encodeURIComponent(body);
+}
+async function submitFeedback(){
+ const messageEl=document.getElementById("feedbackMessage");
+ const emailEl=document.getElementById("feedbackEmail");
+ const sectionEl=document.getElementById("feedbackSection");
+ const status=document.getElementById("feedbackStatus");
+ const mailto=document.getElementById("feedbackMailtoLink");
+ const message=(messageEl && messageEl.value.trim()) || "";
+ const email=(emailEl && emailEl.value.trim()) || (currentUser && currentUser.email) || "";
+ const section=(sectionEl && sectionEl.value.trim()) || currentFeedbackSection();
+ if(!message){
+  if(status) status.textContent="Type a quick note first.";
+  return;
+ }
+ const payload={
+  user_id: currentUser ? currentUser.id : null,
+  email,
+  section,
+  message,
+  page_url: window.location.href,
+  created_at: new Date().toISOString()
+ };
+ if(mailto){mailto.classList.add("hidden"); mailto.removeAttribute("href");}
+ if(status) status.textContent="Sending feedback...";
+ try{
+  if(currentUser && supabaseClient){
+   const { error } = await supabaseClient.from("feedback").insert(payload);
+   if(error) throw error;
+   if(status) status.textContent="Thanks. Feedback sent.";
+   if(messageEl) messageEl.value="";
+   return;
+ }
+ throw new Error("Feedback table unavailable.");
+ }catch(error){
+  if(mailto){
+   mailto.href=feedbackMailtoUrl(payload);
+   mailto.classList.remove("hidden");
+  }
+  if(status) status.textContent="Feedback could not be sent automatically. Use the email draft link below.";
+ }
+}
 function saveAll(){const presetIds=["presetLvpInstall","presetLvpDemo","presetLvpMaterial","presetLaminateInstall","presetLaminateDemo","presetLaminateMaterial","presetCarpetInstall","presetCarpetDemo","presetCarpetMaterial","presetTileInstall","presetTileDemo","presetTileMaterial","presetHardwoodInstall","presetHardwoodDemo","presetHardwoodMaterial"];
  const presets={}; presetIds.forEach(id=>presets[id]=val(id));
  const data={customers,quotes,jobs,payments,presets,company:{name:val("companyName"),phone:val("companyPhone"),email:val("companyEmail"),taxLocationSearch:val("taxLocationSearch"),taxRate:val("taxRate")}};try{localStorage.setItem("fastQuoteIntegratedApp",JSON.stringify(data));alert("Saved on this device.");}catch(e){alert("Too much data to save locally. Photos can make the file large.");}}
