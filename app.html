@@ -857,6 +857,157 @@
   .schedule-meta-actions button {
     min-height:38px;
   }
+  .job-file-overlay {
+    position:fixed;
+    inset:0;
+    z-index:9200;
+    display:flex;
+    justify-content:flex-end;
+    background:rgba(1,8,20,.70);
+    backdrop-filter:blur(10px);
+  }
+  .job-file-overlay.hidden {
+    display:none !important;
+  }
+  .job-file-panel {
+    width:min(760px,100%);
+    height:100vh;
+    overflow:auto;
+    padding:22px;
+    background:
+      radial-gradient(circle at 82% 0,rgba(31,111,255,.20),transparent 24rem),
+      linear-gradient(180deg,rgba(12,24,46,.98),rgba(4,12,26,.98));
+    border-left:1px solid rgba(96,165,250,.28);
+    box-shadow:-28px 0 80px rgba(0,0,0,.42);
+  }
+  .job-file-header {
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:16px;
+    padding-bottom:16px;
+    border-bottom:1px solid rgba(148,163,184,.18);
+    margin-bottom:16px;
+  }
+  .job-file-title {
+    margin:0;
+    color:#f8fafc;
+    font-size:28px;
+    line-height:1.08;
+  }
+  .job-file-subtitle {
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-top:10px;
+  }
+  .job-file-chip {
+    display:inline-flex;
+    align-items:center;
+    min-height:28px;
+    padding:5px 9px;
+    border:1px solid rgba(125,158,204,.24);
+    border-radius:999px;
+    background:rgba(5,14,29,.52);
+    color:#c9d6e8;
+    font-size:12px;
+    font-weight:850;
+  }
+  .job-file-section {
+    margin-top:14px;
+    padding:16px;
+    border:1px solid rgba(125,158,204,.22);
+    border-radius:var(--radius);
+    background:
+      linear-gradient(145deg,rgba(14,29,54,.88),rgba(7,17,33,.88));
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.04), 0 16px 40px rgba(0,0,0,.22);
+  }
+  .job-file-section h3 {
+    margin:0 0 12px;
+    color:#f8fafc;
+    font-size:15px;
+  }
+  .job-file-grid {
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:10px;
+  }
+  .job-file-stat {
+    min-height:74px;
+    padding:12px;
+    border:1px solid rgba(125,158,204,.20);
+    border-radius:12px;
+    background:rgba(5,14,29,.52);
+  }
+  .job-file-label {
+    color:#91a3bd;
+    font-size:11px;
+    font-weight:900;
+    letter-spacing:.05em;
+    text-transform:uppercase;
+    margin-bottom:5px;
+  }
+  .job-file-value {
+    color:#f8fafc;
+    font-size:15px;
+    line-height:1.35;
+    overflow-wrap:anywhere;
+  }
+  .job-file-money .job-file-value {
+    font-size:22px;
+    font-weight:950;
+  }
+  .job-file-actions {
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+    gap:9px;
+  }
+  .job-file-actions button {
+    width:100%;
+    min-height:42px;
+  }
+  .job-file-preview {
+    max-height:260px;
+    overflow:auto;
+    white-space:pre-wrap;
+    color:#dfe8f8;
+    font-family:ui-monospace, "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    font-size:12px;
+    line-height:1.55;
+    padding:12px;
+    border:1px solid rgba(125,158,204,.20);
+    border-radius:12px;
+    background:rgba(5,14,29,.52);
+  }
+  .job-file-empty {
+    color:#9fb0c8;
+    border:1px dashed rgba(125,158,204,.30);
+    border-radius:12px;
+    padding:14px;
+    background:rgba(5,14,29,.36);
+  }
+  .job-file-photo-grid {
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(110px,1fr));
+    gap:10px;
+  }
+  .job-file-photo {
+    overflow:hidden;
+    border:1px solid rgba(125,158,204,.22);
+    border-radius:12px;
+    background:rgba(5,14,29,.52);
+  }
+  .job-file-photo img {
+    width:100%;
+    height:96px;
+    object-fit:cover;
+    display:block;
+  }
+  .job-file-photo div {
+    padding:8px;
+    color:#c9d6e8;
+    font-size:12px;
+  }
   @media (max-width: 980px) {
     #viewSchedule .grid {
       grid-template-columns:1fr;
@@ -882,6 +1033,23 @@
     }
     .schedule-meta-actions button {
       width:100%;
+    }
+    .job-file-overlay {
+      align-items:stretch;
+    }
+    .job-file-panel {
+      width:100%;
+      padding:16px;
+      border-left:0;
+    }
+    .job-file-header {
+      flex-direction:column;
+    }
+    .job-file-grid {
+      grid-template-columns:1fr;
+    }
+    .job-file-title {
+      font-size:24px;
     }
   }
 </style>
@@ -1556,6 +1724,12 @@ Preset rates are only starting points:
         <div id="customerDetails" class="small">Select a customer to view history.</div>
       </div>
     </div>
+  </div>
+</div>
+
+<div id="jobFileOverlay" class="job-file-overlay hidden" onclick="handleJobFileBackdrop(event)">
+  <div class="job-file-panel" role="dialog" aria-modal="true" aria-labelledby="jobFileTitle">
+    <div id="jobFileContent"></div>
   </div>
 </div>
 
@@ -3283,7 +3457,7 @@ function renderSelectedJobs(){
     const jobId=escapeAttr(j.id);
     const duration=Number(j.duration || 1);
     return `
-      <div class="schedule-job-card">
+      <div class="schedule-job-card" role="button" tabindex="0" onclick="openJobFile('${jobId}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openJobFile('${jobId}');}">
         <div class="schedule-job-top">
           <div>
             <div class="schedule-job-title">${escapeHtml(contact.name)}</div>
@@ -3302,7 +3476,7 @@ function renderSelectedJobs(){
           <div class="schedule-detail"><div class="schedule-detail-label">Total</div><div class="schedule-detail-value">${dollars(j.total || 0)}</div></div>
         </div>
         <div class="schedule-notes"><strong>Notes</strong><br>${escapeHtml(contact.notes || "No notes saved.")}</div>
-        <div class="schedule-actions">
+        <div class="schedule-actions" onclick="event.stopPropagation()">
           <button class="secondary" onclick="openJobMaps('${jobId}')">Open Maps</button>
           <button class="secondary" onclick="callJobCustomer('${jobId}')">Call Customer</button>
           <button class="secondary" onclick="textJobCustomer('${jobId}')">Text Customer</button>
@@ -3310,7 +3484,7 @@ function renderSelectedJobs(){
           <button class="success" onclick="downloadJobIcs('${jobId}')">Add to Calendar</button>
           <button class="secondary" onclick="openGoogleCalendarForJob('${jobId}')">Open Google Calendar</button>
         </div>
-        <div class="schedule-meta-actions">
+        <div class="schedule-meta-actions" onclick="event.stopPropagation()">
           <button class="secondary" onclick="recordPaymentForJob('${jobId}')">Record Payment</button>
           <button class="secondary" onclick="markJobInProgress('${jobId}')">Mark In Progress</button>
           <button class="secondary" onclick="markJobComplete('${jobId}')">Mark Complete</button>
@@ -3320,6 +3494,183 @@ function renderSelectedJobs(){
       </div>
     `;
   }).join("");
+}
+
+function findScheduledJob(jobId){
+  return jobs.find(j=>String(j.id)===String(jobId));
+}
+
+function jobQuoteTotal(job, quote){
+  return Number(job?.total || quote?.total || quote?.amount || 0);
+}
+
+function jobEstimateNumber(quote){
+  return quote?.estimateNumber || quote?.estimateNo || quote?.quoteNumber || quote?.id || "Not assigned";
+}
+
+function jobFilePhotos(quote){
+  const photoSource=quote?.roomPhotosSnapshot || quote?.quoteData?.roomPhotos || quote?.roomPhotos || {};
+  if(Array.isArray(photoSource)){
+    return photoSource.filter(Boolean);
+  }
+  return Object.keys(photoSource || {}).flatMap(roomName =>
+    (photoSource[roomName] || []).filter(Boolean).map(photo => ({...photo, roomName}))
+  );
+}
+
+function jobPhotoUrl(photo){
+  return photo?.url || photo?.publicUrl || photo?.signedUrl || photo?.dataUrl || photo?.src || "";
+}
+
+function jobFilePreviewText(quote){
+  return quote?.quoteText || quote?.previewText || quote?.proposalText || "";
+}
+
+function jobFileRenderStat(label,value,extraClass=""){
+  return `<div class="job-file-stat ${extraClass}">
+    <div class="job-file-label">${escapeHtml(label)}</div>
+    <div class="job-file-value">${escapeHtml(value || "Not saved")}</div>
+  </div>`;
+}
+
+function renderJobFile(job){
+  const quote=getJobQuote(job);
+  const contact=jobContact(job);
+  const total=jobQuoteTotal(job, quote);
+  const paid=totalPaidForQuote(job.quoteId);
+  const deposit=depositPaidForQuote(job.quoteId);
+  const balance=Math.max(0,total-paid);
+  const photos=jobFilePhotos(quote);
+  const preview=jobFilePreviewText(quote);
+  const status=job.status || "Scheduled";
+  const quoteStatus=quote.status || "Sold";
+  const estimateNo=jobEstimateNumber(quote);
+  const scheduleNotes=job.notes || contact.notes || "";
+  const quoteNotes=quote.notes || quote.quickNotes || quote.projectNotes || "";
+  const jobId=escapeAttr(job.id);
+
+  return `
+    <div class="job-file-header">
+      <div>
+        <h2 id="jobFileTitle" class="job-file-title">${escapeHtml(contact.name)}</h2>
+        <div class="job-file-subtitle">
+          <span class="job-file-chip">${escapeHtml(status)}</span>
+          <span class="job-file-chip">${escapeHtml(job.date || "No install date")}</span>
+          <span class="job-file-chip">${escapeHtml(String(job.duration || 1))} day(s)</span>
+          <span class="job-file-chip">${escapeHtml(job.crew || "Crew unassigned")}</span>
+          <span class="job-file-chip">${dollars(total)}</span>
+        </div>
+      </div>
+      <button class="secondary" type="button" onclick="closeJobFile()">Close</button>
+    </div>
+
+    <div class="job-file-section">
+      <h3>Contact Actions</h3>
+      <div class="job-file-actions">
+        <button class="secondary" type="button" onclick="callJobCustomer('${jobId}')">Call</button>
+        <button class="secondary" type="button" onclick="textJobCustomer('${jobId}')">Text</button>
+        <button class="secondary" type="button" onclick="emailJobCustomer('${jobId}')">Email</button>
+        <button class="secondary" type="button" onclick="openJobMaps('${jobId}')">Open Maps</button>
+      </div>
+    </div>
+
+    <div class="job-file-section">
+      <h3>Money Snapshot</h3>
+      <div class="job-file-grid job-file-money">
+        ${jobFileRenderStat("Quote Total", dollars(total))}
+        ${jobFileRenderStat("Deposit Paid", dollars(deposit))}
+        ${jobFileRenderStat("Paid To Date", dollars(paid))}
+        ${jobFileRenderStat("Balance Due", dollars(balance))}
+      </div>
+      <div class="job-file-actions" style="margin-top:12px;">
+        <button class="success" type="button" onclick="recordPaymentForJob('${jobId}'); closeJobFile();">Record Payment</button>
+        <button class="secondary" type="button" onclick="recordPaymentForJob('${jobId}'); closeJobFile();">Record Final Payment</button>
+      </div>
+    </div>
+
+    <div class="job-file-section">
+      <h3>Scope / Quote Details</h3>
+      <div class="job-file-grid">
+        ${jobFileRenderStat("Estimate Number", String(estimateNo))}
+        ${jobFileRenderStat("Quote Status", quoteStatus)}
+        ${jobFileRenderStat("Install Date", job.date || "Not scheduled")}
+        ${jobFileRenderStat("Crew", job.crew || "Unassigned")}
+      </div>
+      <div class="job-file-stat" style="margin-top:10px;">
+        <div class="job-file-label">Quote Notes</div>
+        <div class="job-file-value">${escapeHtml(quoteNotes || "No quote notes saved.")}</div>
+      </div>
+      <div class="job-file-stat" style="margin-top:10px;">
+        <div class="job-file-label">Schedule Notes</div>
+        <div class="job-file-value">${escapeHtml(scheduleNotes || "No schedule notes saved.")}</div>
+      </div>
+      ${preview ? `<div class="job-file-preview" style="margin-top:10px;">${escapeHtml(preview)}</div>` : `<div class="job-file-empty" style="margin-top:10px;">No proposal preview is saved for this job yet.</div>`}
+    </div>
+
+    <div class="job-file-section">
+      <h3>Photos</h3>
+      ${photos.length ? `<div class="job-file-photo-grid">${photos.map(photo=>{
+        const url=jobPhotoUrl(photo);
+        const label=photo.roomName || photo.room || photo.name || "Job photo";
+        return url ? `<div class="job-file-photo"><img src="${escapeAttr(url)}" alt="${escapeAttr(label)}"><div>${escapeHtml(label)}</div></div>` : "";
+      }).join("")}</div>` : `<div class="job-file-empty">No quote or room photos are attached yet.</div>`}
+    </div>
+
+    <div class="job-file-section">
+      <h3>Notes Timeline</h3>
+      ${scheduleNotes ? `<div class="job-file-stat"><div class="job-file-label">Schedule Note</div><div class="job-file-value">${escapeHtml(scheduleNotes)}</div></div>` : `<div class="job-file-empty">No job notes yet. Future timestamped notes can live here.</div>`}
+    </div>
+
+    <div class="job-file-section">
+      <h3>Calendar Actions</h3>
+      <div class="job-file-actions">
+        <button class="success" type="button" onclick="downloadJobIcs('${jobId}')">Add to Calendar</button>
+        <button class="secondary" type="button" onclick="openGoogleCalendarForJob('${jobId}')">Open Google Calendar</button>
+        <button class="secondary" type="button" onclick="openJobMaps('${jobId}')">Open Maps</button>
+      </div>
+    </div>
+
+    <div class="job-file-section">
+      <h3>Job Actions</h3>
+      <div class="job-file-actions">
+        <button class="secondary" type="button" onclick="editScheduledJob('${jobId}'); closeJobFile();">Edit Schedule</button>
+        <button class="secondary" type="button" onclick="jobFileMarkInProgress('${jobId}')">Mark In Progress</button>
+        <button class="success" type="button" onclick="jobFileMarkComplete('${jobId}')">Mark Complete</button>
+        <button class="secondary" type="button" onclick="recordPaymentForJob('${jobId}'); closeJobFile();">Record Final Payment</button>
+      </div>
+    </div>
+  `;
+}
+
+function openJobFile(jobId){
+  const job=findScheduledJob(jobId);
+  if(!job){alert("Could not find this scheduled job.");return;}
+  const overlay=document.getElementById("jobFileOverlay");
+  const content=document.getElementById("jobFileContent");
+  if(!overlay || !content) return;
+  content.innerHTML=renderJobFile(job);
+  overlay.classList.remove("hidden");
+}
+
+function closeJobFile(){
+  const overlay=document.getElementById("jobFileOverlay");
+  if(overlay) overlay.classList.add("hidden");
+}
+
+function handleJobFileBackdrop(event){
+  if(event.target && event.target.id==="jobFileOverlay") closeJobFile();
+}
+
+async function jobFileMarkInProgress(jobId){
+  await markJobInProgress(jobId);
+  const job=findScheduledJob(jobId);
+  if(job) openJobFile(jobId);
+}
+
+async function jobFileMarkComplete(jobId){
+  await markJobComplete(jobId);
+  const job=findScheduledJob(jobId);
+  if(job) openJobFile(jobId);
 }
 
  function recordPaymentForJob(jobId) {
