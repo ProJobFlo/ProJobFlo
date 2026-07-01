@@ -110,7 +110,7 @@
   #viewQuote .room-row, #lineItems .item-row { background:#ffffff; border-color:#dbe3ee; box-shadow:0 8px 18px rgba(15,23,42,.05); }
   #viewQuote .room-row input, #lineItems .item-row input, #lineItems .item-row select { margin-bottom:0; }
   #viewQuote .item-row.hide-mobile { padding:0 8px 6px; margin-bottom:8px; border-bottom:1px solid var(--border); }
-  #quotePreview { background:linear-gradient(180deg,#ffffff,#fbfdff); border:1px solid #dbe3ee; border-left:5px solid var(--primary); box-shadow:inset 0 1px 0 rgba(255,255,255,.9), 0 14px 32px rgba(15,23,42,.06); font-family:ui-monospace, "SFMono-Regular", Consolas, "Liberation Mono", monospace; font-size:13px; }
+  #quotePreview { background:#f8fafc; border:1px solid #dbe3ee; border-left:5px solid var(--primary); box-shadow:0 16px 38px rgba(15,23,42,.08); font-family:inherit; font-size:14px; }
   #agreementCard { background:#ffffff; border-color:#bfdbfe; border-left-color:var(--primary); }
   #agreementCard .agreement-text { background:rgba(255,255,255,.75); border-color:#bbf7d0; box-shadow:inset 0 1px 0 rgba(255,255,255,.75); }
   #agreementCard .signature-box { background:linear-gradient(180deg,#ffffff,#f8fafc); border-color:#94a3b8; box-shadow:inset 0 2px 8px rgba(15,23,42,.04); }
@@ -135,7 +135,44 @@
   .muted-heading { font-size:11px; color:var(--muted); font-weight:850; text-transform:uppercase; letter-spacing:.04em; margin-bottom:6px; }
   .checkbox-wrap { display:flex; align-items:center; gap:6px; justify-content:center; }
   .checkbox-wrap input { width:auto; margin:0; }
-  .quote-box { white-space:pre-wrap; background:#fbfdff; padding:18px; border-radius:var(--radius); border:1px solid var(--border); font-size:14px; line-height:1.6; max-height:430px; overflow:auto; box-shadow:inset 0 1px 2px rgba(15,23,42,.04); }
+  .quote-box { background:#fbfdff; padding:18px; border-radius:var(--radius); border:1px solid var(--border); font-size:14px; line-height:1.6; max-height:680px; overflow:auto; box-shadow:inset 0 1px 2px rgba(15,23,42,.04); }
+  .proposal-doc { background:#ffffff; color:#111827; border:1px solid #e2e8f0; border-radius:18px; overflow:hidden; box-shadow:0 18px 45px rgba(15,23,42,.12); }
+  .proposal-doc * { box-sizing:border-box; }
+  .proposal-header { display:grid; grid-template-columns:1.4fr .8fr; gap:18px; padding:24px; background:linear-gradient(135deg,#0f172a,#1e3a8a); color:white; }
+  .proposal-brand { font-size:22px; font-weight:900; letter-spacing:-.02em; margin-bottom:6px; }
+  .proposal-contact { color:#dbeafe; font-size:13px; line-height:1.55; }
+  .proposal-meta { display:grid; gap:8px; justify-items:end; text-align:right; }
+  .proposal-badge { display:inline-flex; align-items:center; border:1px solid rgba(255,255,255,.22); border-radius:999px; padding:5px 10px; color:#bfdbfe; background:rgba(255,255,255,.08); font-size:11px; font-weight:900; text-transform:uppercase; letter-spacing:.08em; }
+  .proposal-number { font-size:26px; font-weight:950; letter-spacing:-.03em; }
+  .proposal-date { color:#dbeafe; font-size:13px; }
+  .proposal-body { padding:24px; display:grid; gap:22px; }
+  .proposal-section { display:grid; gap:12px; }
+  .proposal-section-title { display:flex; align-items:center; gap:9px; color:#0f172a; font-size:12px; font-weight:950; letter-spacing:.1em; text-transform:uppercase; }
+  .proposal-section-title:before { content:""; width:8px; height:8px; border-radius:99px; background:#2563eb; box-shadow:0 0 0 4px #dbeafe; }
+  .proposal-info-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+  .proposal-info-card { border:1px solid #e2e8f0; border-radius:14px; background:#f8fafc; padding:14px; min-width:0; }
+  .proposal-label { display:block; color:#64748b; font-size:11px; font-weight:900; letter-spacing:.08em; text-transform:uppercase; margin-bottom:5px; }
+  .proposal-value { color:#111827; font-weight:800; overflow-wrap:anywhere; }
+  .proposal-muted { color:#64748b; font-size:13px; line-height:1.5; overflow-wrap:anywhere; }
+  .proposal-room-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px; }
+  .proposal-room { border:1px solid #e2e8f0; border-radius:14px; padding:13px; background:#ffffff; }
+  .proposal-room strong { display:block; color:#0f172a; margin-bottom:4px; }
+  .proposal-table { display:grid; gap:8px; }
+  .proposal-line { display:grid; grid-template-columns:minmax(0,1.7fr) .75fr .75fr .85fr; gap:12px; align-items:center; padding:12px 14px; border:1px solid #e2e8f0; border-radius:14px; background:#fff; }
+  .proposal-line.header { background:#f1f5f9; color:#475569; font-size:11px; font-weight:950; letter-spacing:.08em; text-transform:uppercase; }
+  .proposal-line-title { min-width:0; }
+  .proposal-line-title strong { display:block; color:#111827; overflow-wrap:anywhere; }
+  .proposal-line-title span { display:block; color:#64748b; font-size:12px; overflow-wrap:anywhere; }
+  .proposal-num { text-align:right; font-weight:850; color:#111827; }
+  .proposal-totals { display:grid; gap:8px; margin-left:auto; width:min(100%,360px); }
+  .proposal-total-row { display:flex; justify-content:space-between; gap:14px; padding:10px 0; border-bottom:1px solid #e2e8f0; color:#334155; }
+  .proposal-total-row strong { color:#111827; }
+  .proposal-final { margin-top:4px; padding:16px; border-radius:16px; background:linear-gradient(135deg,#eff6ff,#dbeafe); border:1px solid #bfdbfe; color:#1e3a8a; }
+  .proposal-final .proposal-total-row { border:0; padding:0; align-items:baseline; }
+  .proposal-final strong:last-child { font-size:28px; color:#0f172a; letter-spacing:-.03em; }
+  .proposal-deposit { padding:13px 16px; border-radius:14px; background:#ecfdf5; border:1px solid #bbf7d0; color:#14532d; display:flex; justify-content:space-between; gap:14px; font-weight:900; }
+  .proposal-notes { border:1px solid #e2e8f0; border-radius:14px; background:#f8fafc; padding:14px; color:#334155; white-space:pre-wrap; overflow-wrap:anywhere; }
+  .proposal-empty { color:#64748b; background:#f8fafc; border:1px dashed #cbd5e1; border-radius:14px; padding:14px; }
   .small { font-size:13px; color:var(--muted); }
   .doc-row { display:grid; grid-template-columns:1fr 1.5fr auto; gap:10px; align-items:center; margin-top:8px; }
   .photo-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(110px,1fr)); gap:10px; margin-top:10px; }
@@ -229,7 +266,16 @@
     #viewQuote > .grid > div:first-child > .card { padding:16px; margin-bottom:16px; }
     #viewQuote > .grid > div:first-child > .card h2:first-of-type { font-size:17px; gap:8px; margin-bottom:14px; }
     #viewQuote > .grid > div:first-child > .card h2:first-of-type::before { width:26px; height:26px; flex-basis:26px; font-size:12px; }
-    #quotePreview { font-size:12px; padding:15px; }
+    #quotePreview { padding:10px; max-height:none; }
+    .proposal-header { grid-template-columns:1fr; padding:18px; }
+    .proposal-meta { justify-items:start; text-align:left; }
+    .proposal-body { padding:16px; gap:18px; }
+    .proposal-info-grid { grid-template-columns:1fr; }
+    .proposal-line, .proposal-line.header { grid-template-columns:1fr; gap:5px; }
+    .proposal-line.header { display:none; }
+    .proposal-num { text-align:left; }
+    .proposal-totals { width:100%; }
+    .proposal-final strong:last-child { font-size:24px; }
     #liveNumbersCard { position:static; max-height:none; overflow:visible; }
     .room-row,.item-row,.doc-row { grid-template-columns:1fr 1fr; gap:8px; }
     .actions { gap:8px; }
@@ -520,7 +566,6 @@
   #viewQuote .subtle-card,
   #viewQuote .room-row,
   #lineItems .item-row,
-  #quotePreview,
   #agreementCard .agreement-text,
   #agreementCard .signature-box {
     background:linear-gradient(180deg,rgba(10,23,43,.92),rgba(7,18,35,.92));
@@ -536,9 +581,12 @@
     border-bottom-color:rgba(148,163,184,.14);
   }
   #quotePreview {
-    color:#dfe8f8;
+    background:linear-gradient(180deg,#f8fafc,#eef4ff);
+    color:#111827;
+    border-color:rgba(96,165,250,.35);
     border-left:3px solid #1f6fff;
-    font-family:ui-monospace, "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    box-shadow:0 22px 60px rgba(0,0,0,.24);
+    font-family:inherit;
   }
   #agreementCard .agreement-text {
     color:#c9d6e8;
@@ -2965,7 +3013,8 @@ function calculateQuote(){
  document.getElementById("measuredSqft").textContent=measured.toFixed(2);document.getElementById("orderSqft").textContent=order.toFixed(2);document.getElementById("photoCount").textContent=totalPhotoCount();document.getElementById("subtotal").textContent=dollars(subtotal);document.getElementById("taxTotal").textContent=dollars(tax);document.getElementById("grandTotal").textContent=dollars(total);document.getElementById("depositDue").textContent=dollars(deposit);
  rooms.forEach(room=>{const el=document.getElementById("roomSqft-"+room.id);if(el){const sqft=roomSqft(room);el.textContent=sqft.toFixed(2)+" sqft";}});
  lineItems.forEach(item=>{const qtyEl=document.getElementById("itemQty-"+item.id);const amountEl=document.getElementById("itemAmount-"+item.id);if(qtyEl&&item.qtySource!=="manual")qtyEl.value=itemQty(item).toFixed(2);if(amountEl)amountEl.textContent=dollars(itemQty(item)*(Number(item.rate)||0));});
- document.getElementById("quotePreview").textContent=buildQuoteText(measured,order,subtotal,tax,total,deposit);
+ const quoteText=buildQuoteText(measured,order,subtotal,tax,total,deposit);
+ renderQuotePreview(quoteText, measured, order, subtotal, tax, total, deposit);
  renderStats();
  renderProfitMode();
  queueAutoSave();
@@ -3016,6 +3065,130 @@ function buildQuoteText(measured,order,subtotal,tax,total,deposit){
  "\n"+getPhotoSummaryText()+
  "\n\nNOTES / TERMS"+
  "\n"+val("notes");
+}
+
+function getQuotePreviewText(){
+ const preview=document.getElementById("quotePreview");
+ return preview?.dataset?.plainText || preview?.textContent || "";
+}
+
+function renderQuotePreview(quoteText, measured, order, subtotal, tax, total, deposit){
+ const preview=document.getElementById("quotePreview");
+ if(!preview)return;
+ preview.dataset.plainText=quoteText;
+
+ const companyName=val("companyName")||"Company";
+ const companyPhone=val("companyPhone");
+ const companyEmail=val("companyEmail");
+ const customerName=val("customerName")||"Customer";
+ const customerPhone=val("customerPhone");
+ const customerEmail=val("customerEmail");
+ const jobAddress=val("jobAddress");
+ const estimateNumber=val("estimateNumber")||"Draft";
+ const estimateDate=val("estimateDate")||new Date().toLocaleDateString();
+ const taxRate=val("taxRate")||"0";
+ const depositPercent=val("depositPercent")||"0";
+ const notes=val("notes");
+
+ const roomHtml=rooms.length ? rooms.map(room=>{
+   const sqft=roomSqft(room);
+   const lengthText=displayFeetInches(room.lengthFt ?? room.length ?? 0, room.lengthIn ?? 0);
+   const widthText=displayFeetInches(room.widthFt ?? room.width ?? 0, room.widthIn ?? 0);
+   return `<div class="proposal-room">
+     <strong>${escapeHtml(room.name||"Room")}</strong>
+     <div class="proposal-muted">${escapeHtml(lengthText)} x ${escapeHtml(widthText)}</div>
+     <div class="proposal-value">${sqft.toFixed(2)} sq ft</div>
+   </div>`;
+ }).join("") : `<div class="proposal-empty">No rooms have been added yet.</div>`;
+
+ const itemHtml=lineItems.length ? lineItems.map(item=>{
+   const qty=itemQty(item);
+   const rate=Number(item.rate)||0;
+   const amount=qty*rate;
+   const title=item.description||item.service||"Line Item";
+   const detail=[
+     item.service && item.description ? item.service : "",
+     item.taxable ? "Taxable" : ""
+   ].filter(Boolean).join(" - ");
+   return `<div class="proposal-line">
+     <div class="proposal-line-title">
+       <strong>${escapeHtml(title)}</strong>
+       ${detail ? `<span>${escapeHtml(detail)}</span>` : ""}
+     </div>
+     <div class="proposal-num">Qty ${qty.toFixed(2)} ${escapeHtml(item.unit||"")}</div>
+     <div class="proposal-num">${dollars(rate)}</div>
+     <div class="proposal-num">${dollars(amount)}</div>
+   </div>`;
+ }).join("") : `<div class="proposal-empty">No line items have been added yet.</div>`;
+
+ preview.innerHTML=`<article class="proposal-doc" aria-label="Customer proposal preview">
+   <header class="proposal-header">
+     <div>
+       <div class="proposal-brand">${escapeHtml(companyName)}</div>
+       <div class="proposal-contact">
+         ${companyPhone ? `<div>${escapeHtml(companyPhone)}</div>` : ""}
+         ${companyEmail ? `<div>${escapeHtml(companyEmail)}</div>` : ""}
+       </div>
+     </div>
+     <div class="proposal-meta">
+       <span class="proposal-badge">Customer Proposal</span>
+       <div class="proposal-number">Estimate #${escapeHtml(estimateNumber)}</div>
+       <div class="proposal-date">Date: ${escapeHtml(estimateDate)}</div>
+     </div>
+   </header>
+
+   <div class="proposal-body">
+     <section class="proposal-section">
+       <div class="proposal-section-title">Customer Information</div>
+       <div class="proposal-info-grid">
+         <div class="proposal-info-card">
+           <span class="proposal-label">Customer</span>
+           <div class="proposal-value">${escapeHtml(customerName)}</div>
+           ${customerPhone ? `<div class="proposal-muted">${escapeHtml(customerPhone)}</div>` : ""}
+           ${customerEmail ? `<div class="proposal-muted">${escapeHtml(customerEmail)}</div>` : ""}
+         </div>
+         <div class="proposal-info-card">
+           <span class="proposal-label">Project Address</span>
+           <div class="proposal-value">${jobAddress ? escapeHtml(jobAddress) : "Address pending"}</div>
+         </div>
+       </div>
+     </section>
+
+     <section class="proposal-section">
+       <div class="proposal-section-title">Rooms / Measurements</div>
+       <div class="proposal-room-grid">${roomHtml}</div>
+       <div class="proposal-info-grid">
+         <div class="proposal-info-card"><span class="proposal-label">Measured Sq Ft</span><div class="proposal-value">${measured.toFixed(2)}</div></div>
+         <div class="proposal-info-card"><span class="proposal-label">Order Sq Ft with ${escapeHtml(val("waste")||"0")}% Waste</span><div class="proposal-value">${order.toFixed(2)}</div></div>
+       </div>
+     </section>
+
+     <section class="proposal-section">
+       <div class="proposal-section-title">Line Items</div>
+       <div class="proposal-table">
+         ${lineItems.length ? `<div class="proposal-line header"><div>Description</div><div class="proposal-num">Qty</div><div class="proposal-num">Rate</div><div class="proposal-num">Amount</div></div>` : ""}
+         ${itemHtml}
+       </div>
+     </section>
+
+     <section class="proposal-section">
+       <div class="proposal-section-title">Investment Summary</div>
+       <div class="proposal-totals">
+         <div class="proposal-total-row"><span>Subtotal</span><strong>${dollars(subtotal)}</strong></div>
+         <div class="proposal-total-row"><span>Tax (${escapeHtml(taxRate)}%)</span><strong>${dollars(tax)}</strong></div>
+         <div class="proposal-final">
+           <div class="proposal-total-row"><strong>Final Quote</strong><strong>${dollars(total)}</strong></div>
+         </div>
+         <div class="proposal-deposit"><span>Deposit Due (${escapeHtml(depositPercent)}%)</span><span>${dollars(deposit)}</span></div>
+       </div>
+     </section>
+
+     <section class="proposal-section">
+       <div class="proposal-section-title">Notes / Terms</div>
+       <div class="proposal-notes">${notes ? escapeHtml(notes) : "No additional notes have been added yet."}</div>
+     </section>
+   </div>
+ </article>`;
 }
 
 function getCurrentQuoteTotal(){let subtotal=0,taxableSubtotal=0;lineItems.forEach(i=>{const amount=itemQty(i)*(Number(i.rate)||0);subtotal+=amount;if(i.taxable)taxableSubtotal+=amount;});return subtotal+(taxableSubtotal*((num("taxRate")||0)/100));}
@@ -3139,7 +3312,7 @@ function saveAcceptedQuoteAsSold(savedQuote=null, savedCustomer=null, acceptedAt
      depositRequired: payload.depositRequired || (getCurrentQuoteTotal()*((num("depositPercent")||0)/100)).toFixed(2),
      status: savedQuote.status || "Sold",
      notes: payload.notes || val("notes"),
-     quoteText: payload.quoteText || document.getElementById("quotePreview").textContent,
+     quoteText: payload.quoteText || getQuotePreviewText(),
      profitSnapshot: payload.profitSnapshot || profitTotals(),
      lineItemsSnapshot: payload.lineItems || lineItems,
      roomsSnapshot: payload.rooms || rooms,
@@ -3169,7 +3342,7 @@ function saveAcceptedQuoteAsSold(savedQuote=null, savedCustomer=null, acceptedAt
    existing.depositRequired=(getCurrentQuoteTotal()*((num("depositPercent")||0)/100)).toFixed(2);
    existing.status="Sold";
    existing.notes=val("notes");
-   existing.quoteText=document.getElementById("quotePreview").textContent;
+   existing.quoteText=getQuotePreviewText();
    existing.profitSnapshot=profitTotals();
    existing.lineItemsSnapshot=lineItems;
    existing.acceptedAt=acceptedAt;
@@ -3185,7 +3358,7 @@ function saveAcceptedQuoteAsSold(savedQuote=null, savedCustomer=null, acceptedAt
    depositRequired:(getCurrentQuoteTotal()*((num("depositPercent")||0)/100)).toFixed(2),
    status:"Sold",
    notes:val("notes"),
-   quoteText:document.getElementById("quotePreview").textContent,
+   quoteText:getQuotePreviewText(),
    profitSnapshot:profitTotals(),
    lineItemsSnapshot:lineItems,
    acceptedAt:acceptedAt,
@@ -3286,7 +3459,7 @@ if (depositCollected > 0) {
 }
 function setupSignaturePad(){const canvas=document.getElementById("signaturePad");const ctx=canvas.getContext("2d");let drawing=false,lastX=0,lastY=0;function resize(){const rect=canvas.getBoundingClientRect();canvas.width=rect.width;canvas.height=rect.height;ctx.lineWidth=3;ctx.lineCap="round";ctx.strokeStyle="#0f172a";}function pos(e){const rect=canvas.getBoundingClientRect();const p=e.touches?e.touches[0]:e;return{x:p.clientX-rect.left,y:p.clientY-rect.top};}function start(e){e.preventDefault();drawing=true;const p=pos(e);lastX=p.x;lastY=p.y;}function draw(e){if(!drawing)return;e.preventDefault();const p=pos(e);ctx.beginPath();ctx.moveTo(lastX,lastY);ctx.lineTo(p.x,p.y);ctx.stroke();lastX=p.x;lastY=p.y;signatureComplete=true;}function stop(){drawing=false;}resize();window.addEventListener("resize",resize);canvas.addEventListener("mousedown",start);canvas.addEventListener("mousemove",draw);window.addEventListener("mouseup",stop);canvas.addEventListener("touchstart",start,{passive:false});canvas.addEventListener("touchmove",draw,{passive:false});canvas.addEventListener("touchend",stop);}
 function clearSignature(){const canvas=document.getElementById("signaturePad");if(!canvas)return;const ctx=canvas.getContext("2d");ctx.clearRect(0,0,canvas.width,canvas.height);signatureComplete=false;acceptedAt="";document.getElementById("acceptedStatus").textContent="Signature cleared.";}
-function buildSignedAgreementText(){return document.getElementById("quotePreview").textContent+"\n\nACCEPTANCE\nCustomer: "+(val("customerSignatureName")||val("customerName")||"Customer")+"\nContractor: "+(val("contractorName")||val("companyName")||"Contractor")+"\nDeposit collected: $"+(val("depositCollected")||"0")+"\n"+(acceptedAt?"Accepted on: "+acceptedAt:"Not accepted yet")+"\nCustomer signed on contractor device.";}
+function buildSignedAgreementText(){return getQuotePreviewText()+"\n\nACCEPTANCE\nCustomer: "+(val("customerSignatureName")||val("customerName")||"Customer")+"\nContractor: "+(val("contractorName")||val("companyName")||"Contractor")+"\nDeposit collected: $"+(val("depositCollected")||"0")+"\n"+(acceptedAt?"Accepted on: "+acceptedAt:"Not accepted yet")+"\nCustomer signed on contractor device.";}
 function downloadSignedContract(){const blob=new Blob([buildSignedAgreementText()],{type:"text/plain"});const url=URL.createObjectURL(blob);const link=document.createElement("a");link.href=url;link.download="signed-contract.txt";document.body.appendChild(link);link.click();document.body.removeChild(link);URL.revokeObjectURL(url);}
 async function emailContract(){
   const customerName = val("customerName") || val("customerSignatureName") || "Customer";
@@ -5195,7 +5368,7 @@ function openGoogleCalendarForJob(jobId) {
 async function copyText(text){await navigator.clipboard.writeText(text);showToast("Copied","Ready to paste.","success");}
 function openSms(phone,msg){if(!phone){alert("No phone number.");return;}window.location.href="sms:"+encodeURIComponent(phone)+"?&body="+encodeURIComponent(msg);}
 function openEmail(email,msg){if(!email){alert("No email.");return;}window.location.href="mailto:"+encodeURIComponent(email)+"?subject="+encodeURIComponent("Following up on your flooring quote")+"&body="+encodeURIComponent(msg);}
-function copyQuote(){copyText(document.getElementById("quotePreview").textContent);}
+function copyQuote(){copyText(getQuotePreviewText());}
 function currentFeedbackSection(){
  const active=document.querySelector(".tab.active");
  return active ? active.textContent.trim() : "Quote";
@@ -5496,7 +5669,7 @@ savedCustomer = customerData;
     roomPhotos: proposalRoomPhotos,
     lineItems,
     notes: val("notes"),
-    quoteText: document.getElementById("quotePreview").textContent,
+    quoteText: getQuotePreviewText(),
     profitSnapshot: profitTotals(),
     depositRequired,
     acceptedAt: quoteAcceptedAt || null,
