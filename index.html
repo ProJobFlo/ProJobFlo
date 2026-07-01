@@ -4,244 +4,515 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#3b82f6">
+<meta name="theme-color" content="#07111f">
 <link rel="apple-touch-icon" href="https://fwklbatktyqxlwkkiwbh.supabase.co/storage/v1/object/public/Logos/ProJobFlo_App_Icon.png?v=2">
-<title>ProJobFlo | Quote. Sign. Schedule.</title>
+<title>ProJobFlo | Stop Chasing Paperwork. Start Closing Jobs.</title>
 
 <style>
+:root{
+  --bg:#07111f;
+  --bg-soft:#0b1728;
+  --panel:#0f1d31;
+  --panel-strong:#13243a;
+  --line:rgba(148,163,184,.18);
+  --text:#f8fafc;
+  --muted:#9fb0c7;
+  --blue:#2f7bff;
+  --blue-soft:#68a2ff;
+  --green:#37d399;
+  --amber:#f7c948;
+  --shadow:0 28px 90px rgba(0,0,0,.38);
+}
 *{box-sizing:border-box}
-body{margin:0;font-family:Arial,sans-serif;color:#0f172a;background:#f8fafc;line-height:1.5}
-.container{max-width:1180px;margin:0 auto;padding:24px}
-.nav{display:flex;justify-content:space-between;align-items:center;padding:14px 0}
-.logo img{height:95px;width:auto}
-.nav-links{display:flex;gap:22px;align-items:center}
-.nav-links a{color:#0f172a;text-decoration:none;font-weight:800}
-.btn{display:inline-block;padding:14px 22px;border-radius:14px;font-weight:900;text-decoration:none}
-.btn-primary{background:#3b82f6;color:white}
-.btn-secondary{background:white;color:#0f172a;border:1px solid #cbd5e1}
-.hero{display:grid;grid-template-columns:1fr 1fr;gap:44px;align-items:center;padding:54px 0 38px}
-h1{font-size:58px;line-height:1.02;margin:0 0 18px;letter-spacing:-.06em}
-.blue{color:#3b82f6}
-.subhead{font-size:21px;color:#475569;margin:0 0 24px}
-.buttons{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
-.trust-row{display:flex;gap:18px;flex-wrap:wrap;margin-top:18px;color:#334155;font-weight:700;font-size:14px}
-.trust-row span:before{content:"✓";color:#3b82f6;font-weight:900;margin-right:6px}
-.hero-card{background:white;border:1px solid #e2e8f0;border-radius:28px;padding:18px;box-shadow:0 24px 70px rgba(15,23,42,.14)}
-.mock-window{background:#0f172a;border-radius:22px;padding:16px;color:white}
-.mock-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
-.mock-logo{font-weight:900}
-.mock-body{background:#f8fafc;color:#0f172a;border-radius:16px;padding:16px}
-.mock-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px}
-.mock-stat{background:white;border:1px solid #e2e8f0;border-radius:14px;padding:12px}
-.mock-stat small{display:block;color:#64748b;font-weight:800;text-transform:uppercase;font-size:11px}
-.mock-stat strong{font-size:24px}
-.mock-list{background:white;border:1px solid #e2e8f0;border-radius:14px;padding:12px}
-.mock-row{display:flex;justify-content:space-between;border-bottom:1px solid #e2e8f0;padding:8px 0;font-size:14px}
-.mock-row:last-child{border-bottom:0}
-.section{padding:56px 0}
-.section h2{font-size:40px;line-height:1.08;margin:0 0 12px;letter-spacing:-.04em;text-align:center}
-.section-intro{font-size:19px;color:#475569;max-width:760px;margin:0 auto 26px;text-align:center}
-.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
-.card{background:white;border:1px solid #e2e8f0;border-radius:22px;padding:22px;box-shadow:0 8px 28px rgba(15,23,42,.06)}
-.card-icon{font-size:28px;margin-bottom:10px}
-.card h3{margin:0 0 8px;font-size:21px}
-.card p{margin:0;color:#475569}
-.workflow{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-top:26px}
-.step{background:white;border:1px solid #e2e8f0;border-radius:20px;padding:18px;text-align:center}
-.step-num{width:30px;height:30px;border-radius:50%;background:#3b82f6;color:white;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;font-weight:900}
-.beta-pricing{display:grid;grid-template-columns:.9fr 1.1fr;gap:20px;align-items:stretch}
-.price-card{text-align:center}
-.price{font-size:42px;font-weight:900;color:#3b82f6;margin:12px 0}
-.checks{display:grid;grid-template-columns:1fr 1fr;gap:10px;text-align:left;margin:18px 0}
-.checks div:before{content:"✓";color:#3b82f6;font-weight:900;margin-right:8px}
-.story{display:grid;grid-template-columns:1.2fr .8fr;gap:22px;align-items:center}
-.story-box{background:#0f172a;color:white;border-radius:26px;padding:30px}
-.story-box p{color:#cbd5e1;font-size:18px}
-.testimonials{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
-.stars{color:#f59e0b;letter-spacing:2px;margin-bottom:12px}
-.final-cta{background:#0f172a;color:white;border-radius:30px;padding:38px;text-align:center}
-.final-cta p{color:#cbd5e1;font-size:18px}
-.footer{padding:28px 0;color:#64748b;font-size:14px;text-align:center}
-@media(max-width:900px){
-  .hero,.beta-pricing,.story{grid-template-columns:1fr}
-  .cards,.workflow,.testimonials{grid-template-columns:1fr}
-  h1{font-size:42px}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+  color:var(--text);
+  background:
+    radial-gradient(circle at 18% 8%, rgba(47,123,255,.22), transparent 30%),
+    radial-gradient(circle at 78% 2%, rgba(55,211,153,.13), transparent 26%),
+    linear-gradient(180deg,#06101d 0%,#081526 42%,#050a13 100%);
+  line-height:1.5;
+}
+body:before{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);
+  background-size:72px 72px;
+  mask-image:linear-gradient(to bottom,rgba(0,0,0,.55),transparent 76%);
+}
+a{color:inherit}
+img{max-width:100%;display:block}
+.container{width:min(1180px,calc(100% - 40px));margin:0 auto;position:relative}
+.nav{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:20px;
+  padding:22px 0;
+}
+.logo img{height:70px;width:auto;filter:drop-shadow(0 10px 24px rgba(47,123,255,.22))}
+.nav-links{display:flex;gap:24px;align-items:center;color:#c9d6e8;font-weight:750;font-size:14px}
+.nav-links a{text-decoration:none}
+.nav-links a:not(.btn):hover{color:white}
+.btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  min-height:46px;
+  padding:13px 19px;
+  border-radius:14px;
+  font-weight:850;
+  text-decoration:none;
+  border:1px solid transparent;
+  transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease,background .18s ease;
+}
+.btn:hover{transform:translateY(-1px)}
+.btn-primary{background:linear-gradient(135deg,var(--blue),#1b66ef);color:white;box-shadow:0 18px 38px rgba(47,123,255,.28)}
+.btn-secondary{background:rgba(255,255,255,.06);color:#e6eefb;border-color:var(--line)}
+.eyebrow{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  color:#cfe0f8;
+  background:rgba(47,123,255,.13);
+  border:1px solid rgba(104,162,255,.25);
+  border-radius:999px;
+  padding:8px 12px;
+  font-size:13px;
+  font-weight:800;
+}
+.eyebrow:before{content:"";width:8px;height:8px;border-radius:99px;background:var(--green);box-shadow:0 0 18px rgba(55,211,153,.9)}
+.hero{
+  display:grid;
+  grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr);
+  gap:46px;
+  align-items:center;
+  padding:64px 0 74px;
+}
+h1{
+  margin:18px 0 18px;
+  font-size:clamp(46px,7vw,84px);
+  line-height:.96;
+  letter-spacing:-.06em;
+}
+.gradient-text{background:linear-gradient(135deg,#fff 15%,#9fc5ff 55%,#5be0ac 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.subhead{font-size:20px;color:#b7c6da;max-width:660px;margin:0 0 28px}
+.button-row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.trust-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px}
+.trust-pill{
+  color:#d7e3f5;
+  background:rgba(255,255,255,.055);
+  border:1px solid var(--line);
+  border-radius:999px;
+  padding:8px 12px;
+  font-size:13px;
+  font-weight:750;
+}
+.hero-visual{position:relative}
+.hero-visual:before{
+  content:"";
+  position:absolute;
+  inset:30px 24px -26px;
+  background:linear-gradient(135deg,rgba(47,123,255,.26),rgba(55,211,153,.14));
+  filter:blur(34px);
+  border-radius:36px;
+  z-index:-1;
+}
+.screenshot-frame{
+  overflow:hidden;
+  border-radius:28px;
+  background:linear-gradient(180deg,rgba(255,255,255,.12),rgba(255,255,255,.035));
+  border:1px solid rgba(180,200,230,.2);
+  box-shadow:var(--shadow);
+}
+.browser-bar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  padding:14px 16px;
+  border-bottom:1px solid var(--line);
+  background:rgba(6,16,29,.74);
+  color:#cbd8ea;
+  font-weight:800;
+  font-size:13px;
+}
+.window-dots{display:flex;gap:7px}
+.window-dots span{width:10px;height:10px;border-radius:99px;background:#37516f}
+.window-dots span:nth-child(1){background:#ff6b6b}.window-dots span:nth-child(2){background:#f7c948}.window-dots span:nth-child(3){background:#37d399}
+.screenshot-frame img{width:100%;height:auto}
+.section{padding:82px 0}
+.section-header{max-width:760px;margin:0 auto 34px;text-align:center}
+.section-kicker{color:var(--blue-soft);font-weight:900;font-size:13px;text-transform:uppercase;letter-spacing:.16em;margin-bottom:10px}
+h2{font-size:clamp(34px,4vw,52px);line-height:1.02;letter-spacing:-.045em;margin:0 0 14px}
+.section-intro{color:#aebfd4;font-size:18px;margin:0}
+.feature-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.feature-card{
+  position:relative;
+  min-height:218px;
+  padding:24px;
+  border-radius:24px;
+  background:linear-gradient(180deg,rgba(18,34,56,.88),rgba(11,23,40,.86));
+  border:1px solid var(--line);
+  box-shadow:0 18px 60px rgba(0,0,0,.18);
+  overflow:hidden;
+}
+.feature-card:before{
+  content:"";
+  position:absolute;
+  inset:0 0 auto;
+  height:3px;
+  background:linear-gradient(90deg,var(--blue),var(--green));
+}
+.feature-icon{
+  width:42px;
+  height:42px;
+  display:grid;
+  place-items:center;
+  border-radius:14px;
+  background:rgba(47,123,255,.14);
+  color:#b8d4ff;
+  border:1px solid rgba(104,162,255,.24);
+  font-weight:950;
+  margin-bottom:18px;
+}
+.feature-card h3,.contractor-card h3,.testimonial-card h3{font-size:20px;margin:0 0 8px;letter-spacing:-.02em}
+.feature-card p,.contractor-card p,.testimonial-card p,.price-card p{color:#aebfd4;margin:0}
+.showcase{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:26px;
+}
+.showcase-card{
+  display:grid;
+  grid-template-columns:minmax(0,1.05fr) minmax(280px,.95fr);
+  gap:26px;
+  align-items:center;
+  padding:22px;
+  border-radius:30px;
+  background:rgba(12,25,43,.7);
+  border:1px solid var(--line);
+  box-shadow:0 26px 80px rgba(0,0,0,.24);
+}
+.showcase-card:nth-child(even){grid-template-columns:minmax(280px,.92fr) minmax(0,1.08fr)}
+.showcase-card:nth-child(even) .showcase-copy{order:-1}
+.showcase-copy{padding:16px}
+.showcase-copy h3{font-size:30px;line-height:1.08;margin:0 0 12px;letter-spacing:-.035em}
+.showcase-copy p{color:#acbdd3;margin:0 0 18px;font-size:17px}
+.mini-list{display:grid;gap:10px}
+.mini-list span{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  color:#d9e5f6;
+  font-weight:750;
+}
+.mini-list span:before{content:"";width:8px;height:8px;border-radius:99px;background:var(--green);box-shadow:0 0 14px rgba(55,211,153,.5)}
+.contractor-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.contractor-card{
+  padding:22px;
+  border-radius:22px;
+  background:rgba(255,255,255,.045);
+  border:1px solid var(--line);
+}
+.contractor-tag{
+  display:inline-flex;
+  color:#0b1728;
+  background:linear-gradient(135deg,#7eb3ff,#69e2ad);
+  border-radius:999px;
+  padding:5px 9px;
+  font-weight:900;
+  font-size:12px;
+  margin-bottom:14px;
+}
+.testimonial-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.testimonial-card{
+  padding:24px;
+  border-radius:24px;
+  background:linear-gradient(180deg,rgba(19,36,58,.86),rgba(10,21,36,.88));
+  border:1px solid var(--line);
+}
+.quote-mark{color:var(--blue-soft);font-size:38px;line-height:1;font-weight:950}
+.pricing-shell{
+  display:grid;
+  grid-template-columns:.85fr 1.15fr;
+  gap:18px;
+  align-items:stretch;
+}
+.price-card{
+  border-radius:28px;
+  padding:28px;
+  background:linear-gradient(180deg,rgba(18,36,60,.94),rgba(9,19,33,.94));
+  border:1px solid rgba(104,162,255,.26);
+  box-shadow:0 24px 78px rgba(0,0,0,.24);
+}
+.price{font-size:64px;line-height:1;font-weight:950;letter-spacing:-.06em;margin:16px 0;color:#fff}
+.price span{font-size:18px;color:#aebfd4;letter-spacing:0}
+.check-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:24px 0}
+.check-grid span{
+  padding:12px 13px;
+  border-radius:14px;
+  background:rgba(255,255,255,.055);
+  border:1px solid var(--line);
+  color:#dbe7f8;
+  font-weight:750;
+}
+.final-cta{
+  overflow:hidden;
+  position:relative;
+  border-radius:34px;
+  padding:48px;
+  text-align:center;
+  background:
+    radial-gradient(circle at 20% 20%,rgba(47,123,255,.28),transparent 28%),
+    radial-gradient(circle at 78% 24%,rgba(55,211,153,.22),transparent 28%),
+    linear-gradient(135deg,#102441,#07111f);
+  border:1px solid rgba(160,190,230,.22);
+  box-shadow:var(--shadow);
+}
+.final-cta h2{margin-bottom:12px}
+.final-cta p{max-width:650px;margin:0 auto 24px;color:#b7c8dc;font-size:18px}
+.footer{
+  display:flex;
+  justify-content:space-between;
+  gap:18px;
+  flex-wrap:wrap;
+  padding:34px 0 42px;
+  color:#8497ae;
+  font-size:14px;
+  border-top:1px solid var(--line);
+}
+[data-animate]{animation:rise .7s ease both}
+[data-animate="2"]{animation-delay:.08s}
+[data-animate="3"]{animation-delay:.16s}
+@keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  [data-animate]{animation:none}
+  .btn{transition:none}
+}
+@media(max-width:980px){
+  .hero,.showcase-card,.showcase-card:nth-child(even),.pricing-shell{grid-template-columns:1fr}
+  .showcase-card:nth-child(even) .showcase-copy{order:0}
+  .feature-grid,.contractor-grid,.testimonial-grid{grid-template-columns:1fr 1fr}
+  .nav-links a:not(.btn){display:none}
+}
+@media(max-width:640px){
+  .container{width:min(100% - 28px,1180px)}
   .nav{align-items:flex-start}
-  .nav-links{display:none}
-  .logo img{height:80px}
+  .logo img{height:58px}
+  .nav-links{gap:8px}
+  .hero{padding:34px 0 52px}
+  .subhead{font-size:17px}
+  .button-row .btn{width:100%}
+  .feature-grid,.contractor-grid,.testimonial-grid,.check-grid{grid-template-columns:1fr}
+  .section{padding:58px 0}
+  .showcase-card{padding:14px;border-radius:24px}
+  .showcase-copy{padding:8px}
+  .final-cta{padding:34px 20px}
+  .footer{display:block;text-align:center}
 }
 </style>
 </head>
 
 <body>
 <div class="container">
-  <nav class="nav">
-    <div class="logo">
-      <img src="https://fwklbatktyqxlwkkiwbh.supabase.co/storage/v1/object/public/Logos/ProJobFlo_Main_Logo.png">
-    </div>
+  <nav class="nav" aria-label="Main navigation">
+    <a class="logo" href="/" aria-label="ProJobFlo home">
+      <img src="https://fwklbatktyqxlwkkiwbh.supabase.co/storage/v1/object/public/Logos/ProJobFlo_Main_Logo.png" alt="ProJobFlo">
+    </a>
     <div class="nav-links">
       <a href="#features">Features</a>
-      <a href="#pricing">Beta</a>
-      <a href="#story">About</a>
-      <a class="btn btn-primary" href="mailto:hello@projobflo.com?subject=ProJobFlo Beta Access">Join the Beta</a>
+      <a href="#showcase">Screenshots</a>
+      <a href="#pricing">Pricing</a>
+      <a class="btn btn-primary" href="mailto:hello@projobflo.com?subject=ProJobFlo Beta Access">Join Beta</a>
     </div>
   </nav>
 
   <section class="hero">
-    <div>
-      <h1>Run Your Contracting Business <span class="blue">Without The Chaos</span></h1>
+    <div data-animate>
+      <div class="eyebrow">Version 1.0 Beta for contractors</div>
+      <h1>Stop Chasing Paperwork.<br><span class="gradient-text">Start Closing Jobs.</span></h1>
       <p class="subhead">
-        Create quotes, get digital signatures, schedule jobs, and track payments — all in one simple app built for contractors.
+        ProJobFlo brings professional quotes, digital signatures, scheduling, job files, project photos, activity history, payments, and customer follow-up into one premium contractor workflow.
       </p>
-      <div class="buttons">
-        <a class="btn btn-primary" href="mailto:hello@projobflo.com?subject=ProJobFlo Beta Access">Join the Beta</a>
+      <div class="button-row">
+        <a class="btn btn-primary" href="mailto:hello@projobflo.com?subject=ProJobFlo Beta Access">Request Beta Access</a>
         <a class="btn btn-secondary" href="/app.html">Open Contractor App</a>
       </div>
-      <div class="trust-row">
-        <span>Currently free during beta</span>
-        <span>No credit card</span>
-        <span>Built for contractors</span>
+      <div class="trust-row" aria-label="Product highlights">
+        <span class="trust-pill">Quotes to schedule</span>
+        <span class="trust-pill">Customer-ready proposals</span>
+        <span class="trust-pill">Built for field work</span>
       </div>
     </div>
 
-    <div class="hero-card">
-      <div class="mock-window">
-        <div class="mock-top">
-          <div class="mock-logo">ProJobFlo</div>
-          <div>Dashboard</div>
+    <div class="hero-visual" data-animate="2">
+      <div class="screenshot-frame">
+        <div class="browser-bar">
+          <div class="window-dots" aria-hidden="true"><span></span><span></span><span></span></div>
+          <span>Quote Builder</span>
+          <span>Live Numbers</span>
         </div>
-        <div class="mock-body">
-          <div class="mock-stats">
-            <div class="mock-stat"><small>Open Quotes</small><strong>23</strong></div>
-            <div class="mock-stat"><small>Sold This Month</small><strong>$28,750</strong></div>
-            <div class="mock-stat"><small>Scheduled Jobs</small><strong>12</strong></div>
-            <div class="mock-stat"><small>Outstanding</small><strong>$22,350</strong></div>
-          </div>
-          <div class="mock-list">
-            <div class="mock-row"><strong>Johnson Kitchen</strong><span>Scheduled</span></div>
-            <div class="mock-row"><strong>Davis Bathroom</strong><span>Signed</span></div>
-            <div class="mock-row"><strong>Martinez Home</strong><span>Follow-up</span></div>
-          </div>
-        </div>
+        <img src="projobflo-quote-screen.jpg" alt="ProJobFlo Quote Builder with live quote totals">
       </div>
     </div>
   </section>
 
   <section id="features" class="section">
-    <h2>Everything from estimate to install.</h2>
-    <p class="section-intro">
-      ProJobFlo keeps your customers, measurements, quotes, signatures, schedules, photos, and money tracking in one workflow.
-    </p>
+    <div class="section-header" data-animate>
+      <div class="section-kicker">Feature Highlights</div>
+      <h2>One clean operating system for selling and managing jobs.</h2>
+      <p class="section-intro">Built around the way contractors actually work: quote fast, get approval, schedule the install, document the project, and track the money.</p>
+    </div>
 
-    <div class="cards">
-      <div class="card">
-        <div class="card-icon">📝</div>
-        <h3>Create Professional Quotes</h3>
-        <p>Build quotes with rooms, measurements, line items, material, labor, tax, deposits, and totals.</p>
-      </div>
-      <div class="card">
-        <div class="card-icon">✍️</div>
-        <h3>Get Digital Signatures</h3>
-        <p>Send proposals and let customers approve from their phone with a digital signature.</p>
-      </div>
-      <div class="card">
-        <div class="card-icon">📅</div>
-        <h3>Schedule Sold Jobs</h3>
-        <p>Turn signed quotes into scheduled jobs and keep your upcoming work organized.</p>
-      </div>
+    <div class="feature-grid">
+      <article class="feature-card"><div class="feature-icon">01</div><h3>Professional Quotes</h3><p>Create polished proposals with rooms, line items, taxes, deposits, notes, and a live total that stays visible while you build.</p></article>
+      <article class="feature-card"><div class="feature-icon">02</div><h3>Digital Signatures</h3><p>Customers can review and sign from their phone so approvals do not get buried in texts, paper, or email threads.</p></article>
+      <article class="feature-card"><div class="feature-icon">03</div><h3>Scheduling</h3><p>Turn sold quotes into scheduled jobs with install dates, duration, crew, notes, status, and quick customer actions.</p></article>
+      <article class="feature-card"><div class="feature-icon">04</div><h3>Google Calendar</h3><p>Generate calendar links and downloadable events so jobs can move cleanly into the calendar tools your crew already uses.</p></article>
+      <article class="feature-card"><div class="feature-icon">05</div><h3>Job File</h3><p>Open a premium internal job file from the schedule with contact actions, money snapshot, scope details, photos, notes, and job status.</p></article>
+      <article class="feature-card"><div class="feature-icon">06</div><h3>Photo Timeline</h3><p>Group project photos by estimate, pre-install condition, installation progress, and finished project so every job tells a visual story.</p></article>
+      <article class="feature-card"><div class="feature-icon">07</div><h3>Activity Timeline</h3><p>Keep a permanent chronological history of quote approvals, payments, schedule changes, status updates, and manual job notes.</p></article>
+      <article class="feature-card"><div class="feature-icon">08</div><h3>Money Tracker</h3><p>Track deposits, paid-to-date, balances, and payment history without switching away from the job workflow.</p></article>
+      <article class="feature-card"><div class="feature-icon">09</div><h3>Customer Database</h3><p>Keep customer contact details, quote history, scheduled work, and project context organized in one searchable place.</p></article>
+    </div>
+  </section>
+
+  <section id="showcase" class="section">
+    <div class="section-header" data-animate>
+      <div class="section-kicker">Beautiful Screenshot Showcase</div>
+      <h2>A premium workspace your customers never see, but your business feels every day.</h2>
+      <p class="section-intro">The Version 1.0 Beta interface is designed to feel focused, modern, and dependable while staying fast enough for real job sites.</p>
+    </div>
+
+    <div class="showcase">
+      <article class="showcase-card">
+        <div class="screenshot-frame">
+          <div class="browser-bar"><span>Build</span><span>Quote Builder</span></div>
+          <img src="projobflo-quote-screen.jpg" alt="Dark premium ProJobFlo quote builder screen">
+        </div>
+        <div class="showcase-copy">
+          <h3>Quote Builder that feels like a sales command center.</h3>
+          <p>Build a proposal with customer details, scope templates, room measurements, line items, previews, signatures, and a sticky Live Numbers panel.</p>
+          <div class="mini-list">
+            <span>Professional proposals</span>
+            <span>Readable customer and room fields</span>
+            <span>Live quote totals while you work</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="showcase-card">
+        <div class="screenshot-frame">
+          <div class="browser-bar"><span>Schedule</span><span>Calendar Workflow</span></div>
+          <img src="projobflo-schedule-screen.jpg" alt="ProJobFlo scheduling calendar and job cards">
+        </div>
+        <div class="showcase-copy">
+          <h3>Scheduling that keeps sold jobs moving.</h3>
+          <p>See install dates, crews, job status, contact details, maps, calendar actions, and job file access without digging through messages.</p>
+          <div class="mini-list">
+            <span>Add to Calendar</span>
+            <span>Open Google Calendar</span>
+            <span>Call, text, email, and maps actions</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="showcase-card">
+        <div class="screenshot-frame">
+          <div class="browser-bar"><span>Approve</span><span>Digital Signature</span></div>
+          <img src="projobflo-signature-screen.jpg" alt="ProJobFlo digital signature approval page">
+        </div>
+        <div class="showcase-copy">
+          <h3>Customer approval without the paperwork chase.</h3>
+          <p>Customers can review the proposal, sign digitally, and move the job from quote to sold with a smoother, more professional experience.</p>
+          <div class="mini-list">
+            <span>Mobile-friendly signature flow</span>
+            <span>Clear customer proposal view</span>
+            <span>Clean approval records</span>
+          </div>
+        </div>
+      </article>
     </div>
   </section>
 
   <section class="section">
-    <h2>How it works</h2>
-    <p class="section-intro">A simple workflow for contractors who sell in the home and need to keep jobs moving.</p>
+    <div class="section-header" data-animate>
+      <div class="section-kicker">Built For Contractors</div>
+      <h2>Designed for crews that need speed, trust, and clean records.</h2>
+      <p class="section-intro">ProJobFlo is for small contracting companies that sell in the field and need the office side of the business to stop slowing them down.</p>
+    </div>
+    <div class="contractor-grid">
+      <article class="contractor-card"><span class="contractor-tag">Sales</span><h3>Close faster</h3><p>Send a professional quote and get a signature while the customer is still ready to move.</p></article>
+      <article class="contractor-card"><span class="contractor-tag">Operations</span><h3>Know what is next</h3><p>Scheduled jobs, install notes, crew details, and contact actions stay connected to the quote.</p></article>
+      <article class="contractor-card"><span class="contractor-tag">Documentation</span><h3>Protect the project</h3><p>Photo Timeline and Activity Timeline create a clear history from estimate to completion.</p></article>
+      <article class="contractor-card"><span class="contractor-tag">Cash Flow</span><h3>Track the money</h3><p>Deposits, balances, paid-to-date, and customer history stay visible where the job is managed.</p></article>
+    </div>
+  </section>
 
-    <div class="workflow">
-      <div class="step"><div class="step-num">1</div><strong>Measure</strong><p class="small">Add rooms, notes, and photos.</p></div>
-      <div class="step"><div class="step-num">2</div><strong>Quote</strong><p class="small">Build a professional proposal.</p></div>
-      <div class="step"><div class="step-num">3</div><strong>Send</strong><p class="small">Email the quote to the customer.</p></div>
-      <div class="step"><div class="step-num">4</div><strong>Sign</strong><p class="small">Customer approves online.</p></div>
-      <div class="step"><div class="step-num">5</div><strong>Schedule</strong><p class="small">Move the sold job to calendar.</p></div>
+  <section class="section">
+    <div class="section-header" data-animate>
+      <div class="section-kicker">Testimonials Placeholder</div>
+      <h2>Built with contractor feedback, shaped by real job workflows.</h2>
+      <p class="section-intro">Beta feedback will continue shaping ProJobFlo around the work contractors do every day.</p>
+    </div>
+    <div class="testimonial-grid">
+      <article class="testimonial-card"><div class="quote-mark">"</div><h3>Small flooring company</h3><p>The quote-to-signature-to-schedule flow is the kind of simple system contractors actually need.</p></article>
+      <article class="testimonial-card"><div class="quote-mark">"</div><h3>Remodeling contractor</h3><p>Keeping photos, notes, money, and schedule details in the job file makes the project easier to trust.</p></article>
+      <article class="testimonial-card"><div class="quote-mark">"</div><h3>Beta feedback</h3><p>ProJobFlo feels focused on closing work and staying organized instead of adding another complicated tool.</p></article>
     </div>
   </section>
 
   <section id="pricing" class="section">
-    <div class="beta-pricing">
-      <div class="card price-card">
-        <h2>Currently Free During Beta</h2>
-        <div class="price">$0</div>
-        <p class="section-intro" style="margin-bottom:12px;">We’re testing with real contractors before paid plans launch.</p>
-        <a class="btn btn-primary" href="mailto:hello@projobflo.com?subject=ProJobFlo Beta Access">Join the Beta</a>
+    <div class="pricing-shell">
+      <div class="price-card">
+        <div class="section-kicker">Pricing (Beta)</div>
+        <h2>Free during the v1.0 Beta.</h2>
+        <div class="price">$0 <span>/ beta user</span></div>
+        <p>Early contractors get access while ProJobFlo is refined for real sales, schedule, documentation, and payment workflows.</p>
+        <br>
+        <a class="btn btn-primary" href="mailto:hello@projobflo.com?subject=ProJobFlo Beta Access">Request Beta Access</a>
       </div>
-
-      <div class="card">
-        <h2 style="text-align:left;">Beta users get everything.</h2>
-        <div class="checks">
-          <div>Quotes & proposals</div>
-          <div>Digital signatures</div>
-          <div>Customer database</div>
-          <div>Scheduling</div>
-          <div>Money tracking</div>
-          <div>Cloud sync</div>
+      <div class="price-card">
+        <h2>Everything included for beta users.</h2>
+        <div class="check-grid">
+          <span>Professional Quotes</span>
+          <span>Digital Signatures</span>
+          <span>Scheduling</span>
+          <span>Google Calendar</span>
+          <span>Job File</span>
+          <span>Photo Timeline</span>
+          <span>Activity Timeline</span>
+          <span>Money Tracker</span>
+          <span>Customer Database</span>
+          <span>In-app Feedback</span>
         </div>
-        <p>
-          Future pricing is expected to stay simple and affordable. No confusing plans, no nickel-and-dime upgrades.
-        </p>
-      </div>
-    </div>
-  </section>
-
-  <section id="story" class="section">
-    <div class="story">
-      <div class="story-box">
-        <h2 style="text-align:left;">Built by a contractor, for contractors.</h2>
-        <p>
-          ProJobFlo was built because paperwork, text messages, calendars, and job notes get messy fast.
-        </p>
-        <p>
-          The goal is simple: help contractors quote jobs, get approvals, schedule work, and keep projects moving without bouncing between five different tools.
-        </p>
-        <strong>— Hayden Tully, Founder of ProJobFlo</strong>
-      </div>
-
-      <div class="card">
-        <h3>Built for trades like:</h3>
-        <p>Flooring, tile, cabinets, countertops, remodeling, handyman work, and small contracting companies.</p>
+        <p>Paid plans will come later with simple pricing and a contractor-first product roadmap.</p>
       </div>
     </div>
   </section>
 
   <section class="section">
-    <h2>What testers are saying</h2>
-    <div class="testimonials">
-      <div class="card">
-        <div class="stars">★★★★★</div>
-        <p>“Easy to use and figure out. I like the ability to make a bunch of line items.”</p>
-        <br><strong>Tile Installer</strong>
+    <div class="final-cta" data-animate>
+      <div class="section-kicker">Final CTA</div>
+      <h2>Ready to run jobs with less paperwork?</h2>
+      <p>Join the ProJobFlo v1.0 Beta and help shape the contractor app built for quoting, scheduling, documentation, and getting paid.</p>
+      <div class="button-row" style="justify-content:center">
+        <a class="btn btn-primary" href="mailto:hello@projobflo.com?subject=ProJobFlo Beta Access">Join the Beta</a>
+        <a class="btn btn-secondary" href="/app.html">Open Contractor App</a>
       </div>
-      <div class="card">
-        <div class="stars">★★★★★</div>
-        <p>“This could help a lot of people if it stays simple and affordable.”</p>
-        <br><strong>Contractor Feedback</strong>
-      </div>
-      <div class="card">
-        <div class="stars">★★★★★</div>
-        <p>“The quote to signature to schedule workflow is exactly what small contractors need.”</p>
-        <br><strong>Beta Tester</strong>
-      </div>
-    </div>
-  </section>
-
-  <section class="section">
-    <div class="final-cta">
-      <h2 style="color:white;">Want to test ProJobFlo?</h2>
-      <p>Join the beta and help shape the contractor app built for real field work.</p>
-      <a class="btn btn-primary" href="mailto:hello@projobflo.com?subject=ProJobFlo Beta Access">Join the Beta</a>
     </div>
   </section>
 
   <footer class="footer">
-    © 2026 ProJobFlo. Currently in beta.
+    <span>ProJobFlo. Quote. Schedule. Get Paid.</span>
+    <span>Version 1.0 Beta</span>
   </footer>
 </div>
 </body>
