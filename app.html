@@ -50,6 +50,9 @@
   .card { background:var(--surface); padding:18px; border-radius:var(--radius); border:1px solid rgba(203,213,225,.78); box-shadow:var(--shadow-md); margin-bottom:18px; }
   .card > h2 { padding-bottom:10px; border-bottom:1px solid var(--border); }
   .subtle-card { background:linear-gradient(180deg,#fbfdff,#f8fafc); border:1px solid var(--border); border-radius:var(--radius); padding:14px; margin-bottom:12px; }
+  .empty-state { display:grid; gap:6px; padding:18px; border:1px dashed rgba(148,163,184,.75); border-radius:var(--radius); background:linear-gradient(180deg,#ffffff,#f8fafc); color:var(--muted-strong); }
+  .empty-state strong { color:var(--text); font-size:15px; }
+  .empty-state p { margin:0; }
   .form-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin-bottom:10px; }
   .two { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
   input, select, textarea { width:100%; min-height:42px; padding:10px 12px; border:1px solid var(--border-strong); border-radius:var(--radius-sm); font-size:14px; margin-bottom:10px; background:white; color:var(--text); box-shadow:inset 0 1px 1px rgba(15,23,42,.03); transition:border-color .15s ease, box-shadow .15s ease, background .15s ease; }
@@ -65,6 +68,8 @@
   button.success:hover { background:linear-gradient(180deg,#2563eb,var(--primary-dark)); }
   button.warning { background:linear-gradient(180deg,#3b82f6,var(--primary)); }
   button.danger { background:linear-gradient(180deg,#ef4444,var(--danger)); }
+  button.is-loading { opacity:.78; cursor:progress; transform:none; }
+  button:disabled { cursor:not-allowed; opacity:.72; }
   .actions { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
   .hidden { display:none; }
   .stat-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; margin-bottom:18px; }
@@ -193,6 +198,14 @@
   .feedback-status { min-height:18px; }
   .feedback-mailto { display:inline-block; margin-top:4px; color:var(--primary); font-weight:800; text-decoration:none; }
   .feedback-mailto.hidden { display:none !important; }
+  .toast-region { position:fixed; right:18px; top:18px; z-index:9300; display:grid; gap:10px; width:min(380px,calc(100vw - 36px)); pointer-events:none; }
+  .toast { pointer-events:auto; display:grid; gap:4px; padding:13px 14px; border-radius:var(--radius); background:rgba(15,23,42,.94); color:white; box-shadow:0 20px 44px rgba(15,23,42,.22); border:1px solid rgba(255,255,255,.10); animation:toastIn .18s ease-out; }
+  .toast.success { background:linear-gradient(135deg,#0f766e,#065f46); }
+  .toast.error { background:linear-gradient(135deg,#991b1b,#7f1d1d); }
+  .toast.warning { background:linear-gradient(135deg,#92400e,#78350f); }
+  .toast-title { font-weight:900; line-height:1.25; }
+  .toast-message { color:rgba(255,255,255,.84); font-size:13px; line-height:1.35; }
+  @keyframes toastIn { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
   @media (min-width: 981px) {
     #viewQuote > .grid > div:last-child { align-self:stretch; }
     #viewQuote #liveNumbersCard { position:sticky; top:18px; max-height:calc(100vh - 36px); overflow:auto; }
@@ -224,6 +237,7 @@
     .tabs button { width:auto; }
     .feedback-button { width:auto; right:12px; bottom:12px; }
     .feedback-overlay { align-items:flex-end; padding:12px; }
+    .toast-region { right:12px; top:12px; width:calc(100vw - 24px); }
     .hide-mobile { display:none; }
     .day { min-height:95px; padding:6px; }
   }
@@ -2066,6 +2080,7 @@ Preset rates are only starting points:
     <a id="feedbackMailtoLink" class="feedback-mailto hidden" href="#">Open email draft</a>
   </div>
 </div>
+<div id="toastRegion" class="toast-region" aria-live="polite" aria-atomic="true"></div>
 
 <script>
 let customers = [];
@@ -2098,6 +2113,42 @@ let currentCloudQuoteId = null;
  let contractorLogoUrl = "";
 let autoSaveTimer = null;
 let autoSaveEnabled = true;
+
+function showToast(title,message,type="success",duration=3600){
+  const region=document.getElementById("toastRegion");
+  if(!region) return;
+  const toast=document.createElement("div");
+  toast.className="toast "+type;
+  const heading=document.createElement("div");
+  heading.className="toast-title";
+  heading.textContent=title;
+  toast.appendChild(heading);
+  if(message){
+    const body=document.createElement("div");
+    body.className="toast-message";
+    body.textContent=message;
+    toast.appendChild(body);
+  }
+  region.appendChild(toast);
+  window.setTimeout(()=>toast.remove(),duration);
+}
+
+function beginButtonLoading(label){
+  const button=document.activeElement && document.activeElement.tagName==="BUTTON"
+    ? document.activeElement
+    : null;
+  if(!button) return ()=>{};
+  const previousText=button.textContent;
+  const previousDisabled=button.disabled;
+  button.classList.add("is-loading");
+  button.disabled=true;
+  if(label) button.textContent=label;
+  return ()=>{
+    button.classList.remove("is-loading");
+    button.disabled=previousDisabled;
+    button.textContent=previousText;
+  };
+}
 
 const templates = {
   lvp: [
@@ -2301,7 +2352,7 @@ function saveTradeSettingsFromSettings(){
  saveEnabledTrades(trades);
  syncSetupCheckboxes();
  renderSettingsTradeList();
- alert("Trade types saved.");
+  showToast("Trade settings saved","Templates now match the work you do.","success");
 }
 
 function applyTradeVisibility(){
@@ -2641,7 +2692,7 @@ function getOrderSqft(){return getMeasuredSqft()*(1+(num("waste")/100));}
 function renderRooms(){
   const container=document.getElementById("rooms");container.innerHTML="";
   if(!rooms.length){
-    container.innerHTML="<div class='subtle-card'><strong>No rooms added yet.</strong><p class='small'>Click + Add Room or use Quick Add Room when you are ready to measure.</p></div>";
+    container.innerHTML="<div class='empty-state'><strong>No rooms added yet.</strong><p>Use Add Room or Quick Add Room when you are ready to measure.</p></div>";
     return;
   }
   rooms.forEach(room=>{
@@ -2770,7 +2821,7 @@ function savePresetRates(){
  const data={};
  ids.forEach(id=>data[id]=val(id));
  localStorage.setItem("fastQuotePresetRates",JSON.stringify(data));
- alert("Preset rates saved on this device.");
+ showToast("Preset rates saved","Rates are saved on this device.","success");
 }
 
 function loadPresetRates(){
@@ -3300,7 +3351,7 @@ async function emailContract(){
     return;
   }
 
-  alert("Signed contract emailed successfully.");
+  showToast("Signed contract sent","The customer email was sent successfully.","success");
 }
 
 function isDue(q){return q.status==="Unsold"&&q.nextFollowUpAt<=nowMs();}
@@ -3309,7 +3360,7 @@ function getCustomer(id){
 }
 function renderFollowUps(){
  const filter=val("followFilter");let list=quotes.slice();if(filter==="due")list=list.filter(q=>isDue(q));if(filter==="all")list=list.filter(q=>q.status==="Unsold");if(filter==="sold")list=list.filter(q=>q.status==="Sold"||q.status==="Scheduled");if(filter==="lost")list=list.filter(q=>q.status==="Lost");list.sort((a,b)=>a.nextFollowUpAt-b.nextFollowUpAt);
- const box=document.getElementById("followUpList");if(!box)return;if(!list.length){box.innerHTML="<p class='small'>Nothing here right now.</p>";return;}
+  const box=document.getElementById("followUpList");if(!box)return;if(!list.length){box.innerHTML="<div class='empty-state'><strong>No follow-ups in this view.</strong><p>Quotes that need attention will appear here automatically.</p></div>";return;}
  box.innerHTML=list.map(q=>{const c=getCustomer(q.customerId);const due=isDue(q);return `<div class="quote-card ${due?"urgent":""}"><div class="title">${escapeHtml(c.name||"Unnamed")}</div><div class="small">${escapeHtml(c.phone||"")} • ${escapeHtml(c.email||"")}</div><div>${escapeHtml(c.address||"")}</div><div>Quote: <strong>${dollars(q.amount)}</strong></div><div>Status: <span class="pill ${due?"status-FollowUpDue":"status-"+q.status.replaceAll(" ","")}">${due?"Follow-Up Due":q.status}</span></div><div class="small">Next follow-up: ${new Date(q.nextFollowUpAt).toLocaleString()}</div><div class="actions" style="margin-top:8px;"><button class="success" onclick="openQuoteFromFollowUp('${q.id}')">Open Quote</button><button class="secondary" onclick="selectFollowUp('${q.id}')">Follow Up</button><button class="success" onclick="markSold('${q.id}')">Sold</button><button class="warning" onclick="snoozeQuote('${q.id}')">Snooze 48h</button><button class="danger" onclick="markLost('${q.id}')">Lost</button></div></div>`;}).join("");
 }
 function selectFollowUp(id){const q=quotes.find(q => String(q.id) === String(id));const c=getCustomer(q.customerId);const msg=buildFollowUpMessage(q,c);document.getElementById("selectedFollowUp").innerHTML=`<div class="quote-card"><div class="title">${escapeHtml(c.name)}</div><div>${escapeHtml(c.phone)}<br>${escapeHtml(c.email)}</div><div class="quote-box">${escapeHtml(msg)}</div><div class="actions" style="margin-top:8px;"><button onclick="copyText(\`${escapeJs(msg)}\`)">Copy</button><button class="secondary" onclick="openSms('${escapeAttr(c.phone)}', \`${escapeJs(msg)}\`)">Text</button><button class="secondary" onclick="openEmail('${escapeAttr(c.email)}', \`${escapeJs(msg)}\`)">Email</button><button class="success" onclick="markFollowedUp(${q.id})">Mark Followed Up</button></div></div>`;}
@@ -3333,7 +3384,7 @@ async function updateQuoteStatusCloud(id, updates) {
 
     if (error) {
       console.error(error);
-      alert("Cloud quote update failed: " + error.message);
+      showToast("Quote status was not updated","Cloud save failed: " + error.message,"error");
       return;
     }
   }
@@ -3384,9 +3435,11 @@ function loadQuoteIntoSchedule(){
 function setSelectedDate(iso){selectedDate=iso;document.getElementById("scheduleDate").value=iso;renderCalendar();renderSelectedJobs();}
 function changeMonth(delta){currentMonth.setMonth(currentMonth.getMonth()+delta);renderCalendar();}
 async function scheduleSelectedQuote(){
- const selectedQuoteId = val("scheduleQuoteSelect");
-const q = quotes.find(q => String(q.cloudId || q.id) === String(selectedQuoteId));
- if(!q){alert("Select a sold quote first.");return;}
+ const restoreButton=beginButtonLoading("Scheduling...");
+ try{
+  const selectedQuoteId = val("scheduleQuoteSelect");
+ const q = quotes.find(q => String(q.cloudId || q.id) === String(selectedQuoteId));
+  if(!q){alert("Select a sold quote first.");return;}
  const ok = await requireLoggedIn();
  if(!ok) return;
 
@@ -3429,9 +3482,9 @@ const q = quotes.find(q => String(q.cloudId || q.id) === String(selectedQuoteId)
 
  if(error){
    console.error(error);
-   alert("Job did not save to cloud: " + error.message);
+   showToast("Job was not scheduled","Cloud save failed: " + error.message,"error");
    return;
- }
+  }
 
  const savedJob = {
    ...job,
@@ -3456,8 +3509,11 @@ const q = quotes.find(q => String(q.cloudId || q.id) === String(selectedQuoteId)
   document.getElementById("scheduleEditStatus").textContent=
     "Editing scheduled job for "+(savedJob.customer||"customer")+".";
 
- renderAll();
- alert("Job scheduled.");
+  renderAll();
+  showToast("Job scheduled","This job is now on your calendar.","success");
+ } finally {
+  restoreButton();
+ }
 }
 
  async function saveScheduledJobCloud(job){
@@ -3477,7 +3533,7 @@ const q = quotes.find(q => String(q.cloudId || q.id) === String(selectedQuoteId)
 
  if(error){
    console.error(error);
-   alert("Job updated on screen, but cloud save failed: " + error.message);
+   showToast("Schedule was not updated","Cloud save failed: " + error.message,"error");
    return false;
   }
   return true;
@@ -3501,6 +3557,8 @@ function editScheduledJob(jobId){
 }
 
 async function updateScheduledJob(){
+ const restoreButton=beginButtonLoading("Saving...");
+ try{
  if(!editingJobId){alert("Select a calendar job first, then update it.");return;}
  const job=jobs.find(j=>String(j.id)===String(editingJobId));
  if(!job){alert("Could not find selected job.");return;}
@@ -3530,7 +3588,10 @@ async function updateScheduledJob(){
     await appendJobActivity(job, q, "Schedule Changed", changes.length ? changes.join("; ")+"." : "Schedule details reviewed.");
   }
   renderAll();
-  alert("Job updated.");
+  showToast("Schedule updated","The job changes were saved.","success");
+ } finally {
+  restoreButton();
+ }
 }
 
 async function deleteScheduledJob(){
@@ -3547,7 +3608,7 @@ async function deleteScheduledJob(){
 
   if(error){
     console.error(error);
-    alert("Could not delete job from cloud: " + error.message);
+    showToast("Job was not deleted","Cloud delete failed: " + error.message,"error");
     return;
   }
 }
@@ -4109,7 +4170,7 @@ async function persistProjectPhotoTimeline(job,quote,timeline){
 
   if(error){
     console.error(error);
-    alert("Project photos uploaded, but the timeline did not save to the quote: " + error.message);
+    showToast("Photos uploaded, timeline not saved","Quote save failed: " + error.message,"warning");
   }
 }
 
@@ -4324,7 +4385,7 @@ async function persistJobActivityTimeline(job,quote,entries){
 
   if(error){
     console.error(error);
-    alert("Activity timeline did not save: " + error.message);
+    showToast("Activity was not saved","Cloud save failed: " + error.message,"error");
     return false;
   }
   return true;
@@ -4535,7 +4596,7 @@ async function markJobInProgress(jobId) {
  const savedSchedule = await saveScheduledJobCloud(job);
   if(savedSchedule) await appendJobActivity(job, quote, "Job Started", "Job marked In Progress.");
   renderAll();
-  alert("Job marked In Progress.");
+  showToast("Job started","The job is now marked In Progress.","success");
 }
 
 async function markJobComplete(jobId) {
@@ -4577,7 +4638,7 @@ async function markJobComplete(jobId) {
  const savedSchedule = await saveScheduledJobCloud(job);
   if(savedSchedule) await appendJobActivity(job, quote, "Job Completed", "Job marked Complete.");
   renderAll();
-  alert("Job marked Complete.");
+  showToast("Job complete","The job is now marked Complete.","success");
 }
 
 function renderCustomers(){
@@ -4594,7 +4655,7 @@ function renderCustomers(){
   );
 
   if(!list.length){
-    box.innerHTML="<p class='small'>No customers found.</p>";
+    box.innerHTML="<div class='empty-state'><strong>No customers found.</strong><p>Create or save a customer from Quote Builder, then customer history will appear here.</p></div>";
     return;
   }
 
@@ -4680,7 +4741,7 @@ function renderMoneyTracker(){
       if(owed<=0)return "";
       return `<div class="quote-card"><div class="title">${escapeHtml(c.name||"Unnamed")}</div><div>Deposit owed: <span class="money-warning">${dollars(owed)}</span></div><div class="small">Quote total: ${dollars(q.amount)}</div><button class="secondary" onclick="prefillPayment('${q.id}', ${owed.toFixed(2)}, 'Deposit')">Record Deposit</button></div>`;
    }).join("");
-   depositList.innerHTML=items||"<p class='small'>No deposits outstanding.</p>";
+   depositList.innerHTML=items||"<div class='empty-state'><strong>No deposits outstanding.</strong><p>Deposits due will show here after a sold job needs payment.</p></div>";
  }
 
  const finalList=document.getElementById("finalOutstandingList");
@@ -4692,7 +4753,7 @@ function renderMoneyTracker(){
       if(owed<=0)return "";
       return `<div class="quote-card"><div class="title">${escapeHtml(c.name||"Unnamed")}</div><div>Balance owed: <span class="money-warning">${dollars(owed)}</span></div><div class="small">Paid so far: ${dollars(paid)}</div><button class="secondary" onclick="prefillPayment('${q.id}', ${owed.toFixed(2)}, 'Final Payment')">Record Final Payment</button></div>`;
    }).join("");
-   finalList.innerHTML=items||"<p class='small'>No final balances outstanding.</p>";
+    finalList.innerHTML=items||"<div class='empty-state'><strong>No final balances outstanding.</strong><p>Remaining balances will appear here as jobs are completed or paid down.</p></div>";
  }
 
  renderPaymentSelectors();
@@ -4717,6 +4778,8 @@ function prefillPayment(quoteId, amount, type){
 }
 
 async function recordPayment(){
+ const restoreButton=beginButtonLoading("Recording...");
+ try{
  const quoteId = val("paymentJobSelect");
  if(!quoteId){alert("Select a job/quote first.");return;}
  const amount=Number(val("paymentAmount"))||0;
@@ -4734,7 +4797,10 @@ async function recordPayment(){
  if(!saved) return;
  document.getElementById("paymentAmount").value="";
  document.getElementById("paymentNotes").value="";
- alert("Payment recorded.");
+ showToast("Payment recorded","Money Tracker has been updated.","success");
+ } finally {
+  restoreButton();
+ }
 }
 
 async function addPayment(payment) {
@@ -4778,7 +4844,7 @@ async function addPayment(payment) {
 
   if (error) {
     console.error(error);
-    alert("Payment did not save to cloud: " + error.message);
+    showToast("Payment was not recorded","Cloud save failed: " + error.message,"error");
     return false;
   }
 
@@ -4818,7 +4884,7 @@ async function addPayment(payment) {
 
   if (error) {
     console.error(error);
-    alert("Could not load cloud payments: " + error.message);
+    showToast("Payments did not load","Cloud load failed: " + error.message,"error");
     return;
   }
 
@@ -4840,7 +4906,7 @@ function renderPaymentHistory(){
   if(!box)return;
 
   if(!payments.length){
-    box.innerHTML="<p class='small'>No payments recorded yet.</p>";
+    box.innerHTML="<div class='empty-state'><strong>No payments recorded yet.</strong><p>Deposits and final payments will appear here after they are recorded.</p></div>";
     return;
   }
 
@@ -4955,7 +5021,7 @@ function renderDashboard(){
    if(unscheduled.length){
      html += "<div class='quote-card'><div class='title'>Sold but Not Scheduled: "+unscheduled.length+"</div><div class='small'>These jobs are sold but not on the calendar yet.</div><button class='secondary' onclick=\"showTab('schedule')\">Open Schedule</button></div>";
    }
-   if(!html) html="<p class='small'>Nothing urgent right now.</p>";
+    if(!html) html="<div class='empty-state'><strong>No urgent work right now.</strong><p>Follow-ups, sold quotes waiting on scheduling, and payment items will appear here.</p></div>";
    attention.innerHTML=html;
  }
 
@@ -5038,7 +5104,7 @@ function renderDashboard(){
          </div>
        </div>
      `).join("")
-     : "<p class='small'>No activity yet. Create a quote, send a proposal, schedule a job, or record a payment.</p>";
+      : "<div class='empty-state'><strong>No recent activity yet.</strong><p>Create a quote, send a proposal, schedule a job, or record a payment to build the timeline.</p></div>";
  }
 
  const upcoming=document.getElementById("dashUpcomingJobs");
@@ -5052,7 +5118,7 @@ function renderDashboard(){
 
    upcoming.innerHTML=upcomingJobs.length
      ? upcomingJobs.map(j=>`<div class="job-card"><div class="title">${escapeHtml(j.customer||"Unnamed")}</div><div>${escapeHtml(j.date)} • ${escapeHtml(j.crew||"")}</div><div>Status: <span class="pill ${statusClass(j.status)}">${escapeHtml(j.status)}</span></div><div>Total: <strong>${dollars(j.total)}</strong></div></div>`).join("")
-     : "<p class='small'>No upcoming jobs scheduled.</p>";
+      : "<div class='empty-state'><strong>No upcoming jobs scheduled.</strong><p>Sold jobs will appear here after they are placed on the calendar.</p></div>";
  }
 
  const pipeline=document.getElementById("dashPipeline");
@@ -5126,7 +5192,7 @@ function openGoogleCalendarForJob(jobId) {
   window.open(buildGoogleCalendarUrl(job), "_blank");
 }
  
-async function copyText(text){await navigator.clipboard.writeText(text);alert("Copied.");}
+async function copyText(text){await navigator.clipboard.writeText(text);showToast("Copied","Ready to paste.","success");}
 function openSms(phone,msg){if(!phone){alert("No phone number.");return;}window.location.href="sms:"+encodeURIComponent(phone)+"?&body="+encodeURIComponent(msg);}
 function openEmail(email,msg){if(!email){alert("No email.");return;}window.location.href="mailto:"+encodeURIComponent(email)+"?subject="+encodeURIComponent("Following up on your flooring quote")+"&body="+encodeURIComponent(msg);}
 function copyQuote(){copyText(document.getElementById("quotePreview").textContent);}
@@ -5166,49 +5232,56 @@ function feedbackMailtoUrl(payload){
  return "mailto:hello@projobflo.com?subject="+encodeURIComponent("ProJobFlo Feedback")+"&body="+encodeURIComponent(body);
 }
 async function submitFeedback(){
- const messageEl=document.getElementById("feedbackMessage");
- const emailEl=document.getElementById("feedbackEmail");
- const sectionEl=document.getElementById("feedbackSection");
- const status=document.getElementById("feedbackStatus");
- const mailto=document.getElementById("feedbackMailtoLink");
- const message=(messageEl && messageEl.value.trim()) || "";
- const email=(emailEl && emailEl.value.trim()) || (currentUser && currentUser.email) || "";
- const section=(sectionEl && sectionEl.value.trim()) || currentFeedbackSection();
- if(!message){
-  if(status) status.textContent="Type a quick note first.";
-  return;
- }
- const payload={
-  user_id: currentUser ? currentUser.id : null,
-  email,
-  section,
-  message,
-  page_url: window.location.href,
-  created_at: new Date().toISOString()
- };
- if(mailto){mailto.classList.add("hidden"); mailto.removeAttribute("href");}
- if(status) status.textContent="Sending feedback...";
- try{
-  if(currentUser && supabaseClient){
-   const { error } = await supabaseClient.from("feedback").insert(payload);
-   if(error) throw error;
-   if(status) status.textContent="Thanks. Feedback sent.";
-   if(messageEl) messageEl.value="";
+ const restoreButton=beginButtonLoading("Sending...");
+ try {
+  const messageEl=document.getElementById("feedbackMessage");
+  const emailEl=document.getElementById("feedbackEmail");
+  const sectionEl=document.getElementById("feedbackSection");
+  const status=document.getElementById("feedbackStatus");
+  const mailto=document.getElementById("feedbackMailtoLink");
+  const message=(messageEl && messageEl.value.trim()) || "";
+  const email=(emailEl && emailEl.value.trim()) || (currentUser && currentUser.email) || "";
+  const section=(sectionEl && sectionEl.value.trim()) || currentFeedbackSection();
+  if(!message){
+   if(status) status.textContent="Type a quick note first.";
    return;
- }
- throw new Error("Feedback table unavailable.");
- }catch(error){
-  if(mailto){
-   mailto.href=feedbackMailtoUrl(payload);
-   mailto.classList.remove("hidden");
   }
-  if(status) status.textContent="Feedback could not be sent automatically. Use the email draft link below.";
+  const payload={
+   user_id: currentUser ? currentUser.id : null,
+   email,
+   section,
+   message,
+   page_url: window.location.href,
+   created_at: new Date().toISOString()
+  };
+  if(mailto){mailto.classList.add("hidden"); mailto.removeAttribute("href");}
+  if(status) status.textContent="Sending feedback...";
+  try{
+   if(currentUser && supabaseClient){
+    const { error } = await supabaseClient.from("feedback").insert(payload);
+    if(error) throw error;
+    if(status) status.textContent="Thanks. Feedback sent.";
+    showToast("Feedback sent","Thanks for helping improve ProJobFlo.","success");
+    if(messageEl) messageEl.value="";
+    return;
+   }
+   throw new Error("Feedback table unavailable.");
+  }catch(error){
+   if(mailto){
+    mailto.href=feedbackMailtoUrl(payload);
+    mailto.classList.remove("hidden");
+   }
+   if(status) status.textContent="Feedback could not be sent automatically. Use the email draft link below.";
+   showToast("Email draft ready","Feedback could not be sent automatically, so use the email draft link.","warning");
+  }
+ } finally {
+  restoreButton();
  }
 }
 function saveAll(){const presetIds=["presetLvpInstall","presetLvpDemo","presetLvpMaterial","presetLaminateInstall","presetLaminateDemo","presetLaminateMaterial","presetCarpetInstall","presetCarpetDemo","presetCarpetMaterial","presetTileInstall","presetTileDemo","presetTileMaterial","presetHardwoodInstall","presetHardwoodDemo","presetHardwoodMaterial"];
  const presets={}; presetIds.forEach(id=>presets[id]=val(id));
- const data={customers,quotes,jobs,payments,presets,company:{name:val("companyName"),phone:val("companyPhone"),email:val("companyEmail"),taxLocationSearch:val("taxLocationSearch"),taxRate:val("taxRate")}};try{localStorage.setItem("fastQuoteIntegratedApp",JSON.stringify(data));alert("Saved on this device.");}catch(e){alert("Too much data to save locally. Photos can make the file large.");}}
-function loadAll(){const raw=localStorage.getItem("fastQuoteIntegratedApp");if(!raw){alert("No saved data found.");return;}const data=JSON.parse(raw);customers=data.customers||[];quotes=data.quotes||[];jobs=data.jobs||[];payments=data.payments||[];if(data.presets){Object.keys(data.presets).forEach(id=>{const el=document.getElementById(id);if(el)el.value=data.presets[id];});}if(data.company){document.getElementById("companyName").value=data.company.name||"";document.getElementById("companyPhone").value=data.company.phone||"";document.getElementById("companyEmail").value=data.company.email||"";document.getElementById("taxLocationSearch").value=data.company.taxLocationSearch||"";document.getElementById("taxRate").value=data.company.taxRate||"";}maybeShowFirstRunSetup();applyTradeVisibility();renderAll();alert("Loaded.");}
+ const data={customers,quotes,jobs,payments,presets,company:{name:val("companyName"),phone:val("companyPhone"),email:val("companyEmail"),taxLocationSearch:val("taxLocationSearch"),taxRate:val("taxRate")}};try{localStorage.setItem("fastQuoteIntegratedApp",JSON.stringify(data));showToast("Backup saved","A local copy was saved on this device.","success");}catch(e){showToast("Backup was not saved","Photos can make local backups too large.","error");}}
+function loadAll(){const raw=localStorage.getItem("fastQuoteIntegratedApp");if(!raw){showToast("No local backup found","There is no saved device backup to load.","warning");return;}const data=JSON.parse(raw);customers=data.customers||[];quotes=data.quotes||[];jobs=data.jobs||[];payments=data.payments||[];if(data.presets){Object.keys(data.presets).forEach(id=>{const el=document.getElementById(id);if(el)el.value=data.presets[id];});}if(data.company){document.getElementById("companyName").value=data.company.name||"";document.getElementById("companyPhone").value=data.company.phone||"";document.getElementById("companyEmail").value=data.company.email||"";document.getElementById("taxLocationSearch").value=data.company.taxLocationSearch||"";document.getElementById("taxRate").value=data.company.taxRate||"";}maybeShowFirstRunSetup();applyTradeVisibility();renderAll();showToast("Backup loaded","Local app data was restored on this device.","success");}
 function clearAll(){if(!confirm("Clear all saved app data?"))return;customers=[];quotes=[];jobs=[];payments=[];localStorage.removeItem("fastQuoteIntegratedApp");renderAll();}
 function escapeHtml(text){return String(text||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");}
 function escapeJs(text){return String(text||"").replace(/\\/g,"\\\\").replace(/`/g,"\\`").replace(/\$/g,"\\$").replace(/\n/g,"\\n").replace(/\r/g,"");}
@@ -5232,6 +5305,8 @@ function escapeAttr(text){return String(text||"").replace(/'/g,"&#039;").replace
 }
 
 async function signIn() {
+  const restoreButton=beginButtonLoading("Logging in...");
+  try{
   const email = document.getElementById("authEmail").value;
   const password = document.getElementById("authPassword").value;
 
@@ -5242,7 +5317,7 @@ async function signIn() {
     });
 
   if (error) {
-    alert(error.message);
+    showToast("Login failed",error.message,"error");
     return;
   }
 
@@ -5261,6 +5336,10 @@ if (targetTab) {
 } else {
   showTab("dashboard");
 }
+ showToast("Logged in","Cloud data is ready.","success");
+  } finally {
+   restoreButton();
+  }
 }
 
 async function signOut() {
@@ -5281,11 +5360,11 @@ async function resetPassword() {
     await supabaseClient.auth.resetPasswordForEmail(email);
 
   if (error) {
-    alert(error.message);
+    showToast("Reset email was not sent",error.message,"error");
     return;
   }
 
-  alert("Password reset email sent.");
+  showToast("Password reset sent","Check your email for the reset link.","success");
 }
  async function requireLoggedIn() {
   if (currentUser) return true;
@@ -5333,11 +5412,11 @@ async function saveCurrentCustomerToCloud() {
 
   if (error) {
     console.error(error);
-    alert("Customer did not save to cloud: " + error.message);
+    showToast("Customer was not saved","Cloud save failed: " + error.message,"error");
     return;
   }
 
-  alert("Customer saved to cloud: " + data.name);
+  showToast("Customer saved",data.name + " is in your customer database.","success");
   await loadCustomersFromCloud();
 }
 
@@ -5352,7 +5431,7 @@ async function loadCustomersFromCloud() {
 
   if (error) {
     console.error(error);
-    alert("Could not load cloud customers: " + error.message);
+    showToast("Customers did not load","Cloud load failed: " + error.message,"error");
     return;
   }
 
@@ -5395,7 +5474,7 @@ savedCustomer = customerData;
 
   if (customerError) {
     console.error(customerError);
-    alert("Quote customer did not save: " + customerError.message);
+    showToast("Customer was not saved","Quote customer save failed: " + customerError.message,"error");
     return;
   }
   currentCloudCustomerId = customerId;
@@ -5458,7 +5537,7 @@ const { data, error } = await supabaseClient
 
   if (error) {
     console.error(error);
-    alert("Quote did not save to cloud: " + error.message);
+    showToast("Quote was not saved","Cloud save failed: " + error.message,"error");
     return false;
   }
  
@@ -5485,7 +5564,7 @@ async function loadQuotesFromCloud() {
 
   if (error) {
     console.error(error);
-    alert("Could not load cloud quotes: " + error.message);
+    showToast("Quotes did not load","Cloud load failed: " + error.message,"error");
     return;
   }
 
@@ -5546,14 +5625,14 @@ async function loadQuotesFromCloud() {
 
     if (error) {
       console.error(error);
-      alert("Job did not save to cloud: " + error.message);
+      showToast("Job was not saved","Cloud save failed: " + error.message,"error");
       return;
     }
 
     savedCount++;
   }
 
-  alert(savedCount + " job(s) saved to cloud.");
+  showToast("Jobs saved",savedCount + " job(s) saved to cloud.","success");
   await loadJobsFromCloud();
 }
 
@@ -5568,7 +5647,7 @@ async function loadJobsFromCloud() {
 
   if (error) {
     console.error(error);
-    alert("Could not load cloud jobs: " + error.message);
+    showToast("Jobs did not load","Cloud load failed: " + error.message,"error");
     return;
   }
 
@@ -5778,7 +5857,7 @@ if (customerError) {
 
   if (error) {
     console.error(error);
-    alert("Photo did not upload: " + error.message);
+    showToast("Photo was not uploaded","Upload failed: " + error.message,"error");
     return null;
   }
 
@@ -5901,7 +5980,7 @@ async function uploadContractorLogo(file) {
 
   if (error) {
     console.error(error);
-    alert("Logo did not upload: " + error.message);
+    showToast("Logo was not uploaded","Upload failed: " + error.message,"error");
     return;
   }
 
@@ -5923,7 +6002,7 @@ async function uploadContractorLogo(file) {
     preview.style.display = "block";
   }
 
-  alert("Company logo uploaded.");
+  showToast("Logo uploaded","Your company logo is ready for proposals.","success");
 }
 async function generateQuotePDF() {
   const { jsPDF } = window.jspdf;
@@ -6217,7 +6296,7 @@ doc.text("PROJECT PROPOSAL", 14, 42);
 
   await navigator.clipboard.writeText(link);
 
-  alert("Signature link copied to clipboard:\n\n" + link);
+  showToast("Signature link copied","Paste it into a text or email when you are ready.","success");
 }
  function selectCustomer(id){
   const c=customers.find(c=>String(c.id)===String(id));
@@ -6303,7 +6382,7 @@ async function deleteCustomer(id){
 
     if(error){
       console.error(error);
-      alert("Customer could not be deleted: " + error.message);
+      showToast("Customer was not deleted","Cloud delete failed: " + error.message,"error");
       return;
     }
   }
@@ -6316,7 +6395,7 @@ async function deleteCustomer(id){
   const box=document.getElementById("customerDetails");
   if(box)box.innerHTML="<p class='small'>Select a customer to view details.</p>";
 
-  alert("Customer deleted.");
+  showToast("Customer deleted","Customer record removed.","success");
 }
  async function saveUserSettings(updates) {
   const ok = await requireLoggedIn();
@@ -6337,7 +6416,7 @@ async function deleteCustomer(id){
 
   if (error) {
     console.error(error);
-    alert("Settings did not save: " + error.message);
+    showToast("Settings were not saved","Cloud save failed: " + error.message,"error");
   }
 }
 
@@ -6394,7 +6473,7 @@ setEstimateNumberToNext();
     company_license: val("settingsCompanyLicense").trim()
   });
 
-  alert("Company settings saved.");
+  showToast("Company settings saved","Proposal settings are up to date.","success");
 }
  function applyCompanySettingsToQuote() {
   if (!userSettings) return;
@@ -6506,11 +6585,11 @@ setEstimateNumberToNext();
   if (!response.ok) {
     const errorText = await response.text();
     console.error(errorText);
-    alert("Email failed to send.");
+    showToast("Email was not sent","Please check the customer email and try again.","error");
     return;
   }
 
-  alert("Proposal sent successfully.");
+  showToast("Proposal sent","The customer can review and sign from their email.","success");
   await advanceEstimateNumberCloud();
 currentCloudQuoteId = null;
 currentCloudCustomerId = null;
