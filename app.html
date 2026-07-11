@@ -187,6 +187,45 @@
   .customer-card,.quote-card,.job-card { border:1px solid var(--border); border-radius:var(--radius); padding:14px; margin-bottom:12px; background:var(--surface-soft); box-shadow:var(--shadow-sm); }
   .title { font-weight:850; margin-bottom:5px; color:var(--text); }
   .urgent { border-left:6px solid #dc2626; }
+  .dashboard-shell { display:grid; gap:20px; }
+  .dashboard-hero { position:relative; overflow:hidden; display:grid; grid-template-columns:minmax(0,1fr) auto; gap:22px; align-items:end; padding:26px; border:1px solid rgba(191,219,254,.9); border-radius:18px; background:radial-gradient(circle at top right,rgba(37,99,235,.20),transparent 28rem), linear-gradient(135deg,#ffffff,#f8fbff 52%,#eff6ff); box-shadow:0 24px 70px rgba(37,99,235,.13); }
+  .dashboard-hero::before { content:""; position:absolute; inset:0 0 auto; height:4px; background:linear-gradient(90deg,#2563eb,#0f766e); }
+  .dashboard-hero > * { position:relative; }
+  .dashboard-eyebrow { color:var(--primary); font-size:12px; font-weight:950; text-transform:uppercase; letter-spacing:.08em; margin-bottom:8px; }
+  .dashboard-hero h2 { border:0; padding:0; margin:0; font-size:34px; letter-spacing:0; }
+  .dashboard-hero-copy { max-width:68ch; color:var(--muted-strong); margin-top:8px; }
+  .dashboard-date-pill { display:inline-flex; align-items:center; gap:8px; padding:9px 12px; border:1px solid #bfdbfe; border-radius:999px; background:rgba(255,255,255,.76); color:#1e40af; font-weight:900; box-shadow:0 8px 18px rgba(37,99,235,.08); white-space:nowrap; }
+  .dashboard-kpi-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px; }
+  .dashboard-kpi { position:relative; overflow:hidden; min-height:146px; display:grid; align-content:space-between; gap:12px; padding:18px; border:1px solid rgba(203,213,225,.82); border-radius:18px; background:linear-gradient(180deg,#ffffff,#fbfdff); box-shadow:0 16px 38px rgba(15,23,42,.08); transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease; }
+  .dashboard-kpi:hover { transform:translateY(-2px); border-color:#bfdbfe; box-shadow:0 24px 52px rgba(37,99,235,.12); }
+  .dashboard-kpi::after { content:""; position:absolute; inset:auto 0 0; height:3px; background:linear-gradient(90deg,var(--primary),#0f766e); opacity:.72; }
+  .dashboard-kpi-top { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; }
+  .dashboard-icon { width:38px; height:38px; flex:0 0 38px; display:grid; place-items:center; border-radius:13px; background:#eff6ff; color:#1d4ed8; font-weight:950; border:1px solid #bfdbfe; box-shadow:inset 0 1px 0 rgba(255,255,255,.9); }
+  .dashboard-kpi .stat-label { color:#475569; }
+  .dashboard-kpi .stat-value { font-size:34px; letter-spacing:0; }
+  .dashboard-kpi p { margin:0; font-size:13px; }
+  .dashboard-grid { display:grid; grid-template-columns:minmax(0,1.45fr) minmax(340px,.85fr); gap:18px; align-items:start; }
+  .dashboard-column { display:grid; gap:18px; min-width:0; }
+  .dashboard-card { margin:0; border-radius:18px; padding:18px; border-color:rgba(203,213,225,.78); box-shadow:0 18px 44px rgba(15,23,42,.075); }
+  .dashboard-card > h2 { display:flex; align-items:center; justify-content:space-between; gap:12px; border:0; padding:0; margin:0 0 14px; }
+  .dashboard-card-title { display:flex; align-items:center; gap:10px; }
+  .dashboard-card-title .dashboard-icon { width:32px; height:32px; flex-basis:32px; border-radius:11px; font-size:13px; }
+  .dashboard-list { display:grid; gap:10px; }
+  .dashboard-item { display:grid; grid-template-columns:auto minmax(0,1fr) auto; gap:12px; align-items:center; padding:14px; border:1px solid #e2e8f0; border-radius:15px; background:linear-gradient(180deg,#ffffff,#f8fafc); box-shadow:0 8px 20px rgba(15,23,42,.045); transition:transform .15s ease, border-color .15s ease, box-shadow .15s ease; }
+  .dashboard-item:hover { transform:translateY(-1px); border-color:#bfdbfe; box-shadow:0 14px 28px rgba(37,99,235,.09); }
+  .dashboard-item-main { min-width:0; }
+  .dashboard-item-meta { color:var(--muted); font-size:13px; overflow-wrap:anywhere; }
+  .dashboard-item-value { text-align:right; font-weight:950; color:#0f172a; white-space:nowrap; }
+  .dashboard-empty { display:grid; gap:7px; padding:22px; border:1px dashed rgba(148,163,184,.72); border-radius:16px; background:linear-gradient(180deg,#ffffff,#f8fafc); color:var(--muted-strong); }
+  .dashboard-empty strong { color:var(--text); }
+  .dashboard-actions { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+  .dashboard-action { min-height:78px; display:flex; align-items:center; justify-content:flex-start; gap:10px; padding:14px; text-align:left; border-radius:16px; box-shadow:0 12px 26px rgba(15,23,42,.08); }
+  .dashboard-action .dashboard-icon { background:rgba(255,255,255,.18); color:inherit; border-color:rgba(255,255,255,.22); }
+  .dashboard-action.secondary .dashboard-icon { background:#eff6ff; color:#1d4ed8; border-color:#bfdbfe; }
+  .dashboard-action strong { display:block; line-height:1.2; }
+  .dashboard-action span:not(.dashboard-icon) { display:block; font-size:12px; opacity:.78; margin-top:2px; }
+  .dashboard-pipeline-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+  .dashboard-pipeline-card { padding:14px; border:1px solid #e2e8f0; border-radius:15px; background:#ffffff; box-shadow:0 8px 20px rgba(15,23,42,.045); }
   .calendar-header { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:12px; }
   .calendar-title { font-size:24px; font-weight:800; }
   .calendar { display:grid; grid-template-columns:repeat(7,1fr); gap:8px; }
@@ -677,6 +716,62 @@
     background:rgba(10,23,43,.92);
     border-color:rgba(125,158,204,.28);
   }
+  #viewDashboard .dashboard-hero {
+    background:
+      radial-gradient(circle at 84% 8%, rgba(31,111,255,.28), transparent 26rem),
+      radial-gradient(circle at 20% 0, rgba(34,197,94,.12), transparent 24rem),
+      linear-gradient(135deg,rgba(17,33,58,.98),rgba(7,17,33,.98));
+    border-color:rgba(96,165,250,.30);
+    box-shadow:0 30px 80px rgba(0,0,0,.36), inset 0 1px 0 rgba(255,255,255,.05);
+  }
+  #viewDashboard .dashboard-hero h2,
+  #viewDashboard .dashboard-card h2,
+  #viewDashboard .dashboard-item .title,
+  #viewDashboard .dashboard-empty strong,
+  #viewDashboard .dashboard-kpi .stat-value,
+  #viewDashboard .dashboard-item-value {
+    color:#f8fafc;
+  }
+  #viewDashboard .dashboard-hero-copy,
+  #viewDashboard .dashboard-item-meta,
+  #viewDashboard .dashboard-empty,
+  #viewDashboard .dashboard-kpi p {
+    color:#aebed4;
+  }
+  #viewDashboard .dashboard-date-pill {
+    background:rgba(31,111,255,.12);
+    border-color:rgba(96,165,250,.32);
+    color:#bfdbfe;
+  }
+  #viewDashboard .dashboard-kpi,
+  #viewDashboard .dashboard-card,
+  #viewDashboard .dashboard-item,
+  #viewDashboard .dashboard-pipeline-card {
+    background:
+      radial-gradient(circle at top right,rgba(31,111,255,.08),transparent 15rem),
+      linear-gradient(180deg,rgba(16,32,58,.94),rgba(8,18,35,.94));
+    border-color:rgba(125,158,204,.24);
+    box-shadow:0 18px 46px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.04);
+  }
+  #viewDashboard .dashboard-kpi:hover,
+  #viewDashboard .dashboard-item:hover {
+    border-color:rgba(96,165,250,.44);
+    box-shadow:0 26px 62px rgba(31,111,255,.16), inset 0 1px 0 rgba(255,255,255,.05);
+  }
+  #viewDashboard .dashboard-empty {
+    background:linear-gradient(180deg,rgba(12,27,50,.82),rgba(8,18,35,.82));
+    border-color:rgba(125,158,204,.34);
+  }
+  #viewDashboard .dashboard-icon {
+    background:rgba(31,111,255,.16);
+    color:#bfdbfe;
+    border-color:rgba(96,165,250,.28);
+  }
+  #viewDashboard .dashboard-action.secondary .dashboard-icon {
+    background:rgba(31,111,255,.16);
+    color:#bfdbfe;
+    border-color:rgba(96,165,250,.28);
+  }
 
   @media (min-width: 981px) {
     #viewQuote #liveNumbersCard {
@@ -695,6 +790,16 @@
   @media (max-width: 980px) {
     .app {
       padding:12px;
+    }
+    .dashboard-hero,
+    .dashboard-grid {
+      grid-template-columns:1fr;
+    }
+    .dashboard-kpi-grid {
+      grid-template-columns:repeat(2,minmax(0,1fr));
+    }
+    .dashboard-date-pill {
+      width:max-content;
     }
     .topbar {
       position:static;
@@ -772,6 +877,42 @@
     }
   }
   @media (max-width: 700px) {
+    .dashboard-shell {
+      gap:14px;
+    }
+    .dashboard-hero {
+      padding:18px;
+      border-radius:16px;
+    }
+    .dashboard-hero h2 {
+      font-size:27px;
+    }
+    .dashboard-kpi-grid,
+    .dashboard-actions,
+    .dashboard-pipeline-grid {
+      grid-template-columns:1fr;
+    }
+    .dashboard-kpi {
+      min-height:124px;
+    }
+    .dashboard-card {
+      padding:15px;
+    }
+    .dashboard-card > h2 {
+      align-items:flex-start;
+      flex-direction:column;
+    }
+    .dashboard-item {
+      grid-template-columns:auto minmax(0,1fr);
+      align-items:start;
+    }
+    .dashboard-item-value {
+      grid-column:2;
+      text-align:left;
+    }
+    .dashboard-item button {
+      grid-column:1 / -1;
+    }
     .app {
       padding-bottom:calc(100px + env(safe-area-inset-bottom));
     }
@@ -1648,51 +1789,99 @@
 
 
   <div id="viewDashboard" class="hidden">
-    <div class="grid">
-      <div>
-        <div class="card">
-          <h2>Business Dashboard</h2>
-          <p class="small">This is the real home screen: what needs attention and how much work is in the pipeline.</p>
-          <div class="stat-grid">
-            <div class="stat"><div class="stat-label">Open Quotes</div><div id="dashOpenQuotes" class="stat-value">0</div></div>
-            <div class="stat"><div class="stat-label">Sold This Month</div><div id="dashSoldThisMonth" class="stat-value">$0.00</div></div>
-            <div class="stat"><div class="stat-label">Scheduled Jobs</div><div id="dashScheduledJobs" class="stat-value">0</div></div>
-            <div class="stat"><div class="stat-label">Outstanding Balance</div><div id="dashOutstandingBalance" class="stat-value">$0.00</div></div>
+    <div class="dashboard-shell">
+      <section class="dashboard-hero">
+        <div>
+          <div class="dashboard-eyebrow">Contractor command center</div>
+          <h2 id="dashGreeting">Good morning.</h2>
+          <p class="dashboard-hero-copy">Track today's installs, follow up on open quotes, and keep cash flow visible before the first job starts.</p>
+        </div>
+        <div id="dashTodayDate" class="dashboard-date-pill">Today</div>
+      </section>
+
+      <section class="dashboard-kpi-grid">
+        <div class="dashboard-kpi">
+          <div class="dashboard-kpi-top">
+            <div>
+              <div class="stat-label">Today's Jobs</div>
+              <div id="dashTodayJobs" class="stat-value">0</div>
+            </div>
+            <span class="dashboard-icon">J</span>
+          </div>
+          <p id="dashTodayJobsHint">No installs scheduled today.</p>
+        </div>
+        <div class="dashboard-kpi">
+          <div class="dashboard-kpi-top">
+            <div>
+              <div class="stat-label">Upcoming Installs</div>
+              <div id="dashUpcomingInstalls" class="stat-value">0</div>
+            </div>
+            <span class="dashboard-icon">C</span>
+          </div>
+          <p>Scheduled work coming up.</p>
+        </div>
+        <div class="dashboard-kpi">
+          <div class="dashboard-kpi-top">
+            <div>
+              <div class="stat-label">Outstanding Balance</div>
+              <div id="dashOutstandingBalance" class="stat-value">$0.00</div>
+            </div>
+            <span class="dashboard-icon">$</span>
+          </div>
+          <p>Open balances tied to scheduled jobs.</p>
+        </div>
+        <div class="dashboard-kpi">
+          <div class="dashboard-kpi-top">
+            <div>
+              <div class="stat-label">Revenue This Month</div>
+              <div id="dashRevenueThisMonth" class="stat-value">$0.00</div>
+            </div>
+            <span class="dashboard-icon">R</span>
+          </div>
+          <p>Sold work recognized this month.</p>
+        </div>
+      </section>
+
+      <section class="dashboard-grid">
+        <div class="dashboard-column">
+          <div class="card dashboard-card">
+            <h2><span class="dashboard-card-title"><span class="dashboard-icon">T</span>Today's Jobs</span><span class="pill status-Scheduled" id="dashTodayJobsBadge">0 scheduled</span></h2>
+            <div id="dashTodayJobsList" class="dashboard-list"></div>
+          </div>
+
+          <div class="card dashboard-card">
+            <h2><span class="dashboard-card-title"><span class="dashboard-icon">U</span>Upcoming Installs</span><span class="small">Next 6 jobs</span></h2>
+            <div id="dashUpcomingJobs" class="dashboard-list"></div>
+          </div>
+
+          <div class="card dashboard-card">
+            <h2><span class="dashboard-card-title"><span class="dashboard-icon">A</span>Recent Activity</span><span class="small">Latest updates</span></h2>
+            <div id="dashRecentActivity" class="dashboard-list"></div>
           </div>
         </div>
 
-        <div class="card">
-          <h2>Needs Attention</h2>
-          <div id="dashAttention"></div>
-        </div>
-
-                <div class="card">
-          <h2>Recent Activity</h2>
-          <p class="small">Latest quote, signature, schedule, and payment activity.</p>
-          <div id="dashRecentActivity"></div>
-        </div>
-
-        <div class="card">
-          <h2>Upcoming Jobs</h2>
-          <div id="dashUpcomingJobs"></div>
-        </div>
-      </div>
-
-      <div>
-        <div class="card">
-          <h2>Pipeline Snapshot</h2>
-          <div id="dashPipeline"></div>
-        </div>
-        <div class="card">
-          <h2>Quick Actions</h2>
-          <div class="actions">
-            <button class="success" onclick="startNewQuote()">Start New Quote</button>
-            <button class="secondary" onclick="showTab('follow')">View Follow-Ups</button>
-            <button class="secondary" onclick="showTab('schedule')">Open Schedule</button>
-            <button class="secondary" onclick="showTab('customers')">Customer Database</button>
+        <aside class="dashboard-column">
+          <div class="card dashboard-card">
+            <h2><span class="dashboard-card-title"><span class="dashboard-icon">F</span>Quotes Awaiting Follow-up</span><span id="dashFollowups" class="pill status-FollowUpDue">0 due</span></h2>
+            <div id="dashAttention" class="dashboard-list"></div>
           </div>
-        </div>
-      </div>
+
+          <div class="card dashboard-card">
+            <h2><span class="dashboard-card-title"><span class="dashboard-icon">P</span>Pipeline Snapshot</span><span class="small" id="dashOpenQuotes">0 open</span></h2>
+            <div id="dashPipeline" class="dashboard-pipeline-grid"></div>
+          </div>
+
+          <div class="card dashboard-card">
+            <h2><span class="dashboard-card-title"><span class="dashboard-icon">Q</span>Quick Actions</span></h2>
+            <div class="dashboard-actions">
+              <button class="success dashboard-action" onclick="startNewQuote()"><span class="dashboard-icon">N</span><span><strong>New Quote</strong><span>Build an estimate</span></span></button>
+              <button class="secondary dashboard-action" onclick="showTab('schedule')"><span class="dashboard-icon">S</span><span><strong>Schedule Job</strong><span>Open calendar</span></span></button>
+              <button class="secondary dashboard-action" onclick="showTab('customers')"><span class="dashboard-icon">C</span><span><strong>Customers</strong><span>View database</span></span></button>
+              <button class="secondary dashboard-action" onclick="showTab('money')"><span class="dashboard-icon">$</span><span><strong>Money Tracker</strong><span>Review payments</span></span></button>
+            </div>
+          </div>
+        </aside>
+      </section>
     </div>
   </div>
 
@@ -5500,6 +5689,212 @@ function renderDashboard(){
      return `<div class="quote-card"><span class="pill ${statusClass(st)}">${st}</span><div class="stat-value">${count}</div><div class="small">${dollars(total)}</div></div>`;
    }).join("");
  }
+}
+
+function renderDashboard(){
+  const now = new Date();
+  const thisMonth = now.getMonth();
+  const thisYear = now.getFullYear();
+  const today = new Date().toISOString().slice(0,10);
+  const hour = now.getHours();
+  const greeting = hour < 12 ? "Good morning." : hour < 17 ? "Good afternoon." : "Good evening.";
+
+  const openQuotes = quotes.filter(q => q.status === "Unsold").length;
+  const followUpsDue = quotes.filter(q=>isDue(q));
+  const todayJobs = jobs
+    .filter(j => (j.date || j.startDate || "") === today)
+    .filter(j => j.status !== "Complete");
+  const upcomingJobs = jobs
+    .filter(j => (j.date || j.startDate || "") > today)
+    .slice()
+    .sort((a,b)=>(a.date || a.startDate || "").localeCompare(b.date || b.startDate || ""))
+    .slice(0,6);
+
+  const soldThisMonth = quotes
+    .filter(q => q.status === "Sold" || q.status === "Scheduled")
+    .filter(q => {
+      const d = new Date(Number(q.signedAt || q.signed_at || q.updatedAt || q.createdAt || 0));
+      return d.getMonth() === thisMonth && d.getFullYear() === thisYear;
+    })
+    .reduce((s,q) => s + Number(q.amount || 0), 0);
+
+  const scheduledJobs = jobs.filter(j => j.status !== "Complete").length;
+
+  const outstandingBalance = jobs.reduce((sum, job) => {
+    const total = Number(job.total || 0);
+    const collected = payments
+      .filter(p => String(p.quoteId || p.quote_id) === String(job.quoteId || job.quote_id))
+      .reduce((s,p) => s + Number(p.amount || 0), 0);
+    return sum + Math.max(0, total - collected);
+  }, 0);
+
+  const setText=(id,value)=>{const el=document.getElementById(id);if(el)el.textContent=value;};
+  const emptyState=(title,copy)=>`<div class="dashboard-empty"><strong>${escapeHtml(title)}</strong><p>${escapeHtml(copy)}</p></div>`;
+  const jobDate=(j)=>j.date || j.startDate || "";
+  const jobActivityTime=(j)=>Number(j.activityAt || j.activity_at || j.updatedAt || j.updated_at || j.createdAt || j.created_at || 0);
+  const jobCompletionTime=(j)=>Number(j.completedAt || j.completed_at || j.updatedAt || j.updated_at || j.createdAt || j.created_at || 0);
+  const jobItem=(j)=>`
+    <div class="dashboard-item">
+      <span class="dashboard-icon">J</span>
+      <div class="dashboard-item-main">
+        <div class="title">${escapeHtml(j.customer || "Unnamed Customer")}</div>
+        <div class="dashboard-item-meta">${escapeHtml(jobDate(j) || "No date")} - ${escapeHtml(j.crew || "Crew not assigned")}</div>
+        <div><span class="pill ${statusClass(j.status)}">${escapeHtml(j.status || "Scheduled")}</span></div>
+      </div>
+      <div class="dashboard-item-value">${dollars(j.total)}</div>
+    </div>`;
+
+  setText("dashGreeting", greeting);
+  setText("dashTodayDate", now.toLocaleDateString([], { weekday:"long", month:"short", day:"numeric" }));
+  setText("dashOpenQuotes", openQuotes + " open");
+  setText("dashSoldThisMonth", dollars(soldThisMonth));
+  setText("dashRevenueThisMonth", dollars(soldThisMonth));
+  setText("dashScheduledJobs", scheduledJobs);
+  setText("dashUpcomingInstalls", upcomingJobs.length);
+  setText("dashTodayJobs", todayJobs.length);
+  setText("dashTodayJobsHint", todayJobs.length ? todayJobs.length + " install(s) on the board today." : "No installs scheduled today.");
+  setText("dashTodayJobsBadge", todayJobs.length + " scheduled");
+  setText("dashOutstandingBalance", dollars(outstandingBalance));
+  setText("dashFollowups", followUpsDue.length + " due");
+
+  const todayBox=document.getElementById("dashTodayJobsList");
+  if(todayBox){
+    todayBox.innerHTML=todayJobs.length
+      ? todayJobs.map(jobItem).join("")
+      : emptyState("No jobs scheduled today.","Use the calendar to place sold jobs on the board.");
+  }
+
+  const attention=document.getElementById("dashAttention");
+  if(attention){
+    const unscheduled=quotes.filter(q=>(q.status==="Sold")&&!jobs.some(j=>String(j.quoteId)===String(q.id)));
+    let html="";
+    if(followUpsDue.length){
+      html += `
+        <div class="dashboard-item">
+          <span class="dashboard-icon">F</span>
+          <div class="dashboard-item-main">
+            <div class="title">Follow-ups due</div>
+            <div class="dashboard-item-meta">These quotes need a call, text, or email.</div>
+          </div>
+          <button class="secondary" onclick="showTab('follow')">Open</button>
+        </div>`;
+    }
+    if(unscheduled.length){
+      html += `
+        <div class="dashboard-item">
+          <span class="dashboard-icon">S</span>
+          <div class="dashboard-item-main">
+            <div class="title">Sold but not scheduled</div>
+            <div class="dashboard-item-meta">Put sold jobs on the calendar before they drift.</div>
+          </div>
+          <button class="secondary" onclick="showTab('schedule')">Schedule</button>
+        </div>`;
+    }
+    if(!html) html=emptyState("No quotes need attention.","Follow-ups and sold quotes waiting on scheduling will appear here.");
+    attention.innerHTML=html;
+  }
+
+  const activity=document.getElementById("dashRecentActivity");
+  if(activity){
+    const events=[];
+
+    quotes.forEach(q=>{
+      const c=getCustomer(q.customerId);
+      const name=c.name || q.customer || "Unnamed Customer";
+      const estimate=q.estimateNumber || q.estimate_number || "";
+      const quoteLabel=estimate ? "Proposal #" + estimate : "Proposal";
+
+      if(q.createdAt){
+        events.push({
+          time:Number(q.createdAt)||0,
+          icon:"Q",
+          title:"Quote created",
+          detail:`${name} - ${quoteLabel} - ${dollars(q.amount)}`
+        });
+      }
+
+      if(q.signatureStatus==="Sent" || q.signature_status==="Sent"){
+        events.push({
+          time:Number(q.sentAt || q.updatedAt || q.createdAt || 0),
+          icon:"E",
+          title:"Proposal sent",
+          detail:`${name} - ${quoteLabel}`
+        });
+      }
+
+      if(q.status==="Sold" || q.signatureStatus==="Signed" || q.signature_status==="Signed"){
+        events.push({
+          time:Number(q.signedAt || q.signed_at || q.updatedAt || q.createdAt || 0),
+          icon:"A",
+          title:"Proposal signed",
+          detail:`${name} - ${quoteLabel} - ${dollars(q.amount)}`
+        });
+      }
+    });
+
+    jobs.forEach(j=>{
+      events.push({
+        time:jobActivityTime(j),
+        icon:"J",
+        title:"Job scheduled",
+        detail:`${j.customer || "Unnamed Customer"} - ${jobDate(j) || ""} - ${j.crew || ""}`
+      });
+
+      if(j.status==="Complete"){
+        events.push({
+          time:jobCompletionTime(j),
+          icon:"C",
+          title:"Job completed",
+          detail:`${j.customer || "Unnamed Customer"} - ${dollars(j.total)}`
+        });
+      }
+    });
+
+    payments.forEach(p=>{
+      const q=quotes.find(q=>String(q.id)===String(p.quoteId || p.quote_id));
+      const c=q ? getCustomer(q.customerId) : {};
+      events.push({
+        time:Number(p.createdAt || p.date || nowMs()),
+        icon:"$",
+        title:"Payment recorded",
+        detail:`${c.name || "Customer"} - ${p.type || "Payment"} - ${dollars(p.amount)}`
+      });
+    });
+
+    events.sort((a,b)=>b.time-a.time);
+
+    activity.innerHTML=events.length
+      ? events.slice(0,8).map(e=>`
+        <div class="dashboard-item">
+          <span class="dashboard-icon">${escapeHtml(e.icon)}</span>
+          <div class="dashboard-item-main">
+            <div class="title">${escapeHtml(e.title)}</div>
+            <div class="dashboard-item-meta">${escapeHtml(e.detail)}</div>
+            <div class="small">${e.time ? new Date(e.time).toLocaleString() : ""}</div>
+          </div>
+          <div></div>
+        </div>
+      `).join("")
+      : emptyState("No recent activity yet.","Create a quote, send a proposal, schedule a job, or record a payment to build the timeline.");
+  }
+
+  const upcoming=document.getElementById("dashUpcomingJobs");
+  if(upcoming){
+    upcoming.innerHTML=upcomingJobs.length
+      ? upcomingJobs.map(jobItem).join("")
+      : emptyState("No upcoming installs scheduled.","Sold jobs will appear here after they are placed on the calendar.");
+  }
+
+  const pipeline=document.getElementById("dashPipeline");
+  if(pipeline){
+    const statuses=["Unsold","Sold","Scheduled","Lost"];
+    pipeline.innerHTML=statuses.map(st=>{
+      const matching=quotes.filter(q=>q.status===st);
+      const count=matching.length;
+      const total=matching.reduce((s,q)=>s+Number(q.amount||0),0);
+      return `<div class="dashboard-pipeline-card"><span class="pill ${statusClass(st)}">${st}</span><div class="stat-value">${count}</div><div class="small">${dollars(total)}</div></div>`;
+    }).join("");
+  }
 }
 
 function renderStats(){document.getElementById("statCustomers").textContent=customers.length;document.getElementById("statUnsold").textContent=quotes.filter(q=>q.status==="Unsold").length;document.getElementById("statDue").textContent=quotes.filter(q=>isDue(q)).length;document.getElementById("statScheduled").textContent=jobs.length;}
