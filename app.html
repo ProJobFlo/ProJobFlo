@@ -45,6 +45,8 @@
   .tab { background:transparent; color:var(--muted-strong); border:1px solid transparent; box-shadow:none; padding:9px 12px; border-radius:var(--radius-sm); }
   .tab:hover { background:rgba(255,255,255,.78); color:var(--text); transform:none; box-shadow:none; }
   .tab.active { background:#eff6ff; color:var(--primary); border-color:#bfdbfe; box-shadow:0 8px 18px rgba(37,99,235,.10); }
+  .mobile-bottom-nav, .mobile-more-menu { display:none; }
+  .mobile-nav-item { box-shadow:none; }
   .grid { display:grid; grid-template-columns: minmax(0, 2fr) minmax(300px, 1fr); gap:18px; align-items:start; }
   .grid-half { display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap:18px; }
   .card { background:var(--surface); padding:18px; border-radius:var(--radius); border:1px solid rgba(203,213,225,.78); box-shadow:var(--shadow-md); margin-bottom:18px; }
@@ -767,6 +769,137 @@
     select,
     textarea {
       font-size:16px;
+    }
+  }
+  @media (max-width: 700px) {
+    .app {
+      padding-bottom:calc(100px + env(safe-area-inset-bottom));
+    }
+    .tabs {
+      display:none !important;
+    }
+    .mobile-bottom-nav {
+      position:fixed;
+      left:10px;
+      right:10px;
+      bottom:10px;
+      z-index:240;
+      display:grid;
+      grid-template-columns:repeat(6,minmax(0,1fr));
+      gap:4px;
+      padding:8px 8px calc(8px + env(safe-area-inset-bottom));
+      border:1px solid rgba(96,165,250,.28);
+      border-radius:22px;
+      background:linear-gradient(180deg,rgba(9,20,38,.96),rgba(4,12,25,.98));
+      box-shadow:0 22px 60px rgba(0,0,0,.48), inset 0 1px 0 rgba(255,255,255,.07);
+      backdrop-filter:blur(18px);
+    }
+    .mobile-nav-item {
+      width:100%;
+      min-width:0;
+      min-height:58px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:3px;
+      padding:6px 2px;
+      border:1px solid transparent;
+      border-radius:16px;
+      background:transparent;
+      color:#9fb1cc;
+      font-size:10px;
+      line-height:1.05;
+      font-weight:900;
+      letter-spacing:0;
+      white-space:nowrap;
+      box-shadow:none;
+    }
+    .mobile-nav-item:hover {
+      transform:none;
+      box-shadow:none;
+      background:rgba(255,255,255,.07);
+      color:#eef6ff;
+    }
+    .mobile-nav-item.active {
+      color:white;
+      background:linear-gradient(180deg,#2f7bff,#1f6fff);
+      border-color:rgba(147,197,253,.35);
+      box-shadow:0 12px 26px rgba(31,111,255,.32);
+    }
+    .mobile-nav-icon {
+      display:block;
+      font-size:18px;
+      line-height:1;
+    }
+    .mobile-more-menu {
+      position:fixed;
+      left:12px;
+      right:12px;
+      bottom:calc(92px + env(safe-area-inset-bottom));
+      z-index:235;
+      padding:10px;
+      border:1px solid rgba(96,165,250,.30);
+      border-radius:20px;
+      background:linear-gradient(180deg,rgba(13,28,52,.98),rgba(6,16,31,.98));
+      box-shadow:0 24px 70px rgba(0,0,0,.48), inset 0 1px 0 rgba(255,255,255,.06);
+      backdrop-filter:blur(18px);
+    }
+    .mobile-more-menu:not(.hidden) {
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:8px;
+    }
+    .mobile-more-menu button {
+      width:100%;
+      min-height:48px;
+      justify-content:center;
+      background:rgba(255,255,255,.06);
+      border-color:rgba(125,158,204,.25);
+      color:#dbeafe;
+      box-shadow:none;
+    }
+    .mobile-more-menu button.active {
+      background:rgba(47,123,255,.24);
+      border-color:rgba(96,165,250,.48);
+      color:white;
+    }
+    .feedback-button {
+      right:14px !important;
+      left:auto !important;
+      bottom:calc(94px + env(safe-area-inset-bottom)) !important;
+      width:auto !important;
+      min-height:42px;
+      padding:9px 12px;
+      border-radius:14px;
+      z-index:210;
+    }
+    .profit-panel,
+    #viewProfit .card {
+      width:100%;
+      max-width:100%;
+      min-width:0;
+    }
+    #viewProfit > .grid,
+    #viewProfit .stat-grid {
+      grid-template-columns:1fr !important;
+      width:100%;
+      max-width:100%;
+      min-width:0;
+    }
+    .profit-row {
+      grid-template-columns:1fr;
+      gap:5px;
+      padding:10px 0;
+      border-bottom:1px solid rgba(148,163,184,.16);
+    }
+    .profit-row.header {
+      display:none;
+    }
+    .profit-row div {
+      overflow:visible;
+      text-overflow:clip;
+      white-space:normal;
     }
   }
 
@@ -1495,6 +1628,23 @@
     <button id="tabCustomers" class="tab" onclick="showTab('customers')">Customers</button>
     <button id="tabProfit" class="tab" onclick="showTab('profit')">Profit Mode</button>
   </div>
+
+  <div id="mobileMoreMenu" class="mobile-more-menu hidden" aria-label="More navigation">
+    <button id="mobileNavFollow" type="button">Follow-Ups</button>
+    <button id="mobileNavSettings" type="button">Settings</button>
+    <button id="mobileNavProfit" type="button">Profit Mode</button>
+    <button type="button" onclick="openFeedbackModal()">Feedback</button>
+    <button id="mobileLogoutBtn" type="button" onclick="signOut()" style="display:none;">Logout</button>
+  </div>
+
+  <nav class="mobile-bottom-nav" aria-label="Mobile app navigation">
+    <button id="mobileNavDashboard" class="mobile-nav-item" type="button"><span class="mobile-nav-icon">▦</span><span>Dashboard</span></button>
+    <button id="mobileNavQuote" class="mobile-nav-item active" type="button"><span class="mobile-nav-icon">✎</span><span>Quote</span></button>
+    <button id="mobileNavSchedule" class="mobile-nav-item" type="button"><span class="mobile-nav-icon">□</span><span>Schedule</span></button>
+    <button id="mobileNavMoney" class="mobile-nav-item" type="button"><span class="mobile-nav-icon">$</span><span>Money</span></button>
+    <button id="mobileNavCustomers" class="mobile-nav-item" type="button"><span class="mobile-nav-icon">◎</span><span>Customers</span></button>
+    <button id="mobileNavMore" class="mobile-nav-item" type="button"><span class="mobile-nav-icon">•••</span><span>More</span></button>
+  </nav>
 
 
   <div id="viewDashboard" class="hidden">
@@ -2565,6 +2715,8 @@ async function init() {
 
       const logoutBtn = document.getElementById("logoutBtn");
       if (logoutBtn) logoutBtn.style.display = "inline-block";
+      const mobileLogoutBtn = document.getElementById("mobileLogoutBtn");
+      if (mobileLogoutBtn) mobileLogoutBtn.style.display = "block";
 
       const authStatus = document.getElementById("authStatus");
       if (authStatus) {
@@ -2584,10 +2736,55 @@ function showTab(tab) {
   });
   document.getElementById("view" + cap(tab)).classList.remove("hidden");
   document.getElementById("tab" + cap(tab)).classList.add("active");
+  updateMobileNavState(tab);
+  closeMobileMoreMenu();
   renderAll();
  if (tab === "quote") {
   setTimeout(setupSignaturePad, 50);
 }
+}
+function updateMobileNavState(tab){
+ const primaryTabs=["dashboard","quote","schedule","money","customers"];
+ document.querySelectorAll(".mobile-nav-item, .mobile-more-menu button").forEach(btn=>btn.classList.remove("active"));
+ const primary=primaryTabs.includes(tab) ? document.getElementById("mobileNav"+cap(tab)) : null;
+ if(primary){
+   primary.classList.add("active");
+ } else {
+   const more=document.getElementById("mobileNavMore");
+   if(more)more.classList.add("active");
+ }
+ const moreItem=document.getElementById("mobileNav"+cap(tab));
+ if(!primaryTabs.includes(tab) && moreItem)moreItem.classList.add("active");
+}
+function toggleMobileMoreMenu(){
+ const menu=document.getElementById("mobileMoreMenu");
+ const more=document.getElementById("mobileNavMore");
+ if(!menu)return;
+ const opening=menu.classList.contains("hidden");
+ menu.classList.toggle("hidden",!opening);
+ if(more)more.classList.toggle("active",opening);
+}
+function closeMobileMoreMenu(){
+ const menu=document.getElementById("mobileMoreMenu");
+ if(menu)menu.classList.add("hidden");
+}
+function setupMobileNavigation(){
+ const navTargets=[
+   ["mobileNavDashboard","dashboard"],
+   ["mobileNavQuote","quote"],
+   ["mobileNavSchedule","schedule"],
+   ["mobileNavMoney","money"],
+   ["mobileNavCustomers","customers"],
+   ["mobileNavFollow","follow"],
+   ["mobileNavSettings","settings"],
+   ["mobileNavProfit","profit"]
+ ];
+ navTargets.forEach(([id,tab])=>{
+   const btn=document.getElementById(id);
+   if(btn)btn.addEventListener("click",function(event){event.preventDefault();showTab(tab);});
+ });
+ const more=document.getElementById("mobileNavMore");
+ if(more)more.addEventListener("click",function(event){event.preventDefault();toggleMobileMoreMenu();});
 }
  let adminLogoClicks = 0;
 let adminLogoTimer = null;
@@ -5494,9 +5691,10 @@ async function signIn() {
     return;
   }
 
-  currentUser = data.user;
+ currentUser = data.user;
  document.getElementById("authBox").style.display = "none";
  document.getElementById("logoutBtn").style.display = "inline-block";
+ document.getElementById("mobileLogoutBtn").style.display = "block";
 
   document.getElementById("authStatus").textContent =
     "Logged in as " + currentUser.email;
@@ -5518,9 +5716,10 @@ if (targetTab) {
 async function signOut() {
   await supabaseClient.auth.signOut();
 
-  currentUser = null;
+ currentUser = null;
  document.getElementById("authBox").style.display = "block";
  document.getElementById("logoutBtn").style.display = "none";
+ document.getElementById("mobileLogoutBtn").style.display = "none";
 
   document.getElementById("authStatus").textContent =
     "Not logged in.";
@@ -5614,7 +5813,7 @@ async function loadCustomersFromCloud() {
   const authStatus = document.getElementById("authStatus");
   if (authStatus) {
     authStatus.textContent =
-      "Logged in as " + currentUser.email + " — Cloud customers loaded: " + customers.length;
+      "Logged in as " + currentUser.email + " - Cloud customers loaded: " + customers.length;
   }
 }
 async function saveCurrentQuoteToCloud(options = {}) {
@@ -5851,7 +6050,7 @@ async function loadJobsFromCloud() {
   const authStatus = document.getElementById("authStatus");
   if (authStatus) {
     authStatus.textContent =
-      "Logged in as " + currentUser.email + " — Cloud jobs loaded: " + jobs.length;
+      "Logged in as " + currentUser.email + " - Cloud jobs loaded: " + jobs.length;
   }
 }
  function setAutoSaveStatus(message) {
@@ -5979,7 +6178,7 @@ if (customerError) {
     return;
   }
 
-  setAutoSaveStatus("Cloud Saved ✓ " + new Date().toLocaleTimeString());
+  setAutoSaveStatus("Cloud Saved - " + new Date().toLocaleTimeString());
 }
  async function loadAllCloudData() {
   const ok = await requireLoggedIn();
@@ -5995,7 +6194,7 @@ if (customerError) {
   if (authStatus) {
     authStatus.textContent =
       "Logged in as " + currentUser.email +
-      " — Cloud data loaded.";
+      " - Cloud data loaded.";
   }
 
   const cloudSummary = document.getElementById("cloudSyncSummary");
@@ -6769,6 +6968,7 @@ currentCloudCustomerId = null;
 }
  
 init();
+setupMobileNavigation();
 </script>
 </body>
 </html>

@@ -98,6 +98,62 @@
       background: #dc2626;
       color: white;
     }
+
+    .accepted-card {
+      border-color: #bbf7d0;
+      background: linear-gradient(180deg, #f0fdf4, #ffffff);
+      text-align: center;
+    }
+
+    .accepted-icon {
+      width: 58px;
+      height: 58px;
+      margin: 0 auto 14px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      background: #047857;
+      color: white;
+      font-size: 32px;
+      font-weight: 900;
+      box-shadow: 0 14px 30px rgba(4, 120, 87, .22);
+    }
+
+    .accepted-meta {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin: 18px 0;
+      text-align: left;
+    }
+
+    .accepted-meta div {
+      border: 1px solid #d1fae5;
+      border-radius: 14px;
+      padding: 12px;
+      background: rgba(255,255,255,.78);
+    }
+
+    .accepted-meta span {
+      display: block;
+      color: #6b7280;
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      margin-bottom: 5px;
+    }
+
+    .accepted-meta strong {
+      display: block;
+      overflow-wrap: anywhere;
+    }
+
+    @media (max-width: 640px) {
+      .accepted-meta {
+        grid-template-columns: 1fr;
+      }
+    }
   </style>
 </head>
 
@@ -135,6 +191,8 @@
   <h2>Project Photos</h2>
   <div id="approvePhotos"></div>
 </div>
+
+    <div id="acceptedCard" class="card accepted-card" style="display:none;"></div>
 
     <div id="acceptCard" class="card" style="display:none;">
       <h2>Accept Proposal</h2>
@@ -176,6 +234,7 @@
 
     let loadedQuote = null;
     let drawing = false;
+    let signatureComplete = false;
     let canvas;
     let ctx;
 
@@ -223,7 +282,7 @@ if (expiresAt) {
     banner.style.background = "#fee2e2";
     banner.style.color = "#991b1b";
     banner.innerHTML =
-      "⚠ This proposal expired on " +
+      "Warning: This proposal expired on " +
       expiration.toLocaleDateString();
 
     window.proposalExpired = true;
@@ -267,6 +326,12 @@ if (expiresAt) {
       renderApprovePhotos(q);
 
       document.getElementById("proposalCard").style.display = "block";
+      if (isProposalAccepted(data)) {
+        renderAcceptedConfirmation(data);
+        return;
+      }
+
+      document.getElementById("acceptedCard").style.display = "none";
       document.getElementById("acceptCard").style.display =
   window.proposalExpired ? "none" : "block";
 
@@ -312,6 +377,7 @@ if (expiresAt) {
       const p = getPoint(e);
       ctx.lineTo(p.x, p.y);
       ctx.stroke();
+      signatureComplete = true;
     }
 
     function stopDraw() {
@@ -320,6 +386,7 @@ if (expiresAt) {
 
     function clearSignature() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+      signatureComplete = false;
     }
 
     function resolveLineQty(item, totals) {
@@ -336,7 +403,69 @@ if (expiresAt) {
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
 }
-    
+
+function isProposalAccepted(data) {
+  return data?.signature_status === "Signed" ||
+    data?.status === "Sold" ||
+    data?.quote_data?.signature_status === "Signed" ||
+    data?.quote_data?.status === "Sold";
+}
+
+function formatAcceptedDate(value) {
+  if (!value) return "Completed";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Completed";
+  return date.toLocaleDateString() + " at " + date.toLocaleTimeString([], {
+    hour: "numeric",
+    minute: "2-digit"
+  });
+}
+
+function renderAcceptedConfirmation(data) {
+  const q = data?.quote_data || {};
+  const company = q.company || {};
+  const customer = q.customer || {};
+  const acceptedAt = data?.signed_at || q.signed_at || q.acceptedAt || "";
+  const acceptedCard = document.getElementById("acceptedCard");
+
+  document.getElementById("status").textContent =
+    "This proposal has already been accepted.";
+  document.getElementById("acceptCard").style.display = "none";
+  document.getElementById("proposalInfo").innerHTML =
+    "<strong>Proposal #:</strong> " +
+    escapeHtml(data?.estimate_number || "Estimate") +
+    "<br><strong>Status:</strong> Signed";
+
+  if (!acceptedCard) return;
+
+  acceptedCard.innerHTML = `
+    <div class="accepted-icon">✓</div>
+    <h2>Proposal Accepted</h2>
+    <p>Thank you.</p>
+    <p class="small">This proposal was successfully accepted. Your contractor has been notified.</p>
+    <div class="accepted-meta">
+      <div>
+        <span>Accepted on</span>
+        <strong>${escapeHtml(formatAcceptedDate(acceptedAt))}</strong>
+      </div>
+      <div>
+        <span>Customer</span>
+        <strong>${escapeHtml(data?.signed_customer_name || q.signed_customer_name || customer.name || "Customer")}</strong>
+      </div>
+      <div>
+        <span>Estimate Number</span>
+        <strong>${escapeHtml(data?.estimate_number || "Estimate")}</strong>
+      </div>
+      <div>
+        <span>Company</span>
+        <strong>${escapeHtml(company.name || "Your contractor")}</strong>
+      </div>
+    </div>
+    <p class="small">You may safely close this page.</p>
+  `;
+  acceptedCard.style.display = "block";
+}
+
 function renderApproveLineItems(q) {
   const box = document.getElementById("approveLineItems");
   const card = document.getElementById("lineItemCard");
@@ -360,7 +489,7 @@ function renderApproveLineItems(q) {
         <div>
           <strong>${escapeHtml(item.service || "Line Item")}</strong><br>
           <span style="color:#6b7280;font-size:14px;">${escapeHtml(item.description || "")}</span><br>
-          <span style="color:#6b7280;font-size:13px;">${qty.toFixed(2)} ${escapeHtml(item.unit || "")} × $${rate.toFixed(2)}</span>
+          <span style="color:#6b7280;font-size:13px;">${qty.toFixed(2)} ${escapeHtml(item.unit || "")} x $${rate.toFixed(2)}</span>
         </div>
         <strong>${dollars(amount)}</strong>
       </div>
@@ -479,6 +608,11 @@ function renderApproveLineItems(q) {
         return;
       }
 
+      if (!signatureComplete) {
+        alert("Please sign before approving.");
+        return;
+      }
+
       const signatureImage = canvas.toDataURL("image/png");
 
       const { error: insertError } = await supabaseClient
@@ -550,10 +684,22 @@ if (emailError) {
 
 console.log("Contractor notification email sent:", emailData);
 
-      document.getElementById("status").textContent =
-        "Proposal accepted. Thank you.";
+      loadedQuote = {
+        ...loadedQuote,
+        status: "Sold",
+        signature_status: "Signed",
+        signed_at: signedAt,
+        signed_customer_name: printedName,
+        quote_data: {
+          ...(loadedQuote.quote_data || {}),
+          status: "Sold",
+          signature_status: "Signed",
+          signed_at: signedAt,
+          signed_customer_name: printedName
+        }
+      };
 
-      document.getElementById("acceptCard").style.display = "none";
+      renderAcceptedConfirmation(loadedQuote);
       alert("Proposal accepted successfully. Contractor has been notified.");
     }
 
