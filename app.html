@@ -1206,10 +1206,10 @@
     display:none !important;
   }
   .job-file-panel {
-    width:min(760px,100%);
+    width:min(1120px,100%);
     height:100vh;
     overflow:auto;
-    padding:22px;
+    padding:24px;
     background:
       radial-gradient(circle at 82% 0,rgba(31,111,255,.20),transparent 24rem),
       linear-gradient(180deg,rgba(12,24,46,.98),rgba(4,12,26,.98));
@@ -1217,25 +1217,77 @@
     box-shadow:-28px 0 80px rgba(0,0,0,.42);
   }
   .job-file-header {
-    display:flex;
+    position:relative;
+    overflow:hidden;
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    gap:18px;
     align-items:flex-start;
-    justify-content:space-between;
-    gap:16px;
-    padding-bottom:16px;
-    border-bottom:1px solid rgba(148,163,184,.18);
-    margin-bottom:16px;
+    padding:24px;
+    border:1px solid rgba(96,165,250,.28);
+    border-radius:22px;
+    margin-bottom:18px;
+    background:
+      radial-gradient(circle at 86% 0,rgba(31,111,255,.24),transparent 23rem),
+      radial-gradient(circle at 12% 0,rgba(25,195,125,.12),transparent 18rem),
+      linear-gradient(135deg,rgba(15,33,62,.96),rgba(6,16,33,.98));
+    box-shadow:0 28px 90px rgba(0,0,0,.36), inset 0 1px 0 rgba(255,255,255,.05);
+  }
+  .job-file-header:before {
+    content:"";
+    position:absolute;
+    inset:0 0 auto;
+    height:4px;
+    background:linear-gradient(90deg,#1f6fff,#19c37d);
+  }
+  .job-file-header > * {
+    position:relative;
+  }
+  .job-file-eyebrow {
+    color:#93c5fd;
+    font-size:12px;
+    font-weight:950;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    margin-bottom:8px;
   }
   .job-file-title {
     margin:0;
     color:#f8fafc;
-    font-size:28px;
-    line-height:1.08;
+    font-size:38px;
+    line-height:1.02;
+    letter-spacing:0;
+  }
+  .job-file-project-name {
+    margin-top:8px;
+    color:#c9d6e8;
+    font-size:15px;
+    line-height:1.45;
   }
   .job-file-subtitle {
     display:flex;
     flex-wrap:wrap;
     gap:8px;
     margin-top:10px;
+  }
+  .job-file-hero-actions {
+    display:grid;
+    grid-template-columns:repeat(5,minmax(98px,1fr));
+    gap:10px;
+    margin-top:20px;
+  }
+  .job-file-hero-actions button,
+  .job-action-card {
+    min-height:62px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    border-radius:16px;
+    font-weight:900;
+  }
+  .job-file-close {
+    min-width:92px;
   }
   .job-file-chip {
     display:inline-flex;
@@ -1259,11 +1311,33 @@
     box-shadow:inset 0 1px 0 rgba(255,255,255,.04), 0 16px 40px rgba(0,0,0,.22);
   }
   .job-file-section h3 {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
     margin:0 0 12px;
     color:#f8fafc;
     font-size:15px;
   }
+  .job-command-grid {
+    display:grid;
+    grid-template-columns:minmax(0,1.18fr) minmax(320px,.82fr);
+    gap:16px;
+    align-items:start;
+  }
+  .job-command-column {
+    min-width:0;
+  }
+  .job-command-sticky {
+    position:sticky;
+    top:18px;
+  }
   .job-file-grid {
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:10px;
+  }
+  .job-summary-grid {
     display:grid;
     grid-template-columns:repeat(2,minmax(0,1fr));
     gap:10px;
@@ -1293,6 +1367,23 @@
     font-size:22px;
     font-weight:950;
   }
+  .job-file-money-kpis {
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:10px;
+  }
+  .job-file-money-kpis .job-file-stat {
+    min-height:96px;
+    background:
+      radial-gradient(circle at 100% 0,rgba(31,111,255,.16),transparent 12rem),
+      rgba(5,14,29,.62);
+  }
+  .job-file-money-kpis .job-file-stat.balance-due {
+    border-color:rgba(245,158,11,.34);
+    background:
+      radial-gradient(circle at 100% 0,rgba(245,158,11,.16),transparent 12rem),
+      rgba(5,14,29,.62);
+  }
   .job-file-actions {
     display:grid;
     grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
@@ -1301,6 +1392,64 @@
   .job-file-actions button {
     width:100%;
     min-height:42px;
+  }
+  .job-action-grid {
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:10px;
+  }
+  .job-action-card {
+    min-height:76px;
+    flex-direction:column;
+    align-items:flex-start;
+    padding:14px;
+    text-align:left;
+    border:1px solid rgba(125,158,204,.24);
+    background:
+      radial-gradient(circle at 100% 0,rgba(31,111,255,.10),transparent 12rem),
+      rgba(5,14,29,.50);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
+  }
+  .job-action-card strong {
+    display:block;
+    color:#f8fafc;
+  }
+  .job-action-card span {
+    color:#9fb0c8;
+    font-size:12px;
+    font-weight:750;
+  }
+  .job-progress-list {
+    display:grid;
+    gap:10px;
+  }
+  .job-progress-item {
+    display:flex;
+    align-items:center;
+    gap:11px;
+    min-height:48px;
+    padding:12px;
+    border:1px solid rgba(125,158,204,.20);
+    border-radius:14px;
+    background:rgba(5,14,29,.48);
+    color:#dfe8f8;
+    font-weight:850;
+  }
+  .job-progress-item input {
+    width:19px;
+    height:19px;
+    accent-color:#19c37d;
+    flex:0 0 auto;
+  }
+  .job-progress-item.is-auto {
+    border-color:rgba(25,195,125,.28);
+    background:rgba(25,195,125,.08);
+  }
+  .job-progress-note {
+    margin-top:10px;
+    color:#91a3bd;
+    font-size:12px;
+    line-height:1.45;
   }
   .job-file-preview {
     max-height:260px;
@@ -1359,6 +1508,39 @@
       rgba(5,14,29,.50);
     box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
   }
+  details.project-photo-stage {
+    padding:0;
+  }
+  details.project-photo-stage:before {
+    display:none;
+  }
+  details.project-photo-stage[open] {
+    padding-bottom:16px;
+  }
+  .project-photo-stage-summary {
+    cursor:pointer;
+    list-style:none;
+    padding:16px 16px 16px 22px;
+  }
+  .project-photo-stage-summary::-webkit-details-marker {
+    display:none;
+  }
+  .project-photo-stage-body {
+    padding:0 16px 0 22px;
+  }
+  .project-photo-count {
+    display:inline-flex;
+    align-items:center;
+    min-height:26px;
+    padding:4px 9px;
+    border:1px solid rgba(96,165,250,.28);
+    border-radius:999px;
+    background:rgba(31,111,255,.12);
+    color:#bfdbfe;
+    font-size:12px;
+    font-weight:900;
+    white-space:nowrap;
+  }
   .project-photo-stage:before {
     content:"";
     position:absolute;
@@ -1369,6 +1551,9 @@
     border-radius:999px;
     background:linear-gradient(180deg,#1f6fff,#19c37d);
     box-shadow:0 0 22px rgba(31,111,255,.35);
+  }
+  details.project-photo-stage:before {
+    display:none;
   }
   .project-photo-stage-head {
     display:flex;
@@ -1626,6 +1811,21 @@
     }
     .job-file-header {
       flex-direction:column;
+      grid-template-columns:1fr;
+      padding:18px;
+    }
+    .job-file-hero-actions,
+    .job-command-grid,
+    .job-file-money-kpis,
+    .job-action-grid,
+    .job-summary-grid {
+      grid-template-columns:1fr;
+    }
+    .job-file-hero-actions button {
+      min-height:52px;
+    }
+    .job-command-sticky {
+      position:static;
     }
     .job-file-grid {
       grid-template-columns:1fr;
@@ -4485,19 +4685,19 @@ const PROJECT_PHOTO_STAGES = [
   },
   {
     key:"before-demo",
-    title:"Before Demo",
+    title:"Before Photos",
     icon:"Before",
     description:"The site before demolition starts, including protection details, damage, access, and prep conditions."
   },
   {
     key:"installation-progress",
-    title:"Installation Progress",
+    title:"Progress Photos",
     icon:"Progress",
     description:"Work-in-progress proof, substrate prep, installation milestones, and anything the crew should document mid-project."
   },
   {
     key:"finished-project",
-    title:"Finished Project",
+    title:"After Photos",
     icon:"Finished",
     description:"Final completion photos that show the finished work, cleanup, transitions, and punch-list closeout."
   }
@@ -4601,42 +4801,50 @@ function renderProjectPhotoTimeline(job, quote){
   let flatIndex=0;
 
   return `<div class="job-file-section">
-    <h3>Project Photo Timeline</h3>
+    <h3>Project Photo Timeline <span class="job-file-chip">${flatProjectTimelinePhotos(quote).length} photo(s)</span></h3>
     <div class="project-photo-timeline">
       ${PROJECT_PHOTO_STAGES.map(stage=>{
         const photos=timeline[stage.key] || [];
         const inputId=`projectPhotoInput-${jobId}-${stage.key}`;
         const cameraInputId=`projectCameraInput-${jobId}-${stage.key}`;
         const captionId=`projectPhotoCaption-${jobId}-${stage.key}`;
-        return `<div class="project-photo-stage" ondragover="handleProjectPhotoDragOver(event)" ondragleave="handleProjectPhotoDragLeave(event)" ondrop="handleProjectPhotoDrop(event,'${jobId}','${stage.key}')">
-          <div class="project-photo-stage-head">
-            <div>
-              <h4 class="project-photo-stage-title">${escapeHtml(stage.title)}</h4>
-              <p class="project-photo-stage-description">${escapeHtml(stage.description)}</p>
+        return `<details class="project-photo-stage" open ondragover="handleProjectPhotoDragOver(event)" ondragleave="handleProjectPhotoDragLeave(event)" ondrop="handleProjectPhotoDrop(event,'${jobId}','${stage.key}')">
+          <summary class="project-photo-stage-summary">
+            <div class="project-photo-stage-head">
+              <div>
+                <h4 class="project-photo-stage-title">${escapeHtml(stage.title)}</h4>
+                <p class="project-photo-stage-description">${escapeHtml(stage.description)}</p>
+              </div>
+              <span class="project-photo-count">${photos.length} photo(s)</span>
             </div>
-            <div class="project-photo-upload">
-              <button class="success" type="button" onclick="document.getElementById('${inputId}').click()">Upload</button>
-              <button class="secondary" type="button" onclick="document.getElementById('${cameraInputId}').click()">Camera</button>
+          </summary>
+          <div class="project-photo-stage-body">
+            <div class="project-photo-stage-head">
+              <div></div>
+              <div class="project-photo-upload">
+                <button class="success" type="button" onclick="document.getElementById('${inputId}').click()">Upload</button>
+                <button class="secondary" type="button" onclick="document.getElementById('${cameraInputId}').click()">Camera</button>
+              </div>
             </div>
+            <input id="${captionId}" placeholder="Optional caption for new uploads..." />
+            <input id="${inputId}" class="hidden" type="file" accept="image/*" multiple onchange="handleJobTimelineUpload('${jobId}','${stage.key}',this.files); this.value='';" />
+            <input id="${cameraInputId}" class="hidden" type="file" accept="image/*" capture="environment" onchange="handleJobTimelineUpload('${jobId}','${stage.key}',this.files); this.value='';" />
+            <div class="project-photo-dropzone">Drag project photos here for ${escapeHtml(stage.title)}.</div>
+            ${photos.length ? `<div class="project-photo-gallery">${photos.map(photo=>{
+              const url=jobPhotoUrl(photo);
+              const caption=photo.caption || photo.category || "Project documentation";
+              if(!url) return "";
+              const index=flatIndex++;
+              return url ? `<button class="project-photo-thumb" type="button" onclick="openProjectPhotoLightbox('${jobId}',${index})">
+                <img src="${escapeAttr(url)}" alt="${escapeAttr(caption)}">
+                <span class="project-photo-thumb-meta">
+                  <strong>${escapeHtml(formatProjectPhotoDate(photo.uploadedAt))}</strong>
+                  ${escapeHtml(stage.title)}<br>${escapeHtml(caption)}
+                </span>
+              </button>` : "";
+            }).join("")}</div>` : `<div class="project-photo-empty"><strong>No ${escapeHtml(stage.title)} yet.</strong>Upload photos here to build the project history.</div>`}
           </div>
-          <input id="${captionId}" placeholder="Optional caption for new uploads..." />
-          <input id="${inputId}" class="hidden" type="file" accept="image/*" multiple onchange="handleJobTimelineUpload('${jobId}','${stage.key}',this.files); this.value='';" />
-          <input id="${cameraInputId}" class="hidden" type="file" accept="image/*" capture="environment" onchange="handleJobTimelineUpload('${jobId}','${stage.key}',this.files); this.value='';" />
-          <div class="project-photo-dropzone">Drag project photos here for ${escapeHtml(stage.title)}.</div>
-          ${photos.length ? `<div class="project-photo-gallery">${photos.map(photo=>{
-            const url=jobPhotoUrl(photo);
-            const caption=photo.caption || photo.category || "Project documentation";
-            if(!url) return "";
-            const index=flatIndex++;
-            return url ? `<button class="project-photo-thumb" type="button" onclick="openProjectPhotoLightbox('${jobId}',${index})">
-              <img src="${escapeAttr(url)}" alt="${escapeAttr(caption)}">
-              <span class="project-photo-thumb-meta">
-                <strong>${escapeHtml(formatProjectPhotoDate(photo.uploadedAt))}</strong>
-                ${escapeHtml(stage.title)}<br>${escapeHtml(caption)}
-              </span>
-            </button>` : "";
-          }).join("")}</div>` : `<div class="project-photo-empty"><strong>No ${escapeHtml(stage.title)} photos yet.</strong>Upload photos here to build the project history.</div>`}
-        </div>`;
+        </details>`;
       }).join("")}
     </div>
   </div>`;
@@ -4993,6 +5201,129 @@ function renderJobActivityTimeline(job,quote){
   </div>`;
 }
 
+const JOB_PROGRESS_ITEMS = [
+  { key:"arrived", label:"Arrived" },
+  { key:"demoComplete", label:"Demo Complete" },
+  { key:"installationStarted", label:"Installation Started" },
+  { key:"installationFinished", label:"Installation Finished" },
+  { key:"customerWalkthrough", label:"Customer Walkthrough" },
+  { key:"finalPaymentCollected", label:"Final Payment Collected" },
+  { key:"jobComplete", label:"Job Complete" }
+];
+
+function jobProgressKey(job){
+  return String(job?.cloudId || job?.id || job?.quoteId || "");
+}
+
+function jobProgressMap(quote){
+  return quote?.quoteData?.jobProgressChecklist || quote?.jobProgressChecklist || {};
+}
+
+function persistedJobProgress(job,quote){
+  return jobProgressMap(quote)[jobProgressKey(job)] || {};
+}
+
+function automaticJobProgress(job,total,paid){
+  const status=String(job?.status || "").toLowerCase();
+  const progress={};
+  if(status.includes("progress")){
+    progress.installationStarted=true;
+  }
+  if(status.includes("complete")){
+    progress.installationStarted=true;
+    progress.installationFinished=true;
+    progress.jobComplete=true;
+  }
+  if(Number(total || 0)>0 && Number(paid || 0)>=Number(total || 0)){
+    progress.finalPaymentCollected=true;
+  }
+  return progress;
+}
+
+function jobProgressState(job,quote,total,paid){
+  return {
+    ...persistedJobProgress(job,quote),
+    ...automaticJobProgress(job,total,paid)
+  };
+}
+
+function isJobProgressAutomatic(job,key,total,paid){
+  return !!automaticJobProgress(job,total,paid)[key];
+}
+
+async function persistJobProgressChecklist(job,quote,progress){
+  if(!job || !quote) return false;
+
+  const quoteData={...(quote.quoteData || {})};
+  const progressMap={...(quoteData.jobProgressChecklist || quote.jobProgressChecklist || {})};
+  progressMap[jobProgressKey(job)]=progress;
+  const nextQuoteData={...quoteData, jobProgressChecklist:progressMap};
+
+  if(currentUser){
+    const quoteId=quote.cloudId || quote.id || job.quoteId;
+    if(quoteId){
+      const { error } = await supabaseClient
+        .from("quotes")
+        .update({ quote_data: nextQuoteData })
+        .eq("id", quoteId)
+        .eq("user_id", currentUser.id);
+
+      if(error){
+        console.error(error);
+        showToast("Progress was not saved","Cloud save failed: " + error.message,"error");
+        return false;
+      }
+    }
+  }
+
+  quote.quoteData=nextQuoteData;
+  quote.jobProgressChecklist=progressMap;
+  return true;
+}
+
+async function toggleJobProgressItem(jobId,key,checked){
+  const job=findScheduledJob(jobId);
+  const quote=getJobQuote(job);
+  if(!job || !quote){alert("Could not find this job file.");return;}
+  const total=jobQuoteTotal(job,quote);
+  const paid=totalPaidForQuote(job.quoteId);
+  if(isJobProgressAutomatic(job,key,total,paid)){
+    openJobFile(jobId);
+    return;
+  }
+
+  const nextProgress={
+    ...persistedJobProgress(job,quote),
+    [key]:!!checked
+  };
+  const saved=await persistJobProgressChecklist(job,quote,nextProgress);
+  if(saved){
+    showToast("Job progress saved","Checklist updated for this job.","success");
+    openJobFile(jobId);
+  } else {
+    openJobFile(jobId);
+  }
+}
+
+function renderJobProgressChecklist(job,quote,total,paid){
+  const progress=jobProgressState(job,quote,total,paid);
+  const jobId=escapeAttr(job.id);
+  return `<div class="job-file-section">
+    <h3>Job Progress <span class="job-file-chip">${JOB_PROGRESS_ITEMS.filter(item=>progress[item.key]).length}/${JOB_PROGRESS_ITEMS.length} done</span></h3>
+    <div class="job-progress-list">
+      ${JOB_PROGRESS_ITEMS.map(item=>{
+        const checked=!!progress[item.key];
+        const auto=isJobProgressAutomatic(job,item.key,total,paid);
+        return `<label class="job-progress-item ${auto ? "is-auto" : ""}">
+          <input type="checkbox" ${checked ? "checked" : ""} ${auto ? "disabled" : ""} onchange="toggleJobProgressItem('${jobId}','${escapeAttr(item.key)}',this.checked)">
+          <span>${escapeHtml(item.label)}${auto ? " (auto)" : ""}</span>
+        </label>`;
+      }).join("")}
+    </div>
+    <div class="job-progress-note">Items marked auto reflect current job status or payment state. Manual checklist updates save with the Job File.</div>
+  </div>`;
+}
+
 function renderJobFile(job){
   const quote=getJobQuote(job);
   const contact=jobContact(job);
@@ -5007,86 +5338,112 @@ function renderJobFile(job){
   const scheduleNotes=job.notes || contact.notes || "";
   const quoteNotes=quote.notes || quote.quickNotes || quote.projectNotes || "";
   const jobId=escapeAttr(job.id);
+  const projectName=job.projectName || quote.projectName || contact.address || "Scheduled project";
+  const duration=String(job.duration || 1)+" day(s)";
 
   return `
     <div class="job-file-header">
       <div>
+        <div class="job-file-eyebrow">Job Command Center</div>
         <h2 id="jobFileTitle" class="job-file-title">${escapeHtml(contact.name)}</h2>
+        <div class="job-file-project-name">${escapeHtml(projectName)}</div>
         <div class="job-file-subtitle">
           <span class="job-file-chip">${escapeHtml(status)}</span>
           <span class="job-file-chip">${escapeHtml(job.date || "No install date")}</span>
-          <span class="job-file-chip">${escapeHtml(String(job.duration || 1))} day(s)</span>
+          <span class="job-file-chip">${escapeHtml(duration)}</span>
           <span class="job-file-chip">${escapeHtml(job.crew || "Crew unassigned")}</span>
           <span class="job-file-chip">${dollars(total)}</span>
         </div>
+        <div class="job-file-hero-actions">
+          <button class="success" type="button" onclick="openJobMaps('${jobId}')">Navigate</button>
+          <button class="secondary" type="button" onclick="callJobCustomer('${jobId}')">Call</button>
+          <button class="secondary" type="button" onclick="textJobCustomer('${jobId}')">Text</button>
+          <button class="secondary" type="button" onclick="emailJobCustomer('${jobId}')">Email</button>
+          <button class="secondary" type="button" onclick="downloadJobIcs('${jobId}')">Calendar</button>
+        </div>
       </div>
-      <button class="secondary" type="button" onclick="closeJobFile()">Close</button>
+      <button class="secondary job-file-close" type="button" onclick="closeJobFile()">Close</button>
     </div>
 
-    <div class="job-file-section">
-      <h3>Contact Actions</h3>
-      <div class="job-file-actions">
-        <button class="secondary" type="button" onclick="callJobCustomer('${jobId}')">Call</button>
-        <button class="secondary" type="button" onclick="textJobCustomer('${jobId}')">Text</button>
-        <button class="secondary" type="button" onclick="emailJobCustomer('${jobId}')">Email</button>
-        <button class="secondary" type="button" onclick="openJobMaps('${jobId}')">Open Maps</button>
-      </div>
-    </div>
+    <div class="job-command-grid">
+      <main class="job-command-column">
+        ${renderJobProgressChecklist(job,quote,total,paid)}
 
-    <div class="job-file-section">
-      <h3>Money Snapshot</h3>
-      <div class="job-file-grid job-file-money">
-        ${jobFileRenderStat("Quote Total", dollars(total))}
-        ${jobFileRenderStat("Deposit Paid", dollars(deposit))}
-        ${jobFileRenderStat("Paid To Date", dollars(paid))}
-        ${jobFileRenderStat("Balance Due", dollars(balance))}
-      </div>
-      <div class="job-file-actions" style="margin-top:12px;">
-        <button class="success" type="button" onclick="recordPaymentForJob('${jobId}'); closeJobFile();">Record Payment</button>
-        <button class="secondary" type="button" onclick="recordPaymentForJob('${jobId}'); closeJobFile();">Record Final Payment</button>
-      </div>
-    </div>
+        ${renderProjectPhotoTimeline(job,quote)}
 
-    <div class="job-file-section">
-      <h3>Scope / Quote Details</h3>
-      <div class="job-file-grid">
-        ${jobFileRenderStat("Estimate Number", String(estimateNo))}
-        ${jobFileRenderStat("Quote Status", quoteStatus)}
-        ${jobFileRenderStat("Install Date", job.date || "Not scheduled")}
-        ${jobFileRenderStat("Crew", job.crew || "Unassigned")}
-      </div>
-      <div class="job-file-stat" style="margin-top:10px;">
-        <div class="job-file-label">Quote Notes</div>
-        <div class="job-file-value">${escapeHtml(quoteNotes || "No quote notes saved.")}</div>
-      </div>
-      <div class="job-file-stat" style="margin-top:10px;">
-        <div class="job-file-label">Schedule Notes</div>
-        <div class="job-file-value">${escapeHtml(scheduleNotes || "No schedule notes saved.")}</div>
-      </div>
-      ${preview ? `<div class="job-file-preview" style="margin-top:10px;">${escapeHtml(preview)}</div>` : `<div class="job-file-empty" style="margin-top:10px;">No proposal preview is saved for this job yet.</div>`}
-    </div>
+        ${renderJobActivityTimeline(job,quote)}
 
-    ${renderProjectPhotoTimeline(job,quote)}
+        <div class="job-file-section">
+          <h3>Scope / Quote Details</h3>
+          <div class="job-file-grid">
+            ${jobFileRenderStat("Estimate Number", String(estimateNo))}
+            ${jobFileRenderStat("Quote Status", quoteStatus)}
+            ${jobFileRenderStat("Install Date", job.date || "Not scheduled")}
+            ${jobFileRenderStat("Crew", job.crew || "Unassigned")}
+          </div>
+          <div class="job-file-stat" style="margin-top:10px;">
+            <div class="job-file-label">Quote Notes</div>
+            <div class="job-file-value">${escapeHtml(quoteNotes || "No quote notes saved.")}</div>
+          </div>
+          <div class="job-file-stat" style="margin-top:10px;">
+            <div class="job-file-label">Schedule Notes</div>
+            <div class="job-file-value">${escapeHtml(scheduleNotes || "No schedule notes saved.")}</div>
+          </div>
+          ${preview ? `<div class="job-file-preview" style="margin-top:10px;">${escapeHtml(preview)}</div>` : `<div class="job-file-empty" style="margin-top:10px;">No proposal preview is saved for this job yet.</div>`}
+        </div>
+      </main>
 
-    ${renderJobActivityTimeline(job,quote)}
+      <aside class="job-command-column job-command-sticky">
+        <div class="job-file-section">
+          <h3>Job Summary</h3>
+          <div class="job-summary-grid">
+            ${jobFileRenderStat("Customer", contact.name)}
+            ${jobFileRenderStat("Address", contact.address || "No address saved")}
+            ${jobFileRenderStat("Phone", contact.phone || "No phone saved")}
+            ${jobFileRenderStat("Email", contact.email || "No email saved")}
+            ${jobFileRenderStat("Crew", job.crew || "Unassigned")}
+            ${jobFileRenderStat("Install Date", job.date || "Not scheduled")}
+            ${jobFileRenderStat("Duration", duration)}
+            ${jobFileRenderStat("Estimate Number", String(estimateNo))}
+          </div>
+        </div>
 
-    <div class="job-file-section">
-      <h3>Calendar Actions</h3>
-      <div class="job-file-actions">
-        <button class="success" type="button" onclick="downloadJobIcs('${jobId}')">Add to Calendar</button>
-        <button class="secondary" type="button" onclick="openGoogleCalendarForJob('${jobId}')">Open Google Calendar</button>
-        <button class="secondary" type="button" onclick="openJobMaps('${jobId}')">Open Maps</button>
-      </div>
-    </div>
+        <div class="job-file-section">
+          <h3>Money</h3>
+          <div class="job-file-money job-file-money-kpis">
+            ${jobFileRenderStat("Deposit Paid", dollars(deposit))}
+            ${jobFileRenderStat("Balance Remaining", dollars(balance), "balance-due")}
+            ${jobFileRenderStat("Job Total", dollars(total))}
+          </div>
+          <div class="job-file-actions" style="margin-top:12px;">
+            <button class="success" type="button" onclick="recordPaymentForJob('${jobId}'); closeJobFile();">Record Payment</button>
+          </div>
+        </div>
 
-    <div class="job-file-section">
-      <h3>Job Actions</h3>
-      <div class="job-file-actions">
-        <button class="secondary" type="button" onclick="editScheduledJob('${jobId}'); closeJobFile();">Edit Schedule</button>
-        <button class="secondary" type="button" onclick="jobFileMarkInProgress('${jobId}')">Mark In Progress</button>
-        <button class="success" type="button" onclick="jobFileMarkComplete('${jobId}')">Mark Complete</button>
-        <button class="secondary" type="button" onclick="recordPaymentForJob('${jobId}'); closeJobFile();">Record Final Payment</button>
-      </div>
+        <div class="job-file-section">
+          <h3>Quick Actions</h3>
+          <div class="job-action-grid">
+            <button class="job-action-card" type="button" onclick="editScheduledJob('${jobId}'); closeJobFile();"><strong>Edit Schedule</strong><span>Date, crew, duration, notes</span></button>
+            <button class="job-action-card" type="button" onclick="openJobMaps('${jobId}')"><strong>Open Maps</strong><span>Navigate to the job</span></button>
+            <button class="job-action-card" type="button" onclick="downloadJobIcs('${jobId}')"><strong>Add Calendar</strong><span>Download .ics event</span></button>
+            <button class="job-action-card" type="button" onclick="openGoogleCalendarForJob('${jobId}')"><strong>Google Calendar</strong><span>Open calendar link</span></button>
+            <button class="job-action-card" type="button" onclick="jobFileMarkInProgress('${jobId}')"><strong>Mark In Progress</strong><span>Update job status</span></button>
+            <button class="job-action-card success" type="button" onclick="jobFileMarkComplete('${jobId}')"><strong>Complete Job</strong><span>Close out the work</span></button>
+            <button class="job-action-card" type="button" onclick="recordPaymentForJob('${jobId}'); closeJobFile();"><strong>Record Final Payment</strong><span>Open Money Tracker</span></button>
+            <button class="job-action-card" type="button" onclick="emailJobCustomer('${jobId}')"><strong>Email Customer</strong><span>Send job details</span></button>
+          </div>
+        </div>
+
+        <div class="job-file-section">
+          <h3>Contact</h3>
+          <div class="job-file-actions">
+            <button class="secondary" type="button" onclick="callJobCustomer('${jobId}')">Call</button>
+            <button class="secondary" type="button" onclick="textJobCustomer('${jobId}')">Text</button>
+            <button class="secondary" type="button" onclick="emailJobCustomer('${jobId}')">Email</button>
+            <button class="secondary" type="button" onclick="openJobMaps('${jobId}')">Maps</button>
+          </div>
+        </div>
+      </aside>
     </div>
   `;
 }
