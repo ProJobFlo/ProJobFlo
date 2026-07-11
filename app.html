@@ -2088,6 +2088,323 @@
       text-align:left;
     }
   }
+
+  /* v1.0 beta UX polish layer: presentation-only refinements. */
+  :where(button, input, select, textarea, .card, .quote-card, .job-card, .customer-card, .subtle-card, .stat, .dashboard-kpi, .dashboard-card, .dashboard-item, .schedule-job-card, .job-file-section, .customer-profile-section, .customer-record-card, .customer-timeline-card, .project-photo-stage, .project-photo-thumb, .job-activity-card) {
+    transition:
+      background-color .16s ease,
+      background .16s ease,
+      border-color .16s ease,
+      box-shadow .16s ease,
+      transform .16s ease,
+      opacity .16s ease;
+  }
+  :where(.card, .quote-card, .job-card, .customer-card, .subtle-card, .stat, .dashboard-kpi, .dashboard-card, .dashboard-item, .schedule-job-card, .job-file-section, .customer-profile-section, .customer-record-card, .customer-timeline-card, .project-photo-stage, .job-activity-card) {
+    border-color:rgba(125,158,204,.24);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.045), 0 18px 44px rgba(0,0,0,.24);
+  }
+  :where(.card, .dashboard-card, .job-file-section, .customer-profile-section) > h2,
+  :where(.card, .dashboard-card, .job-file-section, .customer-profile-section) > h3 {
+    letter-spacing:0;
+  }
+  :where(.card, .dashboard-card, .job-file-section, .customer-profile-section) > h2:first-child,
+  :where(.card, .dashboard-card, .job-file-section, .customer-profile-section) > h3:first-child {
+    margin-top:0;
+  }
+  :where(.quote-card, .job-card, .customer-card, .dashboard-item, .schedule-job-card, .customer-list-card, .customer-record-card, .job-action-card, .project-photo-thumb):hover {
+    border-color:rgba(96,165,250,.42);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.055), 0 22px 52px rgba(0,0,0,.30);
+  }
+  .card p:last-child,
+  .quote-card p:last-child,
+  .job-card p:last-child,
+  .customer-card p:last-child,
+  .empty-state p:last-child,
+  .job-file-empty p:last-child,
+  .project-photo-empty p:last-child {
+    margin-bottom:0;
+  }
+  .small,
+  .customer-muted,
+  .dashboard-item-meta,
+  .schedule-job-subtitle,
+  .schedule-detail-label,
+  .job-file-label,
+  .project-photo-stage-description,
+  .project-photo-empty,
+  .job-activity-time,
+  .job-activity-author {
+    color:#aebed4;
+  }
+  .title,
+  .customer-record-title,
+  .customer-timeline-title,
+  .schedule-job-title,
+  .job-file-value,
+  .project-photo-stage-title,
+  .job-activity-type {
+    letter-spacing:0;
+  }
+  .field {
+    display:block;
+    min-width:0;
+  }
+  .field label,
+  label {
+    display:block;
+    margin-bottom:6px;
+    color:#d9e5f7;
+    font-size:12px;
+    font-weight:850;
+    letter-spacing:.02em;
+  }
+  input,
+  select,
+  textarea {
+    min-height:46px;
+    border-radius:12px;
+    line-height:1.35;
+  }
+  textarea {
+    padding-top:12px;
+  }
+  input:hover,
+  select:hover,
+  textarea:hover {
+    border-color:rgba(147,197,253,.44);
+  }
+  input:disabled,
+  select:disabled,
+  textarea:disabled {
+    opacity:.62;
+    cursor:not-allowed;
+    background:rgba(5,14,29,.58);
+    border-color:rgba(125,158,204,.18);
+  }
+  input[type="checkbox"],
+  input[type="radio"] {
+    min-height:auto;
+    accent-color:#22c55e;
+  }
+  button {
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    min-height:44px;
+    border-radius:12px;
+    line-height:1.15;
+    letter-spacing:0;
+  }
+  button:hover {
+    transform:translateY(-1px);
+  }
+  button:active {
+    transform:translateY(0);
+    box-shadow:0 8px 18px rgba(0,0,0,.24);
+  }
+  button:disabled,
+  button.is-loading {
+    transform:none;
+    box-shadow:none;
+  }
+  button.secondary {
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.045), 0 10px 24px rgba(0,0,0,.18);
+  }
+  button.danger {
+    background:linear-gradient(180deg,#ef4444,#b91c1c);
+    border-color:rgba(248,113,113,.36);
+    box-shadow:0 16px 34px rgba(185,28,28,.25);
+  }
+  button.danger:hover {
+    background:linear-gradient(180deg,#f87171,#dc2626);
+    box-shadow:0 18px 38px rgba(220,38,38,.30);
+  }
+  .actions {
+    gap:10px;
+    align-items:center;
+  }
+  .pill,
+  .job-file-chip,
+  .project-photo-count {
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.05);
+    letter-spacing:.01em;
+  }
+  .empty-state,
+  .dashboard-empty,
+  .job-file-empty,
+  .project-photo-empty {
+    border-color:rgba(125,158,204,.34);
+    background:
+      radial-gradient(circle at 100% 0,rgba(31,111,255,.10),transparent 14rem),
+      rgba(5,14,29,.42);
+    color:#aebed4;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.035);
+  }
+  .empty-state strong,
+  .dashboard-empty strong,
+  .job-file-empty strong,
+  .project-photo-empty strong {
+    color:#f8fafc;
+  }
+  .stat,
+  .dashboard-kpi,
+  .job-file-stat,
+  .customer-kpi {
+    border-radius:16px;
+  }
+  .stat-value,
+  .customer-kpi-value,
+  .job-file-money .job-file-value,
+  .dashboard-kpi .stat-value {
+    letter-spacing:0;
+  }
+  .quote-box,
+  .job-file-preview {
+    scrollbar-width:thin;
+    scrollbar-color:rgba(96,165,250,.55) rgba(5,14,29,.65);
+  }
+  .quote-box::-webkit-scrollbar,
+  .job-file-preview::-webkit-scrollbar,
+  .tabs::-webkit-scrollbar,
+  .customer-profile-panel::-webkit-scrollbar,
+  .job-file-panel::-webkit-scrollbar {
+    width:10px;
+    height:10px;
+  }
+  .quote-box::-webkit-scrollbar-thumb,
+  .job-file-preview::-webkit-scrollbar-thumb,
+  .tabs::-webkit-scrollbar-thumb,
+  .customer-profile-panel::-webkit-scrollbar-thumb,
+  .job-file-panel::-webkit-scrollbar-thumb {
+    background:rgba(96,165,250,.45);
+    border-radius:999px;
+    border:3px solid rgba(5,14,29,.86);
+  }
+  .toast {
+    border-radius:16px;
+    box-shadow:0 24px 70px rgba(0,0,0,.36), inset 0 1px 0 rgba(255,255,255,.08);
+  }
+  .feedback-modal,
+  #feedbackModal .card {
+    border-color:rgba(96,165,250,.28);
+    box-shadow:0 28px 80px rgba(0,0,0,.38);
+  }
+  .room-row,
+  #lineItems .item-row,
+  .schedule-detail,
+  .job-progress-item,
+  .project-photo-dropzone,
+  .job-activity-card,
+  .customer-record-card,
+  .customer-timeline-card {
+    border-radius:14px;
+  }
+  .job-progress-item:hover,
+  .project-photo-stage:hover,
+  .project-photo-thumb:hover,
+  .job-activity-card:hover {
+    border-color:rgba(96,165,250,.36);
+  }
+  .project-photo-stage-summary {
+    border-radius:16px;
+  }
+  .project-photo-stage-summary:focus-visible,
+  .customer-list-card:focus-visible,
+  .schedule-job-card:focus-visible {
+    outline:none;
+    box-shadow:var(--shadow-focus), 0 22px 52px rgba(0,0,0,.30);
+  }
+  .photo-lightbox-main,
+  .customer-profile-hero,
+  .job-file-header,
+  .dashboard-hero {
+    box-shadow:0 28px 90px rgba(0,0,0,.38), inset 0 1px 0 rgba(255,255,255,.06);
+  }
+  .customer-profile-panel,
+  .job-file-panel {
+    scroll-behavior:smooth;
+  }
+  .mobile-bottom-nav,
+  .mobile-more-menu {
+    -webkit-tap-highlight-color:transparent;
+  }
+  @media (max-width: 980px) {
+    .app {
+      padding-left:16px;
+      padding-right:16px;
+    }
+    .card,
+    .dashboard-card,
+    .job-file-section,
+    .customer-profile-section {
+      padding:16px;
+      border-radius:16px;
+    }
+    .grid,
+    .grid-half,
+    .form-grid,
+    .two,
+    .stat-grid {
+      gap:12px;
+    }
+    button {
+      min-height:46px;
+    }
+    .actions button {
+      flex:1 1 150px;
+    }
+    .customer-profile-panel,
+    .job-file-panel {
+      padding-bottom:calc(118px + env(safe-area-inset-bottom));
+    }
+    .customer-profile-hero,
+    .job-file-header {
+      border-radius:18px;
+    }
+    .schedule-job-card,
+    .customer-list-card,
+    .quote-card,
+    .job-card,
+    .customer-card {
+      padding:16px;
+    }
+  }
+  @media (max-width: 520px) {
+    .app {
+      padding-left:12px;
+      padding-right:12px;
+    }
+    h2 {
+      font-size:17px;
+    }
+    h3 {
+      font-size:14px;
+    }
+    .card,
+    .dashboard-card,
+    .job-file-section,
+    .customer-profile-section {
+      padding:14px;
+    }
+    .actions {
+      gap:8px;
+    }
+    .actions button,
+    .schedule-actions button,
+    .job-file-actions button,
+    .customer-profile-actions button {
+      width:100%;
+      min-height:48px;
+    }
+    .proposal-line {
+      grid-template-columns:1fr;
+      gap:6px;
+    }
+    .proposal-num {
+      text-align:left;
+    }
+  }
 </style>
  <script type="text/javascript">
     (function(c,l,a,r,i,t,y){
