@@ -1205,6 +1205,201 @@
   .job-file-overlay.hidden {
     display:none !important;
   }
+  .customer-profile-overlay {
+    position:fixed;
+    inset:0;
+    z-index:9100;
+    display:flex;
+    justify-content:flex-end;
+    background:rgba(1,8,20,.70);
+    backdrop-filter:blur(10px);
+  }
+  .customer-profile-overlay.hidden {
+    display:none !important;
+  }
+  .customer-profile-panel {
+    width:min(1080px,100%);
+    height:100vh;
+    overflow:auto;
+    padding:24px;
+    border-left:1px solid rgba(96,165,250,.28);
+    background:
+      radial-gradient(circle at 82% 0,rgba(31,111,255,.20),transparent 24rem),
+      linear-gradient(180deg,rgba(12,24,46,.98),rgba(4,12,26,.98));
+    box-shadow:-28px 0 80px rgba(0,0,0,.42);
+  }
+  .customer-profile-hero {
+    position:relative;
+    overflow:hidden;
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    gap:18px;
+    align-items:flex-start;
+    padding:24px;
+    border:1px solid rgba(96,165,250,.28);
+    border-radius:22px;
+    background:
+      radial-gradient(circle at 86% 0,rgba(31,111,255,.24),transparent 23rem),
+      radial-gradient(circle at 12% 0,rgba(25,195,125,.12),transparent 18rem),
+      linear-gradient(135deg,rgba(15,33,62,.96),rgba(6,16,33,.98));
+    box-shadow:0 28px 90px rgba(0,0,0,.36), inset 0 1px 0 rgba(255,255,255,.05);
+  }
+  .customer-profile-hero:before {
+    content:"";
+    position:absolute;
+    inset:0 0 auto;
+    height:4px;
+    background:linear-gradient(90deg,#1f6fff,#19c37d);
+  }
+  .customer-profile-hero > * {
+    position:relative;
+  }
+  .customer-profile-eyebrow {
+    color:#93c5fd;
+    font-size:12px;
+    font-weight:950;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    margin-bottom:8px;
+  }
+  .customer-profile-title {
+    margin:0;
+    color:#f8fafc;
+    font-size:38px;
+    line-height:1.02;
+    letter-spacing:0;
+    overflow-wrap:anywhere;
+  }
+  .customer-profile-meta {
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-top:12px;
+  }
+  .customer-profile-actions {
+    display:grid;
+    grid-template-columns:repeat(5,minmax(92px,1fr));
+    gap:10px;
+    margin-top:20px;
+  }
+  .customer-profile-actions button {
+    min-height:56px;
+    border-radius:16px;
+  }
+  .customer-profile-grid {
+    display:grid;
+    grid-template-columns:minmax(0,1.18fr) minmax(320px,.82fr);
+    gap:16px;
+    align-items:start;
+    margin-top:16px;
+  }
+  .customer-profile-column {
+    min-width:0;
+    display:grid;
+    gap:14px;
+  }
+  .customer-profile-section {
+    padding:16px;
+    border:1px solid rgba(125,158,204,.22);
+    border-radius:var(--radius);
+    background:
+      linear-gradient(145deg,rgba(14,29,54,.88),rgba(7,17,33,.88));
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.04), 0 16px 40px rgba(0,0,0,.22);
+  }
+  .customer-profile-section h3 {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    margin:0 0 12px;
+    color:#f8fafc;
+    font-size:15px;
+  }
+  .customer-kpi-grid {
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:10px;
+  }
+  .customer-kpi {
+    min-height:92px;
+    padding:12px;
+    border:1px solid rgba(125,158,204,.20);
+    border-radius:14px;
+    background:
+      radial-gradient(circle at 100% 0,rgba(31,111,255,.14),transparent 12rem),
+      rgba(5,14,29,.56);
+  }
+  .customer-kpi-label {
+    color:#91a3bd;
+    font-size:11px;
+    font-weight:900;
+    letter-spacing:.05em;
+    text-transform:uppercase;
+    margin-bottom:5px;
+  }
+  .customer-kpi-value {
+    color:#f8fafc;
+    font-size:24px;
+    font-weight:950;
+    overflow-wrap:anywhere;
+  }
+  .customer-record-list,
+  .customer-timeline {
+    display:grid;
+    gap:10px;
+  }
+  .customer-record-card,
+  .customer-timeline-card,
+  .customer-list-card {
+    padding:14px;
+    border:1px solid rgba(125,158,204,.22);
+    border-radius:14px;
+    background:rgba(5,14,29,.50);
+    color:#dfe8f8;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
+  }
+  .customer-list-card {
+    cursor:pointer;
+    transition:transform .15s ease, border-color .15s ease, box-shadow .15s ease;
+  }
+  .customer-list-card:hover {
+    transform:translateY(-1px);
+    border-color:rgba(96,165,250,.44);
+    box-shadow:0 18px 38px rgba(31,111,255,.13);
+  }
+  .customer-record-top,
+  .customer-timeline-top {
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:6px;
+  }
+  .customer-record-title,
+  .customer-timeline-title {
+    color:#f8fafc;
+    font-weight:950;
+    overflow-wrap:anywhere;
+  }
+  .customer-muted {
+    color:#9fb0c8;
+    font-size:13px;
+    line-height:1.45;
+    overflow-wrap:anywhere;
+  }
+  .customer-photo-grid {
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(120px,1fr));
+    gap:10px;
+  }
+  .customer-photo-grid img {
+    width:100%;
+    height:106px;
+    object-fit:cover;
+    border-radius:12px;
+    border:1px solid rgba(125,158,204,.22);
+    background:#020817;
+  }
   .job-file-panel {
     width:min(1120px,100%);
     height:100vh;
@@ -1803,6 +1998,25 @@
     }
     .job-file-overlay {
       align-items:stretch;
+    }
+    .customer-profile-overlay {
+      align-items:stretch;
+    }
+    .customer-profile-panel {
+      width:100%;
+      padding:16px;
+      border-left:0;
+    }
+    .customer-profile-hero,
+    .customer-profile-grid {
+      grid-template-columns:1fr;
+    }
+    .customer-profile-title {
+      font-size:28px;
+    }
+    .customer-profile-actions,
+    .customer-kpi-grid {
+      grid-template-columns:1fr;
     }
     .job-file-panel {
       width:100%;
@@ -2608,9 +2822,15 @@ Preset rates are only starting points:
       </div>
       <div class="card">
         <h2>Customer Details</h2>
-        <div id="customerDetails" class="small">Select a customer to view history.</div>
+        <div id="customerDetails" class="small">Select a customer to open their full profile.</div>
       </div>
     </div>
+  </div>
+</div>
+
+<div id="customerProfileOverlay" class="customer-profile-overlay hidden" onclick="handleCustomerProfileBackdrop(event)">
+  <div class="customer-profile-panel" role="dialog" aria-modal="true" aria-labelledby="customerProfileTitle">
+    <div id="customerProfileContent"></div>
   </div>
 </div>
 
@@ -5563,6 +5783,11 @@ function renderCustomers(){
 
   const search=(val("customerSearch")||"").toLowerCase();
 
+  if(!customers.length){
+    box.innerHTML="<div class='empty-state'><strong>No customers yet.</strong><p>Create or save a customer from Quote Builder, then their profile will appear here.</p></div>";
+    return;
+  }
+
   const list=customers.filter(c=>
     [c.name,c.phone,c.email,c.address]
       .join(" ")
@@ -5571,24 +5796,31 @@ function renderCustomers(){
   );
 
   if(!list.length){
-    box.innerHTML="<div class='empty-state'><strong>No customers found.</strong><p>Create or save a customer from Quote Builder, then customer history will appear here.</p></div>";
+    box.innerHTML="<div class='empty-state'><strong>No matching customers.</strong><p>Try searching by name, phone, email, or address.</p></div>";
     return;
   }
 
   box.innerHTML=list.map(c=>{
-    const qs=quotes.filter(q=>String(q.customerId||q.customer_id)===String(c.id));
-    const js=jobs.filter(j=>String(j.customerId||j.customer_id)===String(c.id));
+    const qs=customerQuotes(c);
+    const js=customerJobs(c);
+    const paid=customerPayments(c).reduce((sum,p)=>sum+Number(p.amount||0),0);
+    const customerId=escapeAttr(c.id);
 
     return `
-      <div class="customer-card">
-        <div class="title">${escapeHtml(c.name||"Unnamed")}</div>
-        <div class="small">${escapeHtml(c.phone||"")} • ${escapeHtml(c.email||"")}</div>
-        <div>${escapeHtml(c.address||"")}</div>
-        <div class="small">${qs.length} quote(s) • ${js.length} scheduled job(s)</div>
+      <div class="customer-list-card" role="button" tabindex="0" onclick="selectCustomer('${customerId}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectCustomer('${customerId}');}">
+        <div class="customer-record-top">
+          <div>
+            <div class="customer-record-title">${escapeHtml(c.name||"Unnamed Customer")}</div>
+            <div class="customer-muted">${escapeHtml(c.phone||"No phone saved")} / ${escapeHtml(c.email||"No email saved")}</div>
+          </div>
+          <span class="pill">${qs.length} quote(s)</span>
+        </div>
+        <div class="customer-muted">${escapeHtml(c.address||"No address saved")}</div>
+        <div class="customer-muted">${js.length} scheduled job(s) / ${dollars(paid)} collected</div>
 
-        <div class="actions" style="margin-top:8px;">
-          <button class="secondary" onclick="selectCustomer('${c.id}')">View</button>
-          <button class="danger" onclick="deleteCustomer('${c.id}')">Delete</button>
+        <div class="actions" style="margin-top:10px;" onclick="event.stopPropagation()">
+          <button class="secondary" onclick="selectCustomer('${customerId}')">Open Profile</button>
+          <button class="danger" onclick="deleteCustomer('${customerId}')">Delete</button>
         </div>
       </div>
     `;
@@ -7422,7 +7654,308 @@ doc.text("PROJECT PROPOSAL", 14, 42);
 
   showToast("Signature link copied","Paste it into a text or email when you are ready.","success");
 }
- function selectCustomer(id){
+function customerIdentity(customer){
+  return String(customer?.id || customer?.cloudId || customer?.cloud_id || "");
+}
+
+function quoteBelongsToCustomer(quote,customer){
+  const id=customerIdentity(customer);
+  return String(quote?.customerId || quote?.customer_id || "")===id;
+}
+
+function jobBelongsToCustomer(job,customer){
+  const id=customerIdentity(customer);
+  return String(job?.customerId || job?.customer_id || "")===id;
+}
+
+function customerQuotes(customer){
+  return quotes
+    .filter(q=>quoteBelongsToCustomer(q,customer))
+    .sort((a,b)=>Number(b.createdAt || b.created_at || 0)-Number(a.createdAt || a.created_at || 0));
+}
+
+function customerJobs(customer){
+  return jobs
+    .filter(j=>jobBelongsToCustomer(j,customer))
+    .sort((a,b)=>String(b.date || b.startDate || "").localeCompare(String(a.date || a.startDate || "")));
+}
+
+function quotePaymentId(quote){
+  return quote?.cloudId || quote?.id || quote?.quoteId || quote?.quote_id || "";
+}
+
+function customerPayments(customer){
+  const ids=new Set(customerQuotes(customer).map(q=>String(quotePaymentId(q))));
+  customerJobs(customer).forEach(job=>ids.add(String(job.quoteId || job.quote_id || "")));
+  return payments
+    .filter(p=>ids.has(String(p.quoteId || p.quote_id || "")))
+    .sort((a,b)=>new Date(b.createdAt || b.date || 0)-new Date(a.createdAt || a.date || 0));
+}
+
+function customerSince(customer,quotesForCustomer,jobsForCustomer,paymentsForCustomer){
+  const times=[];
+  [customer.createdAt,customer.created_at,customer.insertedAt,customer.inserted_at].forEach(v=>{const t=new Date(v).getTime();if(t)times.push(t);});
+  quotesForCustomer.forEach(q=>{const t=Number(q.createdAt || q.created_at || 0) || new Date(q.acceptedAt || q.signedAt || q.sentAt || 0).getTime();if(t)times.push(t);});
+  jobsForCustomer.forEach(j=>{const t=new Date(j.createdAt || j.created_at || j.date || j.startDate || 0).getTime();if(t)times.push(t);});
+  paymentsForCustomer.forEach(p=>{const t=new Date(p.createdAt || p.date || 0).getTime();if(t)times.push(t);});
+  if(!times.length) return "Not saved";
+  return new Date(Math.min(...times)).toLocaleDateString();
+}
+
+function customerPhotoItems(customer){
+  return customerQuotes(customer).flatMap(quote=>{
+    const timeline=projectTimelineStagePhotos(quote);
+    return PROJECT_PHOTO_STAGES.flatMap(stage=>
+      (timeline[stage.key] || [])
+        .map(photo=>({quote,stage,photo,url:jobPhotoUrl(photo)}))
+        .filter(item=>item.url)
+    );
+  });
+}
+
+function customerActivityItems(customer){
+  const qs=customerQuotes(customer);
+  const js=customerJobs(customer);
+  const ps=customerPayments(customer);
+  const events=[];
+
+  qs.forEach(q=>{
+    const estimate=q.estimateNumber || q.estimate_number || q.id || "";
+    const created=Number(q.createdAt || q.created_at || 0);
+    if(created){
+      events.push({time:created,type:"Quote Created",detail:"Estimate "+estimate+" for "+dollars(q.amount || q.total || 0)+".",meta:q.status || "Quote"});
+    }
+    const accepted=q.acceptedAt || q.signedAt || q.signed_at || "";
+    if(accepted){
+      events.push({time:new Date(accepted).getTime(),type:"Proposal Accepted",detail:"Estimate "+estimate+" was accepted.",meta:q.status || "Sold"});
+    }
+    const timeline=projectTimelineStagePhotos(q);
+    PROJECT_PHOTO_STAGES.forEach(stage=>{
+      (timeline[stage.key] || []).forEach(photo=>{
+        const t=new Date(photo.uploadedAt || photo.createdAt || 0).getTime();
+        if(t) events.push({time:t,type:"Photo Uploaded",detail:(photo.caption || stage.title || "Project photo")+".",meta:stage.title});
+      });
+    });
+  });
+
+  js.forEach(job=>{
+    const quote=getJobQuote(job);
+    quoteActivityTimeline(quote).forEach(activity=>{
+      const t=new Date(activity.timestamp || 0).getTime();
+      if(t){
+        events.push({time:t,type:activity.activityType || "Activity",detail:activity.description || "",meta:job.customer || customer.name || "Job"});
+      }
+    });
+  });
+
+  ps.forEach(payment=>{
+    const t=new Date(payment.createdAt || payment.date || 0).getTime();
+    if(t){
+      events.push({time:t,type:payment.type === "Deposit" ? "Deposit Recorded" : "Payment Recorded",detail:(payment.type || "Payment")+" recorded for "+dollars(payment.amount || 0)+".",meta:payment.method || payment.paymentMethod || payment.payment_method || "Payment"});
+    }
+  });
+
+  return events
+    .filter(event=>Number.isFinite(event.time) && event.time>0)
+    .sort((a,b)=>b.time-a.time);
+}
+
+function customerKpis(customer){
+  const qs=customerQuotes(customer);
+  const js=customerJobs(customer);
+  const ps=customerPayments(customer);
+  const lifetimeQuoted=qs.reduce((sum,q)=>sum+Number(q.amount || q.total || 0),0);
+  const lifetimeSold=qs.filter(q=>isMoneyTrackedQuote(q)).reduce((sum,q)=>sum+Number(q.amount || q.total || 0),0);
+  const collected=ps.reduce((sum,p)=>sum+Number(p.amount || 0),0);
+  const outstanding=js.reduce((sum,job)=>{
+    const total=Number(job.total || getJobQuote(job)?.amount || 0);
+    const paid=totalPaidForQuote(job.quoteId || job.quote_id);
+    return sum+Math.max(0,total-paid);
+  },0);
+  return {qs,js,ps,lifetimeQuoted,lifetimeSold,collected,outstanding,completedJobs:js.filter(j=>String(j.status||"").toLowerCase()==="complete").length};
+}
+
+function closeCustomerProfile(){
+  const overlay=document.getElementById("customerProfileOverlay");
+  if(overlay) overlay.classList.add("hidden");
+}
+
+function handleCustomerProfileBackdrop(event){
+  if(event.target && event.target.id==="customerProfileOverlay") closeCustomerProfile();
+}
+
+function customerCall(id){
+  const c=customers.find(c=>String(c.id)===String(id));
+  if(!c?.phone){alert("No phone number for this customer.");return;}
+  window.location.href="tel:"+String(c.phone).replace(/[^\d+]/g,"");
+}
+
+function customerText(id){
+  const c=customers.find(c=>String(c.id)===String(id));
+  if(!c?.phone){alert("No phone number for this customer.");return;}
+  window.location.href="sms:"+encodeURIComponent(c.phone);
+}
+
+function customerEmail(id){
+  const c=customers.find(c=>String(c.id)===String(id));
+  if(!c?.email){alert("No email for this customer.");return;}
+  window.location.href="mailto:"+encodeURIComponent(c.email);
+}
+
+function customerMaps(id){
+  const c=customers.find(c=>String(c.id)===String(id));
+  if(!c?.address){alert("No address for this customer.");return;}
+  window.open("https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(c.address),"_blank");
+}
+
+function startNewQuoteForCustomer(id){
+  const c=customers.find(c=>String(c.id)===String(id));
+  if(!c){alert("Customer not found.");return;}
+  closeCustomerProfile();
+  newQuote();
+  currentCloudCustomerId=c.cloudId || c.id || null;
+  setVal("customerName",c.name || "");
+  setVal("customerPhone",c.phone || "");
+  setVal("customerEmail",c.email || "");
+  setVal("jobAddress",c.address || "");
+  showTab("quote");
+  calculateQuote();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function renderCustomerKpi(label,value){
+  return `<div class="customer-kpi"><div class="customer-kpi-label">${escapeHtml(label)}</div><div class="customer-kpi-value">${escapeHtml(value)}</div></div>`;
+}
+
+function renderCustomerProfile(customer){
+  const kpi=customerKpis(customer);
+  const activity=customerActivityItems(customer);
+  const photos=customerPhotoItems(customer);
+  const returning=(kpi.qs.length+kpi.js.length)>1;
+  const since=customerSince(customer,kpi.qs,kpi.js,kpi.ps);
+  const customerId=escapeAttr(customer.id);
+
+  return `
+    <div class="customer-profile-hero">
+      <div>
+        <div class="customer-profile-eyebrow">Customer Profile</div>
+        <h2 id="customerProfileTitle" class="customer-profile-title">${escapeHtml(customer.name || "Unnamed Customer")}</h2>
+        <div class="customer-profile-meta">
+          <span class="job-file-chip">${escapeHtml(customer.phone || "No phone saved")}</span>
+          <span class="job-file-chip">${escapeHtml(customer.email || "No email saved")}</span>
+          <span class="job-file-chip">Since ${escapeHtml(since)}</span>
+          ${returning ? `<span class="job-file-chip">Returning Customer</span>` : `<span class="job-file-chip">New Customer</span>`}
+        </div>
+        <div class="customer-muted" style="margin-top:10px;">${escapeHtml(customer.address || "No address saved")}</div>
+        <div class="customer-profile-actions">
+          <button class="secondary" type="button" onclick="customerCall('${customerId}')">Call</button>
+          <button class="secondary" type="button" onclick="customerText('${customerId}')">Text</button>
+          <button class="secondary" type="button" onclick="customerEmail('${customerId}')">Email</button>
+          <button class="secondary" type="button" onclick="customerMaps('${customerId}')">Maps</button>
+          <button class="success" type="button" onclick="startNewQuoteForCustomer('${customerId}')">New Quote</button>
+        </div>
+      </div>
+      <button class="secondary" type="button" onclick="closeCustomerProfile()">Close</button>
+    </div>
+
+    <div class="customer-profile-grid">
+      <main class="customer-profile-column">
+        <section class="customer-profile-section">
+          <h3>Customer KPIs</h3>
+          <div class="customer-kpi-grid">
+            ${renderCustomerKpi("Lifetime Quoted",dollars(kpi.lifetimeQuoted))}
+            ${renderCustomerKpi("Lifetime Sold",dollars(kpi.lifetimeSold))}
+            ${renderCustomerKpi("Total Collected",dollars(kpi.collected))}
+            ${renderCustomerKpi("Outstanding Balance",dollars(kpi.outstanding))}
+            ${renderCustomerKpi("Quotes",String(kpi.qs.length))}
+            ${renderCustomerKpi("Scheduled Jobs",String(kpi.js.length))}
+            ${renderCustomerKpi("Completed Jobs",String(kpi.completedJobs))}
+          </div>
+        </section>
+
+        <section class="customer-profile-section">
+          <h3>Recent Activity <span class="job-file-chip">${activity.length}</span></h3>
+          <div class="customer-timeline">
+            ${activity.length ? activity.slice(0,14).map(event=>`
+              <div class="customer-timeline-card">
+                <div class="customer-timeline-top">
+                  <div class="customer-timeline-title">${escapeHtml(event.type)}</div>
+                  <div class="customer-muted">${escapeHtml(new Date(event.time).toLocaleString())}</div>
+                </div>
+                <div class="customer-muted">${escapeHtml(event.detail)}</div>
+                <div class="customer-muted">${escapeHtml(event.meta || "")}</div>
+              </div>
+            `).join("") : `<div class="job-file-empty">No activity has been recorded for this customer yet.</div>`}
+          </div>
+        </section>
+
+        <section class="customer-profile-section">
+          <h3>Quotes <span class="job-file-chip">${kpi.qs.length}</span></h3>
+          <div class="customer-record-list">
+            ${kpi.qs.length ? kpi.qs.map(q=>`
+              <div class="customer-record-card">
+                <div class="customer-record-top">
+                  <div class="customer-record-title">Estimate ${escapeHtml(q.estimateNumber || q.estimate_number || q.id || "Not assigned")}</div>
+                  <span class="pill ${statusClass(q.status || "Unsold")}">${escapeHtml(q.status || "Unsold")}</span>
+                </div>
+                <div class="customer-muted">${dollars(q.amount || q.total || 0)} / ${q.createdAt ? escapeHtml(new Date(Number(q.createdAt)).toLocaleString()) : "Date not saved"}</div>
+                <div class="actions" style="margin-top:8px;"><button class="secondary" type="button" onclick="openQuoteFromFollowUp('${escapeAttr(q.id)}'); closeCustomerProfile();">Open Quote</button></div>
+              </div>
+            `).join("") : `<div class="job-file-empty">No quotes for this customer yet.</div>`}
+          </div>
+        </section>
+      </main>
+
+      <aside class="customer-profile-column">
+        <section class="customer-profile-section">
+          <h3>Jobs <span class="job-file-chip">${kpi.js.length}</span></h3>
+          <div class="customer-record-list">
+            ${kpi.js.length ? kpi.js.map(j=>`
+              <div class="customer-record-card">
+                <div class="customer-record-top">
+                  <div class="customer-record-title">${escapeHtml(j.date || j.startDate || "Not scheduled")}</div>
+                  <span class="pill ${statusClass(j.status || "Scheduled")}">${escapeHtml(j.status || "Scheduled")}</span>
+                </div>
+                <div class="customer-muted">${escapeHtml(j.crew || "Unassigned crew")} / ${escapeHtml(String(j.duration || 1))} day(s)</div>
+                <div class="customer-muted">${escapeHtml(j.notes || "No schedule notes saved.")}</div>
+                <div class="actions" style="margin-top:8px;"><button class="secondary" type="button" onclick="openJobFile('${escapeAttr(j.id)}')">Open Job Command Center</button></div>
+              </div>
+            `).join("") : `<div class="job-file-empty">No scheduled jobs for this customer yet.</div>`}
+          </div>
+        </section>
+
+        <section class="customer-profile-section">
+          <h3>Payments <span class="job-file-chip">${kpi.ps.length}</span></h3>
+          <div class="customer-record-list">
+            ${kpi.ps.length ? kpi.ps.map(p=>`
+              <div class="customer-record-card">
+                <div class="customer-record-top">
+                  <div class="customer-record-title">${escapeHtml(p.type || "Payment")}</div>
+                  <div class="customer-kpi-value">${dollars(p.amount || 0)}</div>
+                </div>
+                <div class="customer-muted">${escapeHtml(p.method || p.paymentMethod || p.payment_method || "Method not saved")} / ${escapeHtml(new Date(p.createdAt || p.date || Date.now()).toLocaleString())}</div>
+              </div>
+            `).join("") : `<div class="job-file-empty">No payments recorded for this customer yet.</div>`}
+          </div>
+        </section>
+
+        <section class="customer-profile-section">
+          <h3>Photos <span class="job-file-chip">${photos.length}</span></h3>
+          ${photos.length ? `<div class="customer-photo-grid">${photos.slice(0,12).map(item=>`<img src="${escapeAttr(item.url)}" alt="${escapeAttr(item.photo.caption || item.stage.title || "Project photo")}">`).join("")}</div>` : `<div class="job-file-empty">No project photos saved for this customer yet.</div>`}
+        </section>
+
+        <section class="customer-profile-section">
+          <h3>Notes</h3>
+          <div class="customer-record-list">
+            ${(customer.notes || customer.note || kpi.js.some(j=>j.notes)) ? `${customer.notes || customer.note ? `<div class="customer-record-card"><div class="customer-record-title">Customer Notes</div><div class="customer-muted">${escapeHtml(customer.notes || customer.note)}</div></div>` : ""}${kpi.js.filter(j=>j.notes).map(j=>`<div class="customer-record-card"><div class="customer-record-title">Schedule Notes</div><div class="customer-muted">${escapeHtml(j.notes)}</div></div>`).join("")}` : `<div class="job-file-empty">No saved notes for this customer yet.</div>`}
+          </div>
+        </section>
+      </aside>
+    </div>
+  `;
+}
+
+function selectCustomer(id){
   const c=customers.find(c=>String(c.id)===String(id));
 
   if(!c){
@@ -7430,63 +7963,18 @@ doc.text("PROJECT PROPOSAL", 14, 42);
     return;
   }
 
-  const customerQuotes=quotes.filter(q=>
-    String(q.customerId||q.customer_id)===String(id)
-  );
-
-  const customerJobs=jobs.filter(j=>
-    String(j.customerId||j.customer_id)===String(id)
-  );
-
-  const box=document.getElementById("customerDetails");
-  if(!box){
-    alert(
-      (c.name||"Unnamed Customer") +
-      "\n\nQuotes: " + customerQuotes.length +
-      "\nJobs: " + customerJobs.length
-    );
-    return;
+  const details=document.getElementById("customerDetails");
+  if(details){
+    const kpi=customerKpis(c);
+    details.innerHTML=`<div class="customer-list-card" onclick="selectCustomer('${escapeAttr(c.id)}')"><div class="customer-record-title">${escapeHtml(c.name||"Unnamed Customer")}</div><div class="customer-muted">${escapeHtml(c.phone||"")} / ${escapeHtml(c.email||"")}</div><div class="customer-muted">${kpi.qs.length} quote(s) / ${kpi.js.length} job(s) / ${dollars(kpi.collected)} collected</div></div>`;
   }
 
-  box.innerHTML=`
-    <div class="card">
-      <h2>${escapeHtml(c.name||"Unnamed Customer")}</h2>
-      <p>${escapeHtml(c.phone||"")}</p>
-      <p>${escapeHtml(c.email||"")}</p>
-      <p>${escapeHtml(c.address||"")}</p>
-
-      <h3>Quotes</h3>
-      ${
-        customerQuotes.length
-        ? customerQuotes.map(q=>`
-            <div class="quote-card">
-              <strong>Quote #${escapeHtml(q.estimateNumber||q.estimate_number||"")}</strong><br>
-              Status: ${escapeHtml(q.status||"Unsold")}<br>
-              Total: ${dollars(q.amount||q.total||0)}
-              <div class="actions" style="margin-top:6px;">
-                <button class="success" onclick="openQuoteFromFollowUp('${q.id}')">Open Quote</button>
-              </div>
-            </div>
-          `).join("")
-        : "<p class='small'>No quotes for this customer.</p>"
-      }
-
-      <h3>Scheduled Jobs</h3>
-      ${
-        customerJobs.length
-        ? customerJobs.map(j=>`
-            <div class="quote-card">
-              <strong>${escapeHtml(j.status||"Scheduled Job")}</strong><br>
-              Start: ${escapeHtml(j.startDate||j.start_date||"")}<br>
-              Notes: ${escapeHtml(j.notes||"")}
-            </div>
-          `).join("")
-        : "<p class='small'>No scheduled jobs for this customer.</p>"
-      }
-    </div>
-  `;
+  const overlay=document.getElementById("customerProfileOverlay");
+  const content=document.getElementById("customerProfileContent");
+  if(!overlay || !content) return;
+  content.innerHTML=renderCustomerProfile(c);
+  overlay.classList.remove("hidden");
 }
-
 async function deleteCustomer(id){
   const c=customers.find(c=>String(c.id)===String(id));
   const name=c?.name||"this customer";
