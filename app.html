@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
@@ -253,6 +253,257 @@
   .sold-screen { background:#ecfdf5; border:1px solid #bbf7d0; border-radius:var(--radius); padding:16px; margin-top:12px; }
   .money-positive { color:#3b82f6; font-weight:900; }
   .money-warning { color:#dc2626; font-weight:900; }
+  .cashflow-shell { display:grid; gap:18px; }
+  .cashflow-hero {
+    position:relative;
+    overflow:hidden;
+    padding:24px;
+    border:1px solid rgba(96,165,250,.28);
+    border-radius:22px;
+    background:
+      radial-gradient(circle at 82% 0,rgba(31,111,255,.22),transparent 24rem),
+      radial-gradient(circle at 8% 0,rgba(34,197,94,.12),transparent 18rem),
+      linear-gradient(135deg,rgba(15,33,62,.96),rgba(6,16,33,.98));
+    box-shadow:0 28px 90px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.05);
+  }
+  .cashflow-hero:before {
+    content:"";
+    position:absolute;
+    inset:0 0 auto;
+    height:4px;
+    background:linear-gradient(90deg,#22c55e,#1f6fff);
+  }
+  .cashflow-hero > * { position:relative; }
+  .cashflow-eyebrow {
+    color:#86efac;
+    font-size:12px;
+    font-weight:950;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    margin-bottom:8px;
+  }
+  .cashflow-hero h2 {
+    border:0;
+    padding:0;
+    margin:0;
+    font-size:34px;
+  }
+  .cashflow-hero p {
+    max-width:68ch;
+    margin-top:8px;
+    color:#c9d6e8;
+  }
+  .cashflow-kpi-grid {
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:12px;
+    margin-top:18px;
+  }
+  .cashflow-kpi {
+    min-height:132px;
+    display:grid;
+    align-content:space-between;
+    gap:12px;
+    padding:16px;
+    border:1px solid rgba(125,158,204,.24);
+    border-radius:18px;
+    background:
+      radial-gradient(circle at 100% 0,rgba(31,111,255,.14),transparent 12rem),
+      rgba(5,14,29,.56);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.04), 0 18px 44px rgba(0,0,0,.24);
+  }
+  .cashflow-kpi.primary {
+    border-color:rgba(34,197,94,.34);
+    background:
+      radial-gradient(circle at 100% 0,rgba(34,197,94,.18),transparent 12rem),
+      rgba(5,14,29,.60);
+  }
+  .cashflow-kpi.warning {
+    border-color:rgba(245,158,11,.34);
+    background:
+      radial-gradient(circle at 100% 0,rgba(245,158,11,.18),transparent 12rem),
+      rgba(5,14,29,.60);
+  }
+  .cashflow-kpi-label {
+    color:#aebed4;
+    font-size:11px;
+    font-weight:950;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+  }
+  .cashflow-kpi-value {
+    color:#f8fafc;
+    font-size:30px;
+    line-height:1.05;
+    font-weight:950;
+    overflow-wrap:anywhere;
+  }
+  .cashflow-kpi-note {
+    color:#91a3bd;
+    font-size:12px;
+    line-height:1.35;
+  }
+  .cashflow-grid {
+    display:grid;
+    grid-template-columns:minmax(0,1.2fr) minmax(340px,.8fr);
+    gap:18px;
+    align-items:start;
+  }
+  .cashflow-column {
+    min-width:0;
+    display:grid;
+    gap:18px;
+  }
+  .cashflow-card {
+    margin:0;
+    border-radius:18px;
+  }
+  .cashflow-card > h2 {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    border:0;
+    padding:0;
+    margin:0 0 14px;
+  }
+  .cashflow-list {
+    display:grid;
+    gap:12px;
+  }
+  .cashflow-payment-card {
+    position:relative;
+    overflow:hidden;
+    padding:16px;
+    border:1px solid rgba(125,158,204,.24);
+    border-radius:16px;
+    background:
+      radial-gradient(circle at 100% 0,rgba(31,111,255,.12),transparent 14rem),
+      rgba(5,14,29,.52);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.04), 0 16px 36px rgba(0,0,0,.22);
+  }
+  .cashflow-payment-card.overdue {
+    border-color:rgba(245,158,11,.42);
+    background:
+      radial-gradient(circle at 100% 0,rgba(245,158,11,.16),transparent 14rem),
+      rgba(5,14,29,.54);
+  }
+  .cashflow-payment-top {
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:10px;
+  }
+  .cashflow-payment-title {
+    color:#f8fafc;
+    font-size:16px;
+    font-weight:950;
+    overflow-wrap:anywhere;
+  }
+  .cashflow-payment-amount {
+    color:#f8fafc;
+    font-size:24px;
+    line-height:1.1;
+    font-weight:950;
+    text-align:right;
+    white-space:nowrap;
+  }
+  .cashflow-payment-meta {
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:8px;
+    margin:10px 0 12px;
+  }
+  .cashflow-meta {
+    min-height:54px;
+    padding:9px 10px;
+    border:1px solid rgba(125,158,204,.20);
+    border-radius:12px;
+    background:rgba(2,8,23,.32);
+  }
+  .cashflow-meta-label {
+    color:#91a3bd;
+    font-size:10px;
+    font-weight:950;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    margin-bottom:4px;
+  }
+  .cashflow-meta-value {
+    color:#dfe8f8;
+    font-size:13px;
+    line-height:1.35;
+    overflow-wrap:anywhere;
+  }
+  .cashflow-actions {
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(118px,1fr));
+    gap:8px;
+  }
+  .cashflow-actions button {
+    width:100%;
+  }
+  .cashflow-history-card {
+    padding:14px;
+    border:1px solid rgba(125,158,204,.22);
+    border-radius:14px;
+    background:rgba(5,14,29,.48);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
+  }
+  .cashflow-history-top {
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:6px;
+  }
+  .cashflow-history-title {
+    color:#f8fafc;
+    font-weight:950;
+    overflow-wrap:anywhere;
+  }
+  .cashflow-history-amount {
+    color:#86efac;
+    font-size:18px;
+    font-weight:950;
+    white-space:nowrap;
+  }
+  .cashflow-form-card select,
+  .cashflow-form-card input,
+  .cashflow-form-card textarea {
+    margin-bottom:12px;
+  }
+  @media (max-width: 980px) {
+    .cashflow-grid,
+    .cashflow-kpi-grid {
+      grid-template-columns:1fr;
+    }
+    .cashflow-hero {
+      padding:18px;
+      border-radius:18px;
+    }
+    .cashflow-hero h2 {
+      font-size:28px;
+    }
+    .cashflow-kpi {
+      min-height:112px;
+    }
+    .cashflow-payment-meta {
+      grid-template-columns:1fr;
+    }
+    .cashflow-actions {
+      grid-template-columns:1fr;
+    }
+    .cashflow-payment-top,
+    .cashflow-history-top {
+      flex-direction:column;
+    }
+    .cashflow-payment-amount,
+    .cashflow-history-amount {
+      text-align:left;
+    }
+  }
   .setup-overlay { position:fixed; inset:0; background:rgba(15,23,42,.82); z-index:9999; display:flex; align-items:center; justify-content:center; padding:12px; }
   .setup-overlay.hidden { display:none !important; }
   .setup-modal { background:white; border-radius:var(--radius); max-width:720px; width:100%; max-height:92vh; overflow:auto; box-shadow:0 20px 60px rgba(0,0,0,.35); padding:20px 20px 96px; position:relative; }
@@ -2468,7 +2719,7 @@
       style="height:175px;width:auto;"
     >
     <p style="margin:-38px 0 0 0;color:#6b7280;font-size:14px;">
-      Quote → Sign → Schedule → Complete
+      Quote â†’ Sign â†’ Schedule â†’ Complete
     </p>
   </div>
 
@@ -2510,12 +2761,12 @@
   </div>
 
   <nav class="mobile-bottom-nav" aria-label="Mobile app navigation">
-    <button id="mobileNavDashboard" class="mobile-nav-item" type="button"><span class="mobile-nav-icon">▦</span><span>Dashboard</span></button>
-    <button id="mobileNavQuote" class="mobile-nav-item active" type="button"><span class="mobile-nav-icon">✎</span><span>Quote</span></button>
-    <button id="mobileNavSchedule" class="mobile-nav-item" type="button"><span class="mobile-nav-icon">□</span><span>Schedule</span></button>
+    <button id="mobileNavDashboard" class="mobile-nav-item" type="button"><span class="mobile-nav-icon">â–¦</span><span>Dashboard</span></button>
+    <button id="mobileNavQuote" class="mobile-nav-item active" type="button"><span class="mobile-nav-icon">âœŽ</span><span>Quote</span></button>
+    <button id="mobileNavSchedule" class="mobile-nav-item" type="button"><span class="mobile-nav-icon">â–¡</span><span>Schedule</span></button>
     <button id="mobileNavMoney" class="mobile-nav-item" type="button"><span class="mobile-nav-icon">$</span><span>Money</span></button>
-    <button id="mobileNavCustomers" class="mobile-nav-item" type="button"><span class="mobile-nav-icon">◎</span><span>Customers</span></button>
-    <button id="mobileNavMore" class="mobile-nav-item" type="button"><span class="mobile-nav-icon">•••</span><span>More</span></button>
+    <button id="mobileNavCustomers" class="mobile-nav-item" type="button"><span class="mobile-nav-icon">â—Ž</span><span>Customers</span></button>
+    <button id="mobileNavMore" class="mobile-nav-item" type="button"><span class="mobile-nav-icon">â€¢â€¢â€¢</span><span>More</span></button>
   </nav>
 
 
@@ -2811,7 +3062,7 @@
         </div>
 
         <div class="sold-screen hidden" id="soldScreen">
-          <h2>Job Sold 🎉</h2>
+          <h2>Job Sold ðŸŽ‰</h2>
           <div class="stat"><div class="stat-label">Contract Total</div><div id="soldTotal" class="stat-value">$0.00</div></div>
           <div class="stat"><div class="stat-label">Deposit Required</div><div id="soldDepositRequired" class="stat-value">$0.00</div></div>
           <input id="soldDepositCollected" placeholder="Deposit collected today $" inputmode="decimal" />
@@ -2895,9 +3146,9 @@
       <div>
         <div class="card">
           <div class="calendar-header">
-            <button class="secondary" onclick="changeMonth(-1)">← Prev</button>
+            <button class="secondary" onclick="changeMonth(-1)">â† Prev</button>
             <div id="calendarTitle" class="calendar-title"></div>
-            <button class="secondary" onclick="changeMonth(1)">Next →</button>
+            <button class="secondary" onclick="changeMonth(1)">Next â†’</button>
           </div>
           <div class="actions" style="margin-bottom:10px;">
             <span class="pill" style="background:#d97706;color:white;">Sold</span>
@@ -2953,57 +3204,100 @@
 
 
   <div id="viewMoney" class="hidden">
-    <div class="grid">
-      <div>
-        <div class="card">
-          <h2>Money Tracker</h2>
-          <p class="small">Track deposits owed, deposits collected, final balances, and outstanding money.</p>
-          <div class="stat-grid">
-            <div class="stat"><div class="stat-label">Deposits Due</div><div id="moneyDepositsDue" class="stat-value">$0.00</div></div>
-            <div class="stat"><div class="stat-label">Final Balances Due</div><div id="moneyFinalDue" class="stat-value">$0.00</div></div>
-            <div class="stat"><div class="stat-label">Collected</div><div id="moneyCollected" class="stat-value">$0.00</div></div>
-            <div class="stat"><div class="stat-label">Total Outstanding</div><div id="moneyOutstanding" class="stat-value">$0.00</div></div>
+    <div class="cashflow-shell">
+      <div class="cashflow-hero">
+        <div class="cashflow-eyebrow">Cash Flow Dashboard</div>
+        <h2>Money Tracker</h2>
+        <p>See what has been collected, what is still owed, and which customer payment should be handled next.</p>
+        <div class="cashflow-kpi-grid">
+          <div class="cashflow-kpi primary">
+            <div class="cashflow-kpi-label">Total Collected</div>
+            <div id="moneyCollected" class="cashflow-kpi-value">$0.00</div>
+            <div class="cashflow-kpi-note">All recorded payments</div>
+          </div>
+          <div class="cashflow-kpi warning">
+            <div class="cashflow-kpi-label">Outstanding Balance</div>
+            <div id="moneyOutstanding" class="cashflow-kpi-value">$0.00</div>
+            <div class="cashflow-kpi-note">Remaining final balances</div>
+          </div>
+          <div class="cashflow-kpi">
+            <div class="cashflow-kpi-label">Deposits Received</div>
+            <div id="moneyDepositsReceived" class="cashflow-kpi-value">$0.00</div>
+            <div class="cashflow-kpi-note">Deposit payments recorded</div>
+          </div>
+          <div class="cashflow-kpi">
+            <div class="cashflow-kpi-label">Remaining To Collect</div>
+            <div id="moneyRemainingToCollect" class="cashflow-kpi-value">$0.00</div>
+            <div class="cashflow-kpi-note">Deposits due plus final balances</div>
+          </div>
+          <div class="cashflow-kpi">
+            <div class="cashflow-kpi-label">Average Job Value</div>
+            <div id="moneyAverageJobValue" class="cashflow-kpi-value">$0.00</div>
+            <div class="cashflow-kpi-note">Tracked sold job average</div>
+          </div>
+          <div class="cashflow-kpi">
+            <div class="cashflow-kpi-label">Collection Rate</div>
+            <div id="moneyCollectionRate" class="cashflow-kpi-value">0%</div>
+            <div class="cashflow-kpi-note">Collected vs. collected plus outstanding</div>
           </div>
         </div>
-
-        <div class="card">
-          <h2>Deposits Outstanding</h2>
-          <div id="depositOutstandingList"></div>
-        </div>
-
-        <div class="card">
-          <h2>Final Payments Outstanding</h2>
-          <div id="finalOutstandingList"></div>
+        <div class="hidden">
+          <span id="moneyDepositsDue">$0.00</span>
+          <span id="moneyFinalDue">$0.00</span>
         </div>
       </div>
 
-      <div>
-        <div class="card">
-          <h2>Record Payment</h2>
-          <select id="paymentJobSelect"></select>
-          <div class="two">
-            <input id="paymentAmount" placeholder="Payment amount $" inputmode="decimal" />
-            <select id="paymentType">
-              <option>Deposit</option>
-              <option>Final Payment</option>
-              <option>Partial Payment</option>
-            </select>
+      <div class="cashflow-grid">
+        <div class="cashflow-column">
+          <div class="card cashflow-card">
+            <h2>Outstanding Payments <span class="job-file-chip">Collect next</span></h2>
+            <div id="depositOutstandingList" class="cashflow-list"></div>
+            <div id="finalOutstandingList" class="cashflow-list" style="margin-top:12px;"></div>
           </div>
-          <select id="paymentMethod">
-            <option>Cash</option>
-            <option>Check</option>
-            <option>Credit Card</option>
-            <option>Zelle</option>
-            <option>Venmo</option>
-            <option>Other</option>
-          </select>
-          <textarea id="paymentNotes" placeholder="Payment notes..."></textarea>
-          <button class="success" onclick="recordPayment()">Record Payment</button>
+
+          <div class="card cashflow-card">
+            <h2>Recent Payments <span class="job-file-chip">Newest first</span></h2>
+            <div id="recentPaymentList" class="cashflow-list"></div>
+          </div>
         </div>
 
-        <div class="card">
-          <h2>Payment History</h2>
-          <div id="paymentHistory"></div>
+        <div class="cashflow-column">
+          <div class="card cashflow-card cashflow-form-card">
+            <h2>Record Payment</h2>
+            <label for="paymentJobSelect">Job or Quote</label>
+            <select id="paymentJobSelect"></select>
+            <div class="two">
+              <div>
+                <label for="paymentAmount">Amount</label>
+                <input id="paymentAmount" placeholder="Payment amount $" inputmode="decimal" />
+              </div>
+              <div>
+                <label for="paymentType">Type</label>
+                <select id="paymentType">
+                  <option>Deposit</option>
+                  <option>Final Payment</option>
+                  <option>Partial Payment</option>
+                </select>
+              </div>
+            </div>
+            <label for="paymentMethod">Method</label>
+            <select id="paymentMethod">
+              <option>Cash</option>
+              <option>Check</option>
+              <option>Credit Card</option>
+              <option>Zelle</option>
+              <option>Venmo</option>
+              <option>Other</option>
+            </select>
+            <label for="paymentNotes">Notes</label>
+            <textarea id="paymentNotes" placeholder="Payment notes..."></textarea>
+            <button class="success" onclick="recordPayment()">Record Payment</button>
+          </div>
+
+          <div class="card cashflow-card">
+            <h2>Payment History</h2>
+            <div id="paymentHistory" class="cashflow-list"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -4147,7 +4441,7 @@ function buildQuoteText(measured,order,subtotal,tax,total,deposit){
    const sqft=roomSqft(r);
    const lengthText=displayFeetInches(r.lengthFt ?? r.length ?? 0, r.lengthIn ?? 0);
    const widthText=displayFeetInches(r.widthFt ?? r.width ?? 0, r.widthIn ?? 0);
-   return "• " + (r.name||"Room") + "\n  " + lengthText + " x " + widthText + " = " + sqft.toFixed(2) + " sqft";
+   return "â€¢ " + (r.name||"Room") + "\n  " + lengthText + " x " + widthText + " = " + sqft.toFixed(2) + " sqft";
  }).join("\n\n") : "No rooms added.";
 
  const itemLines=lineItems.length ? lineItems.map(i=>{
@@ -4657,7 +4951,7 @@ function getCustomer(id){
 function renderFollowUps(){
  const filter=val("followFilter");let list=quotes.slice();if(filter==="due")list=list.filter(q=>isDue(q));if(filter==="all")list=list.filter(q=>q.status==="Unsold");if(filter==="sold")list=list.filter(q=>q.status==="Sold"||q.status==="Scheduled");if(filter==="lost")list=list.filter(q=>q.status==="Lost");list.sort((a,b)=>a.nextFollowUpAt-b.nextFollowUpAt);
   const box=document.getElementById("followUpList");if(!box)return;if(!list.length){box.innerHTML="<div class='empty-state'><strong>No follow-ups in this view.</strong><p>Quotes that need attention will appear here automatically.</p></div>";return;}
- box.innerHTML=list.map(q=>{const c=getCustomer(q.customerId);const due=isDue(q);return `<div class="quote-card ${due?"urgent":""}"><div class="title">${escapeHtml(c.name||"Unnamed")}</div><div class="small">${escapeHtml(c.phone||"")} • ${escapeHtml(c.email||"")}</div><div>${escapeHtml(c.address||"")}</div><div>Quote: <strong>${dollars(q.amount)}</strong></div><div>Status: <span class="pill ${due?"status-FollowUpDue":"status-"+q.status.replaceAll(" ","")}">${due?"Follow-Up Due":q.status}</span></div><div class="small">Next follow-up: ${new Date(q.nextFollowUpAt).toLocaleString()}</div><div class="actions" style="margin-top:8px;"><button class="success" onclick="openQuoteFromFollowUp('${q.id}')">Open Quote</button><button class="secondary" onclick="selectFollowUp('${q.id}')">Follow Up</button><button class="success" onclick="markSold('${q.id}')">Sold</button><button class="warning" onclick="snoozeQuote('${q.id}')">Snooze 48h</button><button class="danger" onclick="markLost('${q.id}')">Lost</button></div></div>`;}).join("");
+ box.innerHTML=list.map(q=>{const c=getCustomer(q.customerId);const due=isDue(q);return `<div class="quote-card ${due?"urgent":""}"><div class="title">${escapeHtml(c.name||"Unnamed")}</div><div class="small">${escapeHtml(c.phone||"")} â€¢ ${escapeHtml(c.email||"")}</div><div>${escapeHtml(c.address||"")}</div><div>Quote: <strong>${dollars(q.amount)}</strong></div><div>Status: <span class="pill ${due?"status-FollowUpDue":"status-"+q.status.replaceAll(" ","")}">${due?"Follow-Up Due":q.status}</span></div><div class="small">Next follow-up: ${new Date(q.nextFollowUpAt).toLocaleString()}</div><div class="actions" style="margin-top:8px;"><button class="success" onclick="openQuoteFromFollowUp('${q.id}')">Open Quote</button><button class="secondary" onclick="selectFollowUp('${q.id}')">Follow Up</button><button class="success" onclick="markSold('${q.id}')">Sold</button><button class="warning" onclick="snoozeQuote('${q.id}')">Snooze 48h</button><button class="danger" onclick="markLost('${q.id}')">Lost</button></div></div>`;}).join("");
 }
 function selectFollowUp(id){const q=quotes.find(q => String(q.id) === String(id));const c=getCustomer(q.customerId);const msg=buildFollowUpMessage(q,c);document.getElementById("selectedFollowUp").innerHTML=`<div class="quote-card"><div class="title">${escapeHtml(c.name)}</div><div>${escapeHtml(c.phone)}<br>${escapeHtml(c.email)}</div><div class="quote-box">${escapeHtml(msg)}</div><div class="actions" style="margin-top:8px;"><button onclick="copyText(\`${escapeJs(msg)}\`)">Copy</button><button class="secondary" onclick="openSms('${escapeAttr(c.phone)}', \`${escapeJs(msg)}\`)">Text</button><button class="secondary" onclick="openEmail('${escapeAttr(c.email)}', \`${escapeJs(msg)}\`)">Email</button><button class="success" onclick="markFollowedUp(${q.id})">Mark Followed Up</button></div></div>`;}
 function buildFollowUpMessage(q,c){const first=(c.name||"there").split(" ")[0];return `Hi ${first}, this is following up on the flooring quote for ${c.address||"your project"}. The estimate was ${dollars(q.amount)}. I wanted to see if you had any questions or if you would like to get on the schedule.`;}
@@ -4917,7 +5211,7 @@ async function deleteScheduledJob(){
 function calendarStatusClass(status){if(status==="Sold")return"cal-Sold";if(status==="Scheduled")return"cal-Scheduled";if(status==="Materials Ordered")return"cal-Ordered";if(status==="Ready to Install")return"cal-Ready";if(status==="In Progress")return"cal-Progress";if(status==="Complete")return"cal-Complete";return"cal-Scheduled";}
 function jobCoversDate(job,iso){const duration=Math.max(1,Number(job.duration)||1);const start=new Date(job.date+"T00:00:00");const target=new Date(iso+"T00:00:00");for(let i=0;i<duration;i++){const d=new Date(start);d.setDate(start.getDate()+i);if(fmtDate(d)===fmtDate(target))return true;}return false;}
 function getJobDayNumber(job,iso){const start=new Date(job.date+"T00:00:00");const target=new Date(iso+"T00:00:00");return Math.round((target-start)/(1000*60*60*24))+1;}
-function renderCalendar(){const title=currentMonth.toLocaleDateString(undefined,{month:"long",year:"numeric"});document.getElementById("calendarTitle").textContent=title;const cal=document.getElementById("calendar");if(!cal)return;cal.innerHTML="";const year=currentMonth.getFullYear();const month=currentMonth.getMonth();const first=new Date(year,month,1);const start=new Date(first);start.setDate(first.getDate()-first.getDay());for(let i=0;i<42;i++){const day=new Date(start);day.setDate(start.getDate()+i);const iso=fmtDate(day);const div=document.createElement("div");div.className="day";if(day.getMonth()!==month)div.classList.add("muted");if(iso===selectedDate)div.classList.add("selected");const number=document.createElement("div");number.className="day-number";number.textContent=day.getDate();div.appendChild(number);jobs.filter(j=>jobCoversDate(j,iso)).forEach(job=>{const event=document.createElement("div");event.className="event "+calendarStatusClass(job.status);const dayNum=getJobDayNumber(job,iso);event.innerHTML="<strong>"+escapeHtml(job.customer||"Unnamed")+"</strong><br>"+escapeHtml(job.status)+" • "+escapeHtml(job.crew)+" • Day "+dayNum+"/"+(Number(job.duration)||1);
+function renderCalendar(){const title=currentMonth.toLocaleDateString(undefined,{month:"long",year:"numeric"});document.getElementById("calendarTitle").textContent=title;const cal=document.getElementById("calendar");if(!cal)return;cal.innerHTML="";const year=currentMonth.getFullYear();const month=currentMonth.getMonth();const first=new Date(year,month,1);const start=new Date(first);start.setDate(first.getDate()-first.getDay());for(let i=0;i<42;i++){const day=new Date(start);day.setDate(start.getDate()+i);const iso=fmtDate(day);const div=document.createElement("div");div.className="day";if(day.getMonth()!==month)div.classList.add("muted");if(iso===selectedDate)div.classList.add("selected");const number=document.createElement("div");number.className="day-number";number.textContent=day.getDate();div.appendChild(number);jobs.filter(j=>jobCoversDate(j,iso)).forEach(job=>{const event=document.createElement("div");event.className="event "+calendarStatusClass(job.status);const dayNum=getJobDayNumber(job,iso);event.innerHTML="<strong>"+escapeHtml(job.customer||"Unnamed")+"</strong><br>"+escapeHtml(job.status)+" â€¢ "+escapeHtml(job.crew)+" â€¢ Day "+dayNum+"/"+(Number(job.duration)||1);
 event.onclick=function(){editScheduledJob(job.id);};
 div.appendChild(event);});cal.appendChild(div);}}
 function renderSelectedJobs(){
@@ -6143,7 +6437,7 @@ function renderCustomers(){
     `;
   }).join("");
 }
-function selectCustomer(id){const c=getCustomer(id);const qs=quotes.filter(q=>q.customerId===id).sort((a,b)=>b.createdAt-a.createdAt);const js=jobs.filter(j=>j.customerId===id).sort((a,b)=>a.date.localeCompare(b.date));document.getElementById("customerDetails").innerHTML=`<div class="customer-card"><div class="title">${escapeHtml(c.name||"Unnamed")}</div><div>${escapeHtml(c.phone||"")}<br>${escapeHtml(c.email||"")}<br>${escapeHtml(c.address||"")}</div></div><h3>Quote History</h3>${qs.length?qs.map(q=>`<div class="quote-card"><div>Quote: <strong>${dollars(q.amount)}</strong></div><div>Status: <span class="pill ${statusClass(q.status)}">${escapeHtml(q.status)}</span></div><div class="small">${new Date(q.createdAt).toLocaleString()}</div></div>`).join(""):"<p>No quote history.</p>"}<h3>Scheduled Jobs</h3>${js.length?js.map(j=>`<div class="job-card"><div>${escapeHtml(j.date)} • ${escapeHtml(j.crew)}</div><div>Status: ${escapeHtml(j.status)}</div></div>`).join(""):"<p>No scheduled jobs.</p>"}`;}
+function selectCustomer(id){const c=getCustomer(id);const qs=quotes.filter(q=>q.customerId===id).sort((a,b)=>b.createdAt-a.createdAt);const js=jobs.filter(j=>j.customerId===id).sort((a,b)=>a.date.localeCompare(b.date));document.getElementById("customerDetails").innerHTML=`<div class="customer-card"><div class="title">${escapeHtml(c.name||"Unnamed")}</div><div>${escapeHtml(c.phone||"")}<br>${escapeHtml(c.email||"")}<br>${escapeHtml(c.address||"")}</div></div><h3>Quote History</h3>${qs.length?qs.map(q=>`<div class="quote-card"><div>Quote: <strong>${dollars(q.amount)}</strong></div><div>Status: <span class="pill ${statusClass(q.status)}">${escapeHtml(q.status)}</span></div><div class="small">${new Date(q.createdAt).toLocaleString()}</div></div>`).join(""):"<p>No quote history.</p>"}<h3>Scheduled Jobs</h3>${js.length?js.map(j=>`<div class="job-card"><div>${escapeHtml(j.date)} â€¢ ${escapeHtml(j.crew)}</div><div>Status: ${escapeHtml(j.status)}</div></div>`).join(""):"<p>No scheduled jobs.</p>"}`;}
 function statusClass(status){if(status==="Materials Ordered")return"status-Ordered";if(status==="Ready to Install")return"status-Ready";if(status==="In Progress")return"status-Progress";return"status-"+String(status).replaceAll(" ","");}
 
 function isMoneyTrackedQuote(q) {
@@ -6181,32 +6475,69 @@ function depositPaidForQuote(quoteId){
 function renderMoneyTracker(){
  const soldQuotes = quotes.filter(isMoneyTrackedQuote);
  let depositsDue=0, finalDue=0, collected=0;
- soldQuotes.forEach(q=>{
+  soldQuotes.forEach(q=>{
    const paid=totalPaidForQuote(q.id);
    const depPaid=depositPaidForQuote(q.id);
-   const depReq=Number(q.depositRequired||quoteDepositRequired(q)||0);
+    const depReq=Number(q.depositRequired ?? q.deposit_required ?? quoteDepositRequired(q) ?? 0);
    depositsDue += Math.max(0, depReq-depPaid);
    finalDue += Math.max(0, Number(q.amount || 0) - paid);
  });
  collected = payments.reduce((s,p)=>s+Number(p.amount||0),0);
+  const depositsReceived=payments.filter(p=>p.type==="Deposit").reduce((s,p)=>s+Number(p.amount||0),0);
+  const remainingToCollect=depositsDue+finalDue;
+  const trackedValue=soldQuotes.reduce((s,q)=>s+Number(q.amount||0),0);
+  const averageJobValue=soldQuotes.length ? trackedValue / soldQuotes.length : 0;
+  const collectionBase=collected+finalDue;
+  const collectionRate=collectionBase>0 ? (collected/collectionBase)*100 : 0;
 
- const set=(id,val)=>{const el=document.getElementById(id); if(el) el.textContent=dollars(val);};
-  set("moneyDepositsDue",depositsDue);
-  set("moneyFinalDue",finalDue);
-  set("moneyCollected",collected);
-  set("moneyOutstanding",finalDue);
+  const set=(id,val)=>{const el=document.getElementById(id); if(el) el.textContent=dollars(val);};
+   set("moneyDepositsDue",depositsDue);
+   set("moneyFinalDue",finalDue);
+   set("moneyCollected",collected);
+   set("moneyOutstanding",finalDue);
+   set("moneyDepositsReceived",depositsReceived);
+   set("moneyRemainingToCollect",remainingToCollect);
+   set("moneyAverageJobValue",averageJobValue);
+   const rateEl=document.getElementById("moneyCollectionRate");
+   if(rateEl) rateEl.textContent=collectionRate.toFixed(0)+"%";
 
  const depositList=document.getElementById("depositOutstandingList");
   if(depositList){
     const items=soldQuotes.map(q=>{
       const c=getCustomer(q.customerId);
-      const depReq=Number(q.depositRequired||quoteDepositRequired(q)||0);
+      const depReq=Number(q.depositRequired ?? q.deposit_required ?? quoteDepositRequired(q) ?? 0);
       const depPaid=depositPaidForQuote(q.id);
       const owed = Math.max(0, depReq - depPaid);
       if(owed<=0)return "";
-      return `<div class="quote-card"><div class="title">${escapeHtml(c.name||"Unnamed")}</div><div>Deposit owed: <span class="money-warning">${dollars(owed)}</span></div><div class="small">Quote total: ${dollars(q.amount)}</div><button class="secondary" onclick="prefillPayment('${q.id}', ${owed.toFixed(2)}, 'Deposit')">Record Deposit</button></div>`;
+      const job=jobs.find(j=>String(j.quoteId)===String(q.id) || String(j.quoteId)===String(q.cloudId));
+      const jobId=job ? escapeAttr(job.id) : "";
+      const customerId=c?.id ? escapeAttr(c.id) : "";
+      const installDate=job?.date || job?.startDate || "Not scheduled";
+      const project=q.estimateNumber || q.estimate_number || q.id || "Quote";
+      return `<div class="cashflow-payment-card overdue">
+        <div class="cashflow-payment-top">
+          <div>
+            <div class="cashflow-payment-title">${escapeHtml(c.name||"Unnamed Customer")}</div>
+            <div class="customer-muted">${escapeHtml(project)}</div>
+          </div>
+          <div class="cashflow-payment-amount">${dollars(owed)}</div>
+        </div>
+        <div class="cashflow-payment-meta">
+          <div class="cashflow-meta"><div class="cashflow-meta-label">Project</div><div class="cashflow-meta-value">${escapeHtml(project)}</div></div>
+          <div class="cashflow-meta"><div class="cashflow-meta-label">Install Date</div><div class="cashflow-meta-value">${escapeHtml(installDate)}</div></div>
+          <div class="cashflow-meta"><div class="cashflow-meta-label">Status</div><div class="cashflow-meta-value">${escapeHtml(q.status||"Sold")}</div></div>
+          <div class="cashflow-meta"><div class="cashflow-meta-label">Quote Total</div><div class="cashflow-meta-value">${dollars(q.amount)}</div></div>
+        </div>
+        <div class="cashflow-actions">
+          <button class="secondary" ${customerId ? `onclick="customerCall('${customerId}')"` : "disabled"}>Call</button>
+          <button class="secondary" ${customerId ? `onclick="customerText('${customerId}')"` : "disabled"}>Text</button>
+          <button class="secondary" ${customerId ? `onclick="customerEmail('${customerId}')"` : "disabled"}>Email</button>
+          <button class="secondary" ${jobId ? `onclick="openJobFile('${jobId}')"` : "disabled"}>Open Job</button>
+          <button class="success" onclick="prefillPayment('${escapeAttr(q.id)}', ${owed.toFixed(2)}, 'Deposit')">Record Payment</button>
+        </div>
+      </div>`;
    }).join("");
-   depositList.innerHTML=items||"<div class='empty-state'><strong>No deposits outstanding.</strong><p>Deposits due will show here after a sold job needs payment.</p></div>";
+   depositList.innerHTML=items||"<div class='empty-state'><strong>No outstanding deposits.</strong><p>Deposits due will show here after a sold job needs payment.</p></div>";
  }
 
  const finalList=document.getElementById("finalOutstandingList");
@@ -6216,13 +6547,39 @@ function renderMoneyTracker(){
       const paid=totalPaidForQuote(q.id);
       const owed = Math.max(0, Number(q.amount || 0) - paid);
       if(owed<=0)return "";
-      return `<div class="quote-card"><div class="title">${escapeHtml(c.name||"Unnamed")}</div><div>Balance owed: <span class="money-warning">${dollars(owed)}</span></div><div class="small">Paid so far: ${dollars(paid)}</div><button class="secondary" onclick="prefillPayment('${q.id}', ${owed.toFixed(2)}, 'Final Payment')">Record Final Payment</button></div>`;
+      const job=jobs.find(j=>String(j.quoteId)===String(q.id) || String(j.quoteId)===String(q.cloudId));
+      const jobId=job ? escapeAttr(job.id) : "";
+      const customerId=c?.id ? escapeAttr(c.id) : "";
+      const installDate=job?.date || job?.startDate || "Not scheduled";
+      const project=q.estimateNumber || q.estimate_number || q.id || "Quote";
+      return `<div class="cashflow-payment-card">
+        <div class="cashflow-payment-top">
+          <div>
+            <div class="cashflow-payment-title">${escapeHtml(c.name||"Unnamed Customer")}</div>
+            <div class="customer-muted">${escapeHtml(project)}</div>
+          </div>
+          <div class="cashflow-payment-amount">${dollars(owed)}</div>
+        </div>
+        <div class="cashflow-payment-meta">
+          <div class="cashflow-meta"><div class="cashflow-meta-label">Project</div><div class="cashflow-meta-value">${escapeHtml(project)}</div></div>
+          <div class="cashflow-meta"><div class="cashflow-meta-label">Install Date</div><div class="cashflow-meta-value">${escapeHtml(installDate)}</div></div>
+          <div class="cashflow-meta"><div class="cashflow-meta-label">Status</div><div class="cashflow-meta-value">${escapeHtml(q.status||"Sold")}</div></div>
+          <div class="cashflow-meta"><div class="cashflow-meta-label">Paid So Far</div><div class="cashflow-meta-value">${dollars(paid)}</div></div>
+        </div>
+        <div class="cashflow-actions">
+          <button class="secondary" ${customerId ? `onclick="customerCall('${customerId}')"` : "disabled"}>Call</button>
+          <button class="secondary" ${customerId ? `onclick="customerText('${customerId}')"` : "disabled"}>Text</button>
+          <button class="secondary" ${customerId ? `onclick="customerEmail('${customerId}')"` : "disabled"}>Email</button>
+          <button class="secondary" ${jobId ? `onclick="openJobFile('${jobId}')"` : "disabled"}>Open Job</button>
+          <button class="success" onclick="prefillPayment('${escapeAttr(q.id)}', ${owed.toFixed(2)}, 'Final Payment')">Record Payment</button>
+        </div>
+      </div>`;
    }).join("");
-    finalList.innerHTML=items||"<div class='empty-state'><strong>No final balances outstanding.</strong><p>Remaining balances will appear here as jobs are completed or paid down.</p></div>";
+    finalList.innerHTML=items||"<div class='empty-state'><strong>No outstanding balances.</strong><p>All jobs have been paid, or remaining balances will appear here after sold jobs are created.</p></div>";
  }
 
- renderPaymentSelectors();
- renderPaymentHistory();
+  renderPaymentSelectors();
+  renderPaymentHistory();
 }
 
 function renderPaymentSelectors(){
@@ -6231,7 +6588,7 @@ function renderPaymentSelectors(){
    const sel=document.getElementById(id);
    if(!sel)return;
    const sold = quotes.filter(isMoneyTrackedQuote);
-   sel.innerHTML=sold.length?sold.map(q=>{const c=getCustomer(q.customerId);return `<option value="${q.id}">${escapeHtml(c.name||"Unnamed")} — ${dollars(q.amount)}</option>`;}).join(""):`<option value="">No sold jobs</option>`;
+   sel.innerHTML=sold.length?sold.map(q=>{const c=getCustomer(q.customerId);return `<option value="${q.id}">${escapeHtml(c.name||"Unnamed")} â€” ${dollars(q.amount)}</option>`;}).join(""):`<option value="">No sold jobs</option>`;
  });
 }
 
@@ -6368,28 +6725,48 @@ async function addPayment(payment) {
 
 function renderPaymentHistory(){
   const box=document.getElementById("paymentHistory");
-  if(!box)return;
+  const recentBox=document.getElementById("recentPaymentList");
+  if(!box && !recentBox)return;
 
   if(!payments.length){
-    box.innerHTML="<div class='empty-state'><strong>No payments recorded yet.</strong><p>Deposits and final payments will appear here after they are recorded.</p></div>";
+    const empty="<div class='empty-state'><strong>No payments recorded yet.</strong><p>Deposits and final payments will appear here after they are recorded.</p></div>";
+    if(box) box.innerHTML=empty;
+    if(recentBox) recentBox.innerHTML=empty;
     return;
   }
 
-  box.innerHTML=payments.slice().reverse().map(p=>{
+  const sortedPayments=payments.slice().sort((a,b)=>new Date(b.date || b.createdAt || b.created_at || 0)-new Date(a.date || a.createdAt || a.created_at || 0));
+  const renderPaymentCard=(p,compact=false)=>{
     const q=quotes.find(q =>
       String(q.id) === String(p.quoteId) ||
       String(q.cloudId) === String(p.quoteId)
     ) || {};
 
     const c=getCustomer(q.customerId || q.customer_id);
+    const job=jobs.find(j=>String(j.quoteId)===String(q.id) || String(j.quoteId)===String(q.cloudId) || String(j.quoteId)===String(p.quoteId));
+    const project=q.estimateNumber || q.estimate_number || q.id || "Quote";
+    const paidDate=new Date(p.date || p.createdAt || p.created_at || Date.now()).toLocaleString();
+    const relatedJob=job ? `${job.date || job.startDate || "Scheduled"} / ${job.status || "Scheduled"}` : "No scheduled job linked";
 
-    return `<div class="quote-card">
-      <div class="title">${escapeHtml(c.name||"Unnamed")}</div>
-      <div>${escapeHtml(p.type)}: <strong>${dollars(p.amount)}</strong></div>
-      <div class="small">${escapeHtml(p.method)} • ${new Date(p.date).toLocaleString()}</div>
-      <div class="small">${escapeHtml(p.notes||"")}</div>
+    return `<div class="cashflow-history-card">
+      <div class="cashflow-history-top">
+        <div>
+          <div class="cashflow-history-title">${escapeHtml(c.name||"Unnamed Customer")}</div>
+          <div class="customer-muted">${escapeHtml(p.type || "Payment")} / ${escapeHtml(p.method || "Method not saved")}</div>
+        </div>
+        <div class="cashflow-history-amount">${dollars(p.amount)}</div>
+      </div>
+      <div class="cashflow-payment-meta">
+        <div class="cashflow-meta"><div class="cashflow-meta-label">Date</div><div class="cashflow-meta-value">${escapeHtml(paidDate)}</div></div>
+        <div class="cashflow-meta"><div class="cashflow-meta-label">Related Job</div><div class="cashflow-meta-value">${escapeHtml(relatedJob)}</div></div>
+        ${compact ? "" : `<div class="cashflow-meta"><div class="cashflow-meta-label">Project</div><div class="cashflow-meta-value">${escapeHtml(project)}</div></div>
+        <div class="cashflow-meta"><div class="cashflow-meta-label">Notes</div><div class="cashflow-meta-value">${escapeHtml(p.notes||"No notes saved")}</div></div>`}
+      </div>
     </div>`;
-  }).join("");
+  };
+
+  if(recentBox) recentBox.innerHTML=sortedPayments.slice(0,5).map(p=>renderPaymentCard(p,true)).join("");
+  if(box) box.innerHTML=sortedPayments.map(p=>renderPaymentCard(p,false)).join("");
 }
 
 async function recordDepositAndSchedule(){
@@ -6502,27 +6879,27 @@ function renderDashboard(){
      if(q.createdAt){
        events.push({
          time:Number(q.createdAt)||0,
-         icon:"📝",
+         icon:"ðŸ“",
          title:"Quote created",
-         detail:`${name} ${estimate ? "• Proposal #" + estimate : ""} • ${dollars(q.amount)}`
+         detail:`${name} ${estimate ? "â€¢ Proposal #" + estimate : ""} â€¢ ${dollars(q.amount)}`
        });
      }
 
      if(q.signatureStatus==="Sent" || q.signature_status==="Sent"){
        events.push({
          time:Number(q.sentAt || q.updatedAt || q.createdAt || 0),
-         icon:"📨",
+         icon:"ðŸ“¨",
          title:"Proposal sent",
-         detail:`${name} ${estimate ? "• Proposal #" + estimate : ""}`
+         detail:`${name} ${estimate ? "â€¢ Proposal #" + estimate : ""}`
        });
      }
 
      if(q.status==="Sold" || q.signatureStatus==="Signed" || q.signature_status==="Signed"){
        events.push({
          time:Number(q.signedAt || q.signed_at || q.updatedAt || q.createdAt || 0),
-         icon:"✅",
+         icon:"âœ…",
          title:"Proposal signed",
-         detail:`${name} ${estimate ? "• Proposal #" + estimate : ""} • ${dollars(q.amount)}`
+         detail:`${name} ${estimate ? "â€¢ Proposal #" + estimate : ""} â€¢ ${dollars(q.amount)}`
        });
      }
    });
@@ -6530,17 +6907,17 @@ function renderDashboard(){
    jobs.forEach(j=>{
      events.push({
        time:new Date((j.date || selectedDate) + "T00:00:00").getTime(),
-       icon:"📅",
+       icon:"ðŸ“…",
        title:"Job scheduled",
-       detail:`${j.customer || "Unnamed Customer"} • ${j.date || ""} • ${j.crew || ""}`
+       detail:`${j.customer || "Unnamed Customer"} â€¢ ${j.date || ""} â€¢ ${j.crew || ""}`
      });
 
      if(j.status==="Complete"){
        events.push({
          time:new Date((j.date || selectedDate) + "T00:00:00").getTime(),
-         icon:"🏁",
+         icon:"ðŸ",
          title:"Job completed",
-         detail:`${j.customer || "Unnamed Customer"} • ${dollars(j.total)}`
+         detail:`${j.customer || "Unnamed Customer"} â€¢ ${dollars(j.total)}`
        });
      }
    });
@@ -6550,9 +6927,9 @@ function renderDashboard(){
      const c=q ? getCustomer(q.customerId) : {};
      events.push({
        time:Number(p.createdAt || p.date || nowMs()),
-       icon:"💵",
+       icon:"ðŸ’µ",
        title:"Payment recorded",
-       detail:`${c.name || "Customer"} • ${p.type || "Payment"} • ${dollars(p.amount)}`
+       detail:`${c.name || "Customer"} â€¢ ${p.type || "Payment"} â€¢ ${dollars(p.amount)}`
      });
    });
 
@@ -6582,7 +6959,7 @@ function renderDashboard(){
      .slice(0,6);
 
    upcoming.innerHTML=upcomingJobs.length
-     ? upcomingJobs.map(j=>`<div class="job-card"><div class="title">${escapeHtml(j.customer||"Unnamed")}</div><div>${escapeHtml(j.date)} • ${escapeHtml(j.crew||"")}</div><div>Status: <span class="pill ${statusClass(j.status)}">${escapeHtml(j.status)}</span></div><div>Total: <strong>${dollars(j.total)}</strong></div></div>`).join("")
+     ? upcomingJobs.map(j=>`<div class="job-card"><div class="title">${escapeHtml(j.customer||"Unnamed")}</div><div>${escapeHtml(j.date)} â€¢ ${escapeHtml(j.crew||"")}</div><div>Status: <span class="pill ${statusClass(j.status)}">${escapeHtml(j.status)}</span></div><div>Total: <strong>${dollars(j.total)}</strong></div></div>`).join("")
       : "<div class='empty-state'><strong>No upcoming jobs scheduled.</strong><p>Sold jobs will appear here after they are placed on the calendar.</p></div>";
  }
 
@@ -7629,7 +8006,7 @@ if (customerError) {
   renderLineItems();
   calculateQuote();
 
-  setAutoSaveStatus("Quote loaded from cloud ✓");
+  setAutoSaveStatus("Quote loaded from cloud âœ“");
 }
  function setVal(id, value) {
   const el = document.getElementById(id);
