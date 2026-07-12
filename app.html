@@ -5233,16 +5233,20 @@ function buildFollowUpMessage(q,c){const first=(c.name||"there").split(" ")[0];r
 function markFollowedUp(id){const q=quotes.find(q => String(q.id) === String(id));q.lastFollowedUpAt=nowMs();q.nextFollowUpAt=nowMs()+(Number(q.followUpHours)||48)*60*60*1000;renderAll();selectFollowUp(id);}
 async function updateQuoteStatusCloud(id, updates) {
   const q = quotes.find(q => String(q.id) === String(id));
-  if (!q) return;
+  if (!q) return false;
 
-  Object.assign(q, updates);
+  const nextQuote = { ...q, ...updates };
+  const nextQuoteData = {
+    ...(q.quoteData || q.quote_data || {}),
+    ...updates
+  };
 
   if (currentUser) {
     const { error } = await supabaseClient
       .from("quotes")
       .update({
-        status: q.status,
-        quote_data: q.quoteData || q.quote_data || {}
+        status: nextQuote.status,
+        quote_data: nextQuoteData
       })
       .eq("id", id)
       .eq("user_id", currentUser.id);
@@ -5250,11 +5254,14 @@ async function updateQuoteStatusCloud(id, updates) {
     if (error) {
       console.error(error);
       showToast("Quote status was not updated","Cloud save failed: " + error.message,"error");
-      return;
+      return false;
     }
   }
 
+  Object.assign(q, nextQuote);
+  q.quoteData = nextQuoteData;
   renderAll();
+  return true;
 }
 
 async function markSold(id) {
@@ -5830,7 +5837,9 @@ function quoteProjectTimeline(quote){
     ...(quote?.quoteData?.projectPhotoTimeline || quote?.projectPhotoTimeline || {})
   };
   PROJECT_PHOTO_STAGES.forEach(stage=>{
-    if(!Array.isArray(timeline[stage.key])) timeline[stage.key]=[];
+    timeline[stage.key]=Array.isArray(timeline[stage.key])
+      ? timeline[stage.key].map(photo=>({ ...photo }))
+      : [];
   });
   return timeline;
 }
@@ -6011,14 +6020,10 @@ async function handleJobTimelineUpload(jobId,stageKey,files){
 }
 
 async function persistProjectPhotoTimeline(job,quote,timeline){
-  quote.projectPhotoTimeline=timeline;
-  quote.quoteData=quote.quoteData || {};
-  quote.quoteData.projectPhotoTimeline=timeline;
-
-  if(!currentUser) return;
+  const baseQuoteData={...(quote.quoteData || {})};
 
   const quoteId=quote.cloudId || quote.id || job.quoteId;
-  if(!quoteId) return;
+  if(!quoteId) return false;
 
   const persistedTimeline={};
   PROJECT_PHOTO_STAGES.forEach(stage=>{
@@ -6032,19 +6037,28 @@ async function persistProjectPhotoTimeline(job,quote,timeline){
     });
   });
 
-  quote.quoteData.projectPhotoTimeline=persistedTimeline;
-  quote.projectPhotoTimeline=persistedTimeline;
+  const nextQuoteData={...baseQuoteData, projectPhotoTimeline:persistedTimeline};
+
+  if(!currentUser){
+    quote.quoteData=nextQuoteData;
+    quote.projectPhotoTimeline=persistedTimeline;
+    return true;
+  }
 
   const { error } = await supabaseClient
     .from("quotes")
-    .update({ quote_data: quote.quoteData })
+    .update({ quote_data: nextQuoteData })
     .eq("id", quoteId)
     .eq("user_id", currentUser.id);
 
   if(error){
     console.error(error);
     showToast("Photos uploaded, timeline not saved","Quote save failed: " + error.message,"warning");
+    return false;
   }
+  quote.quoteData=nextQuoteData;
+  quote.projectPhotoTimeline=persistedTimeline;
+  return true;
 }
 
 function handleProjectPhotoDragOver(event){
@@ -6242,17 +6256,22 @@ function jobActivityItems(job,quote){
 
 async function persistJobActivityTimeline(job,quote,entries){
   if(!quote) return false;
-  quote.quoteData=quote.quoteData || {};
-  quote.quoteData.jobActivityTimeline=entries;
-  quote.jobActivityTimeline=entries;
+  const nextQuoteData={
+    ...(quote.quoteData || {}),
+    jobActivityTimeline:entries
+  };
 
-  if(!currentUser) return true;
+  if(!currentUser){
+    quote.quoteData=nextQuoteData;
+    quote.jobActivityTimeline=entries;
+    return true;
+  }
   const quoteId=quote.cloudId || quote.id || job?.quoteId;
-  if(!quoteId) return true;
+  if(!quoteId) return false;
 
   const { error } = await supabaseClient
     .from("quotes")
-    .update({ quote_data: quote.quoteData })
+    .update({ quote_data: nextQuoteData })
     .eq("id", quoteId)
     .eq("user_id", currentUser.id);
 
@@ -6261,6 +6280,8 @@ async function persistJobActivityTimeline(job,quote,entries){
     showToast("Activity was not saved","Cloud save failed: " + error.message,"error");
     return false;
   }
+  quote.quoteData=nextQuoteData;
+  quote.jobActivityTimeline=entries;
   return true;
 }
 
@@ -6609,16 +6630,19 @@ async function markJobInProgress(jobId) {
     return;
   }
 
-  job.status = "In Progress";
-
   const quote = quotes.find(q => String(q.id) === String(job.quoteId) || String(q.cloudId) === String(job.quoteId));
-  if (quote) quote.status = "Sold";
+  const proposedJob = { ...job, status: "In Progress" };
 
   editingJobId = job.id;
- const savedSchedule = await saveScheduledJobCloud(job);
-  if(savedSchedule) await appendJobActivity(job, quote, "Job Started", "Job marked In Progress.");
+  const savedSchedule = await saveScheduledJobCloud(proposedJob);
+  if(!savedSchedule) return false;
+
+  Object.assign(job, proposedJob);
+  if (quote) quote.status = "Sold";
+  await appendJobActivity(job, quote, "Job Started", "Job marked In Progress.");
   renderAll();
   showToast("Job started","The job is now marked In Progress.","success");
+  return true;
 }
 
 async function markJobComplete(jobId) {
@@ -6651,16 +6675,19 @@ async function markJobComplete(jobId) {
     if (!completeAnyway) return;
   }
 
-  job.status = "Complete";
-
   const quote = quotes.find(q => String(q.id) === String(job.quoteId) || String(q.cloudId) === String(job.quoteId));
-  if (quote) quote.status = "Sold";
+  const proposedJob = { ...job, status: "Complete" };
 
   editingJobId = job.id;
- const savedSchedule = await saveScheduledJobCloud(job);
-  if(savedSchedule) await appendJobActivity(job, quote, "Job Completed", "Job marked Complete.");
+  const savedSchedule = await saveScheduledJobCloud(proposedJob);
+  if(!savedSchedule) return false;
+
+  Object.assign(job, proposedJob);
+  if (quote) quote.status = "Sold";
+  await appendJobActivity(job, quote, "Job Completed", "Job marked Complete.");
   renderAll();
   showToast("Job complete","The job is now marked Complete.","success");
+  return true;
 }
 
 function renderCustomers(){
@@ -7802,7 +7829,6 @@ savedCustomer = customerData;
     showToast("Customer was not saved","Quote customer save failed: " + customerError.message,"error");
     return;
   }
-  currentCloudCustomerId = customerId;
 
   const measured = getMeasuredSqft();
   const order = getOrderSqft();
@@ -7866,6 +7892,7 @@ const { data, error } = await supabaseClient
     return false;
   }
  
+ currentCloudCustomerId = savedCustomer.id || customerId;
  currentCloudQuoteId = data.id;
 
  if(!options.skipReload){
@@ -8291,9 +8318,9 @@ if (customerError) {
 
 async function uploadContractorLogo(file) {
   const ok = await requireLoggedIn();
-  if (!ok) return;
+  if (!ok) return false;
 
-  if (!file) return;
+  if (!file) return false;
 
   const fileExt = file.name.split(".").pop() || "png";
   const fileName = currentUser.id + "/company-logo-" + Date.now() + "." + fileExt;
@@ -8307,17 +8334,19 @@ async function uploadContractorLogo(file) {
   if (error) {
     console.error(error);
     showToast("Logo was not uploaded","Upload failed: " + error.message,"error");
-    return;
+    return false;
   }
 
   const { data } = supabaseClient.storage
     .from("contractor-logos")
     .getPublicUrl(fileName);
 
+  const savedSettings = await saveUserSettings({
+    company_logo_url: data.publicUrl
+  });
+  if(!savedSettings) return false;
+
   contractorLogoUrl = data.publicUrl;
- await saveUserSettings({
-  company_logo_url: contractorLogoUrl
-});
 
   const status = document.getElementById("companyLogoStatus");
   if (status) status.textContent = "Logo uploaded successfully.";
@@ -8329,6 +8358,7 @@ async function uploadContractorLogo(file) {
   }
 
   showToast("Logo uploaded","Your company logo is ready for proposals.","success");
+  return true;
 }
 async function generateQuotePDF() {
   const { jsPDF } = window.jspdf;
@@ -8979,11 +9009,11 @@ async function deleteCustomer(id){
 
   showToast("Customer deleted","Customer record removed.","success");
 }
- async function saveUserSettings(updates) {
+async function saveUserSettings(updates) {
   const ok = await requireLoggedIn();
-  if (!ok) return;
+  if (!ok) return false;
 
-  userSettings = {
+  const nextUserSettings = {
     ...(userSettings || {}),
     ...updates
   };
@@ -8992,14 +9022,17 @@ async function deleteCustomer(id){
     .from("user_settings")
     .upsert({
       user_id: currentUser.id,
-      ...userSettings,
+      ...nextUserSettings,
       updated_at: new Date().toISOString()
     });
 
   if (error) {
     console.error(error);
     showToast("Settings were not saved","Cloud save failed: " + error.message,"error");
+    return false;
   }
+  userSettings = nextUserSettings;
+  return true;
 }
 
 async function loadUserSettings() {
@@ -9045,8 +9078,8 @@ setEstimateNumberToNext();
     }
   }
 }
- async function saveCompanySettings() {
-  await saveUserSettings({
+async function saveCompanySettings() {
+   const saved = await saveUserSettings({
     company_name: val("settingsCompanyName").trim(),
     company_phone: val("settingsCompanyPhone").trim(),
     company_email: val("settingsCompanyEmail").trim(),
@@ -9055,7 +9088,7 @@ setEstimateNumberToNext();
     company_license: val("settingsCompanyLicense").trim()
   });
 
-  showToast("Company settings saved","Proposal settings are up to date.","success");
+  if(saved) showToast("Company settings saved","Proposal settings are up to date.","success");
 }
  function applyCompanySettingsToQuote() {
   if (!userSettings) return;
