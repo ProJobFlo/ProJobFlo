@@ -503,17 +503,82 @@
     .cashflow-history-amount {
       text-align:left;
     }
+    .setup-overlay {
+      align-items:stretch;
+      padding:0;
+    }
+    .setup-modal {
+      width:100%;
+      max-height:100vh;
+      border-radius:0;
+      border-left:0;
+      border-right:0;
+    }
+    .setup-hero,
+    .setup-body,
+    .setup-sticky-actions {
+      padding-left:16px;
+      padding-right:16px;
+    }
+    .setup-hero h1 {
+      font-size:28px;
+    }
+    .setup-progress,
+    .setup-grid,
+    .setup-default-grid {
+      grid-template-columns:1fr;
+    }
+    .setup-progress-step {
+      min-height:46px;
+    }
+    .setup-body {
+      padding-bottom:148px;
+    }
+    .setup-sticky-actions {
+      flex-direction:column;
+      align-items:stretch;
+    }
+    .setup-sticky-actions .actions {
+      display:grid;
+      grid-template-columns:1fr;
+      width:100%;
+    }
+    .setup-sticky-actions button {
+      width:100%;
+      min-height:48px;
+    }
   }
-  .setup-overlay { position:fixed; inset:0; background:rgba(15,23,42,.82); z-index:9999; display:flex; align-items:center; justify-content:center; padding:12px; }
+  .setup-overlay { position:fixed; inset:0; background:rgba(2,8,23,.86); z-index:9999; display:flex; align-items:center; justify-content:center; padding:18px; backdrop-filter:blur(14px); }
   .setup-overlay.hidden { display:none !important; }
-  .setup-modal { background:white; border-radius:var(--radius); max-width:720px; width:100%; max-height:92vh; overflow:auto; box-shadow:0 20px 60px rgba(0,0,0,.35); padding:20px 20px 96px; position:relative; }
-  .setup-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:14px 0; }
+  .setup-modal { width:min(980px,100%); max-height:92vh; overflow:auto; border:1px solid rgba(96,165,250,.30); border-radius:24px; background:radial-gradient(circle at 86% 0,rgba(31,111,255,.20),transparent 24rem), linear-gradient(180deg,rgba(16,31,55,.98),rgba(7,17,33,.98)); box-shadow:0 32px 100px rgba(0,0,0,.48), inset 0 1px 0 rgba(255,255,255,.06); padding:0; position:relative; }
+  .setup-hero { padding:24px 24px 16px; border-bottom:1px solid rgba(125,158,204,.22); background:radial-gradient(circle at 0 0,rgba(34,197,94,.13),transparent 18rem); }
+  .setup-eyebrow { color:#93c5fd; font-size:12px; font-weight:950; letter-spacing:.08em; text-transform:uppercase; margin-bottom:8px; }
+  .setup-hero h1 { color:#f8fafc; font-size:34px; }
+  .setup-hero p { max-width:68ch; color:#c9d6e8; }
+  .setup-progress { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; margin-top:18px; }
+  .setup-progress-step { min-height:56px; display:flex; align-items:center; gap:9px; padding:9px 10px; border:1px solid rgba(125,158,204,.22); border-radius:14px; background:rgba(5,14,29,.45); color:#9fb0c8; font-size:12px; font-weight:850; }
+  .setup-progress-step span { width:26px; height:26px; display:grid; place-items:center; border-radius:999px; background:rgba(96,165,250,.12); color:#bfdbfe; font-weight:950; }
+  .setup-progress-step.active { border-color:rgba(96,165,250,.48); background:rgba(31,111,255,.16); color:#f8fafc; }
+  .setup-progress-step.active span { background:linear-gradient(180deg,#2f7bff,#1f6fff); color:white; }
+  .setup-body { padding:22px 24px 110px; }
+  .setup-step { display:none; }
+  .setup-step.active { display:grid; gap:16px; animation:setupStepIn .18s ease-out; }
+  .setup-step h2 { border:0; padding:0; margin:0; color:#f8fafc; font-size:22px; }
+  .setup-step-copy { margin:0; color:#aebed4; }
+  .setup-panel { padding:16px; border:1px solid rgba(125,158,204,.24); border-radius:18px; background:rgba(5,14,29,.45); box-shadow:inset 0 1px 0 rgba(255,255,255,.04); }
+  .setup-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:0; }
+  .setup-default-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
   .trade-option { border:1px solid var(--border-strong); border-radius:var(--radius); padding:10px 12px; display:flex; gap:10px; align-items:center; cursor:pointer; background:var(--surface-soft); min-height:64px; }
   .trade-option input { width:auto; margin:0; transform:scale(1.15); }
   .trade-option strong { display:block; font-size:16px; }
   .trade-option .small { margin:0; font-size:12px; line-height:1.2; }
-  .setup-sticky-actions { position:sticky; bottom:0; background:white; border-top:1px solid #e5e7eb; margin:16px -18px -96px; padding:12px 18px calc(12px + env(safe-area-inset-bottom)); box-shadow:0 -8px 20px rgba(0,0,0,.08); }
-  .setup-sticky-actions .setup-count { font-size:13px; color:#4b5563; font-weight:800; margin-bottom:8px; }
+  .setup-sticky-actions { position:sticky; bottom:0; display:flex; align-items:center; justify-content:space-between; gap:14px; background:rgba(7,17,33,.96); border-top:1px solid rgba(125,158,204,.24); margin:0; padding:14px 24px calc(14px + env(safe-area-inset-bottom)); box-shadow:0 -18px 42px rgba(0,0,0,.32); backdrop-filter:blur(16px); }
+  .setup-sticky-actions .setup-count { font-size:13px; color:#aebed4; font-weight:850; }
+  .setup-sticky-actions .actions { justify-content:flex-end; }
+  .setup-logo-row { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:12px; align-items:center; }
+  .setup-ready-card { text-align:center; padding:28px; border:1px solid rgba(34,197,94,.30); border-radius:20px; background:radial-gradient(circle at 50% 0,rgba(34,197,94,.14),transparent 18rem), rgba(5,14,29,.48); }
+  .setup-ready-mark { width:64px; height:64px; margin:0 auto 14px; display:grid; place-items:center; border-radius:999px; background:linear-gradient(180deg,#22c55e,#0f766e); color:white; font-size:32px; font-weight:950; box-shadow:0 18px 38px rgba(34,197,94,.24); }
+  @keyframes setupStepIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
   .trade-hidden { display:none !important; }
   .room-type-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:10px; margin-top:10px; }
   .room-type-grid button { width:100%; }
@@ -959,9 +1024,14 @@
   }
   .setup-modal,
   .setup-sticky-actions {
-    background:#0b172b;
     color:#f8fafc;
     border-color:rgba(125,158,204,.24);
+  }
+  .setup-modal {
+    background:radial-gradient(circle at 86% 0,rgba(31,111,255,.20),transparent 24rem), linear-gradient(180deg,rgba(16,31,55,.98),rgba(7,17,33,.98));
+  }
+  .setup-sticky-actions {
+    background:rgba(7,17,33,.96);
   }
   .trade-option {
     background:rgba(10,23,43,.92);
@@ -2670,28 +2740,125 @@
 <body>
 <div id="setupOverlay" class="setup-overlay hidden">
   <div class="setup-modal">
-    <h1>Set Up ProJobFlo</h1>
-    <p>Select the work you actually do. ProJobFlo will only show those templates and preset rate fields.</p>
-    <div class="setup-grid">
-      <label class="trade-option"><input type="checkbox" value="carpet" class="setupTrade"><div><strong>Carpet</strong><span class="small">Carpet, pad, removal</span></div></label>
-      <label class="trade-option"><input type="checkbox" value="lvp" class="setupTrade" checked><div><strong>LVP</strong><span class="small">Floating/glue-down vinyl jobs</span></div></label>
-      <label class="trade-option"><input type="checkbox" value="tile" class="setupTrade"><div><strong>Tile</strong><span class="small">Floor tile, demo, thinset, grout</span></div></label>
-      <label class="trade-option"><input type="checkbox" value="hardwood" class="setupTrade"><div><strong>Hardwood</strong><span class="small">Wood installs</span></div></label>
-      <label class="trade-option"><input type="checkbox" value="laminate" class="setupTrade"><div><strong>Laminate</strong><span class="small">Laminate installs</span></div></label>
-      <label class="trade-option"><input type="checkbox" value="sheetvinyl" class="setupTrade"><div><strong>Sheet Vinyl</strong><span class="small">Sheet goods</span></div></label>
-      <label class="trade-option"><input type="checkbox" value="shower" class="setupTrade"><div><strong>Showers</strong><span class="small">Shower/bath tile work</span></div></label>
-      <label class="trade-option"><input type="checkbox" value="backsplash" class="setupTrade"><div><strong>Backsplash</strong><span class="small">Kitchen backsplashes</span></div></label>
-      <label class="trade-option"><input type="checkbox" value="cabinets" class="setupTrade"><div><strong>Cabinets</strong><span class="small">Cabinet jobs</span></div></label>
-      <label class="trade-option"><input type="checkbox" value="countertops" class="setupTrade"><div><strong>Countertops</strong><span class="small">Countertop jobs</span></div></label>
-      <label class="trade-option"><input type="checkbox" value="repair" class="setupTrade"><div><strong>Repairs</strong><span class="small">Small jobs/repairs</span></div></label>
+    <div class="setup-hero">
+      <div class="setup-eyebrow">Welcome to ProJobFlo</div>
+      <h1>Set up your quoting workspace</h1>
+      <p>Answer a few quick questions and ProJobFlo will open your first quote with the right business details and trade setup already in place.</p>
+      <div class="setup-progress" aria-label="Onboarding progress">
+        <div class="setup-progress-step active" data-setup-progress="1"><span>1</span>Business</div>
+        <div class="setup-progress-step" data-setup-progress="2"><span>2</span>Trades</div>
+        <div class="setup-progress-step" data-setup-progress="3"><span>3</span>Defaults</div>
+        <div class="setup-progress-step" data-setup-progress="4"><span>4</span>Ready</div>
+      </div>
     </div>
+
+    <div class="setup-body">
+      <section class="setup-step active" data-setup-step="1">
+        <div>
+          <h2>Business basics</h2>
+          <p class="setup-step-copy">These details appear on quotes and proposals. You can edit them later from Settings.</p>
+        </div>
+        <div class="setup-panel">
+          <div class="setup-grid">
+            <div>
+              <label for="onboardingCompanyName">Business Name</label>
+              <input id="onboardingCompanyName" placeholder="Hayden's Floors" />
+            </div>
+            <div>
+              <label for="onboardingCompanyPhone">Company Phone</label>
+              <input id="onboardingCompanyPhone" placeholder="(555) 123-4567" inputmode="tel" />
+            </div>
+            <div>
+              <label for="onboardingCompanyEmail">Company Email</label>
+              <input id="onboardingCompanyEmail" placeholder="you@company.com" type="email" />
+            </div>
+            <div>
+              <label for="onboardingLogoFile">Optional Logo</label>
+              <input id="onboardingLogoFile" type="file" accept="image/*" onchange="handleOnboardingLogoUpload(this.files[0])" />
+            </div>
+          </div>
+          <p id="onboardingLogoStatus" class="small">A logo can be added now or later from Settings.</p>
+        </div>
+      </section>
+
+      <section class="setup-step" data-setup-step="2">
+        <div>
+          <h2>Choose the work you do</h2>
+          <p class="setup-step-copy">ProJobFlo will show the matching templates and preset rate fields.</p>
+        </div>
+        <div class="setup-grid">
+          <label class="trade-option"><input type="checkbox" value="carpet" class="setupTrade"><div><strong>Carpet</strong><span class="small">Carpet, pad, removal</span></div></label>
+          <label class="trade-option"><input type="checkbox" value="lvp" class="setupTrade" checked><div><strong>LVP</strong><span class="small">Floating/glue-down vinyl jobs</span></div></label>
+          <label class="trade-option"><input type="checkbox" value="tile" class="setupTrade"><div><strong>Tile</strong><span class="small">Floor tile, demo, thinset, grout</span></div></label>
+          <label class="trade-option"><input type="checkbox" value="hardwood" class="setupTrade"><div><strong>Hardwood</strong><span class="small">Wood installs</span></div></label>
+          <label class="trade-option"><input type="checkbox" value="laminate" class="setupTrade"><div><strong>Laminate</strong><span class="small">Laminate installs</span></div></label>
+          <label class="trade-option"><input type="checkbox" value="sheetvinyl" class="setupTrade"><div><strong>Sheet Vinyl</strong><span class="small">Sheet goods</span></div></label>
+          <label class="trade-option"><input type="checkbox" value="shower" class="setupTrade"><div><strong>Showers</strong><span class="small">Shower/bath tile work</span></div></label>
+          <label class="trade-option"><input type="checkbox" value="backsplash" class="setupTrade"><div><strong>Backsplash</strong><span class="small">Kitchen backsplashes</span></div></label>
+          <label class="trade-option"><input type="checkbox" value="cabinets" class="setupTrade"><div><strong>Cabinets</strong><span class="small">Cabinet jobs</span></div></label>
+          <label class="trade-option"><input type="checkbox" value="countertops" class="setupTrade"><div><strong>Countertops</strong><span class="small">Countertop jobs</span></div></label>
+          <label class="trade-option"><input type="checkbox" value="repair" class="setupTrade"><div><strong>Repairs</strong><span class="small">Small jobs/repairs</span></div></label>
+        </div>
+      </section>
+
+      <section class="setup-step" data-setup-step="3">
+        <div>
+          <h2>Quote defaults</h2>
+          <p class="setup-step-copy">These mirror existing Quote Builder and preset-rate fields. Leave anything blank if you prefer to set it job by job.</p>
+        </div>
+        <div class="setup-panel">
+          <div class="setup-default-grid">
+            <div>
+              <label for="onboardingDepositPercent">Deposit %</label>
+              <select id="onboardingDepositPercent">
+                <option value="0">0%</option>
+                <option value="25">25%</option>
+                <option value="50" selected>50%</option>
+                <option value="75">75%</option>
+                <option value="100">100%</option>
+              </select>
+            </div>
+            <div>
+              <label for="onboardingTaxRate">Tax Rate</label>
+              <input id="onboardingTaxRate" placeholder="Sales tax %" inputmode="decimal" />
+            </div>
+            <div>
+              <label for="onboardingLvpInstall">LVP Labor Default</label>
+              <input id="onboardingLvpInstall" placeholder="Install $/sqft" inputmode="decimal" />
+            </div>
+            <div>
+              <label for="onboardingTileInstall">Tile Labor Default</label>
+              <input id="onboardingTileInstall" placeholder="Install $/sqft" inputmode="decimal" />
+            </div>
+            <div>
+              <label for="onboardingCarpetInstall">Carpet Labor Default</label>
+              <input id="onboardingCarpetInstall" placeholder="Install $/sqft" inputmode="decimal" />
+            </div>
+            <div>
+              <label>Warranty / Terms</label>
+              <div class="job-file-empty">Uses the existing proposal acceptance language. You can adjust terms later as ProJobFlo expands settings.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="setup-step" data-setup-step="4">
+        <div class="setup-ready-card">
+          <div class="setup-ready-mark">✓</div>
+          <h2>You're ready to create your first quote.</h2>
+          <p class="setup-step-copy">Your business details, trade selection, and quote defaults are ready for the Quote Builder.</p>
+        </div>
+      </section>
+    </div>
+
     <div class="setup-sticky-actions">
-      <div id="setupSelectedCount" class="setup-count">Selected Trades: 1</div>
+      <div id="setupSelectedCount" class="setup-count">Step 1 of 4</div>
       <div class="actions">
-        <button class="success" onclick="completeFirstRunSetup()">Save Setup</button>
+        <button id="setupBackBtn" class="secondary" onclick="previousOnboardingStep()">Back</button>
+        <button id="setupNextBtn" class="success" onclick="nextOnboardingStep()">Continue</button>
+        <button id="setupCreateQuoteBtn" class="success hidden" onclick="completeFirstRunSetup(true)">Create First Quote</button>
         <button class="secondary" onclick="selectAllTrades()">Select All</button>
       </div>
-      <p class="small">You can change this later from Settings.</p>
     </div>
   </div>
 </div>
@@ -3701,9 +3868,10 @@ function saveEnabledTrades(trades){
 }
 
 function updateSetupSelectedCount(){
- const count=Array.from(document.querySelectorAll(".setupTrade:checked")).length;
- const el=document.getElementById("setupSelectedCount");
- if(el) el.textContent="Selected Trades: "+count;
+  const count=Array.from(document.querySelectorAll(".setupTrade:checked")).length;
+  const el=document.getElementById("setupSelectedCount");
+  const step=Number(window.currentOnboardingStep || 1);
+  if(el) el.textContent=step===2 ? "Selected Trades: "+count : "Step "+step+" of 4";
 }
 
 function selectAllTrades(){
@@ -3711,10 +3879,109 @@ function selectAllTrades(){
  updateSetupSelectedCount();
 }
 
-function completeFirstRunSetup(){
- const trades = Array.from(document.querySelectorAll(".setupTrade:checked")).map(cb=>cb.value);
- if(!trades.length){
-   alert("Select at least one trade type.");
+window.currentOnboardingStep = 1;
+
+function syncOnboardingFieldsFromApp(){
+  setVal("onboardingCompanyName", val("companyName") || val("settingsCompanyName") || userSettings?.company_name || "");
+  setVal("onboardingCompanyPhone", val("companyPhone") || val("settingsCompanyPhone") || userSettings?.company_phone || "");
+  setVal("onboardingCompanyEmail", val("companyEmail") || val("settingsCompanyEmail") || userSettings?.company_email || "");
+  setVal("onboardingDepositPercent", val("depositPercent") || "50");
+  setVal("onboardingTaxRate", val("taxRate") || "");
+  setVal("onboardingLvpInstall", val("presetLvpInstall") || "");
+  setVal("onboardingTileInstall", val("presetTileInstall") || "");
+  setVal("onboardingCarpetInstall", val("presetCarpetInstall") || "");
+  const status=document.getElementById("onboardingLogoStatus");
+  if(status) status.textContent=contractorLogoUrl ? "Logo uploaded." : "A logo can be added now or later from Settings.";
+}
+
+function applyOnboardingFieldsToApp(){
+  const companyName=val("onboardingCompanyName");
+  const companyPhone=val("onboardingCompanyPhone");
+  const companyEmail=val("onboardingCompanyEmail");
+  setVal("companyName", companyName);
+  setVal("companyPhone", companyPhone);
+  setVal("companyEmail", companyEmail);
+  setVal("settingsCompanyName", companyName);
+  setVal("settingsCompanyPhone", companyPhone);
+  setVal("settingsCompanyEmail", companyEmail);
+  setVal("depositPercent", val("onboardingDepositPercent") || val("depositPercent") || "50");
+  setVal("taxRate", val("onboardingTaxRate"));
+  setVal("presetLvpInstall", val("onboardingLvpInstall"));
+  setVal("presetTileInstall", val("onboardingTileInstall"));
+  setVal("presetCarpetInstall", val("onboardingCarpetInstall"));
+  calculateQuote();
+}
+
+function showOnboardingStep(step){
+  const next=Math.max(1,Math.min(4,Number(step)||1));
+  window.currentOnboardingStep=next;
+  document.querySelectorAll("[data-setup-step]").forEach(el=>el.classList.toggle("active",Number(el.dataset.setupStep)===next));
+  document.querySelectorAll("[data-setup-progress]").forEach(el=>el.classList.toggle("active",Number(el.dataset.setupProgress)===next));
+  const back=document.getElementById("setupBackBtn");
+  const nextBtn=document.getElementById("setupNextBtn");
+  const create=document.getElementById("setupCreateQuoteBtn");
+  if(back) back.classList.toggle("hidden",next===1);
+  if(nextBtn) nextBtn.classList.toggle("hidden",next===4);
+  if(create) create.classList.toggle("hidden",next!==4);
+  const selectAll=document.querySelector(".setup-sticky-actions button[onclick='selectAllTrades()']");
+  if(selectAll) selectAll.classList.toggle("hidden",next!==2);
+  updateSetupSelectedCount();
+}
+
+function validateOnboardingStep(step){
+  if(Number(step)===2 && !document.querySelectorAll(".setupTrade:checked").length){
+    alert("Select at least one trade type.");
+    return false;
+  }
+  return true;
+}
+
+function nextOnboardingStep(){
+  const step=Number(window.currentOnboardingStep || 1);
+  if(!validateOnboardingStep(step)) return;
+  if(step===1 || step===3) applyOnboardingFieldsToApp();
+  showOnboardingStep(step+1);
+}
+
+function previousOnboardingStep(){
+  showOnboardingStep(Number(window.currentOnboardingStep || 1)-1);
+}
+
+function hasCompletedFirstRunSetup(){
+  try {
+    const raw=localStorage.getItem("fastQuoteTradeSetup");
+    if(!raw) return false;
+    const data=JSON.parse(raw);
+    return !!(data && data.completed && Array.isArray(data.enabledTrades) && data.enabledTrades.length);
+  } catch(e) {
+    return false;
+  }
+}
+
+function hasExistingWorkData(){
+  return (customers && customers.length) || (quotes && quotes.length) || (jobs && jobs.length);
+}
+
+async function handleOnboardingLogoUpload(file){
+  if(!file) return;
+  const source=document.getElementById("onboardingLogoFile");
+  const target=document.getElementById("companyLogoFile");
+  if(target && source){
+    try {
+      const transfer=new DataTransfer();
+      transfer.items.add(file);
+      target.files=transfer.files;
+    } catch(e) {}
+  }
+  await uploadContractorLogo(file);
+  const status=document.getElementById("onboardingLogoStatus");
+  if(status) status.textContent=contractorLogoUrl ? "Logo uploaded." : "Logo upload is available after login.";
+}
+
+function completeFirstRunSetup(launchQuote=false){
+  const trades = Array.from(document.querySelectorAll(".setupTrade:checked")).map(cb=>cb.value);
+  if(!trades.length){
+    alert("Select at least one trade type.");
    return;
  }
  try {
@@ -3722,26 +3989,34 @@ function completeFirstRunSetup(){
  } catch(e) {
    enabledTrades = trades;
    applyTradeVisibility();
- }
- const overlay = document.getElementById("setupOverlay");
- if(overlay) overlay.classList.add("hidden");
- renderSettingsTradeList();
- renderAll();
+  }
+  const overlay = document.getElementById("setupOverlay");
+  if(overlay) overlay.classList.add("hidden");
+  applyOnboardingFieldsToApp();
+  renderSettingsTradeList();
+  renderAll();
+  if(launchQuote){
+    showTab("quote");
+    window.scrollTo({top:0,behavior:"smooth"});
+  }
 }
 
 function maybeShowFirstRunSetup(){
- const forceSetup = window.location.search.includes("setup=1");
- const saved = getSavedTrades();
- if(saved && saved.length && !forceSetup){
-   enabledTrades = saved;
-   document.getElementById("setupOverlay").classList.add("hidden");
- } else {
+  const forceSetup = window.location.search.includes("setup=1");
+  const saved = getSavedTrades();
+  const shouldSkip = !forceSetup && ((saved && saved.length && hasCompletedFirstRunSetup()) || hasExistingWorkData());
+  if(shouldSkip){
+    enabledTrades = saved && saved.length ? saved : (enabledTrades && enabledTrades.length ? enabledTrades : ["lvp"]);
+    document.getElementById("setupOverlay").classList.add("hidden");
+  } else {
    enabledTrades = saved && saved.length ? saved : ["lvp"];
    document.getElementById("setupOverlay").classList.remove("hidden");
- }
- syncSetupCheckboxes();
- renderSettingsTradeList();
- applyTradeVisibility();
+  }
+  syncSetupCheckboxes();
+  syncOnboardingFieldsFromApp();
+  showOnboardingStep(1);
+  renderSettingsTradeList();
+  applyTradeVisibility();
 }
 
 function syncSetupCheckboxes(){
@@ -7867,6 +8142,7 @@ if (customerError) {
   await loadJobsFromCloud();
   await loadPaymentsFromCloud();
   await loadUserSettings();
+  maybeShowFirstRunSetup();
 
   const authStatus = document.getElementById("authStatus");
   if (authStatus) {
