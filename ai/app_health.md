@@ -15,6 +15,7 @@ It answers:
 - Is the approval RPC reachable?
 - Are required Edge Function names configured in the client?
 - Is browser-local configuration available?
+- Is the browser currently online or offline?
 
 ## Where It Lives
 
@@ -48,6 +49,7 @@ Overall health is:
 | Subsystem | Check | Notes |
 |---|---|---|
 | Local configuration | Confirms Supabase URL and publishable key constants exist. | Does not validate secrets. The publishable key is expected to be public. |
+| Connection | Reads the browser online/offline state. | Reports `PASS` when online and `WARNING` when offline. It does not attempt repair or background sync. |
 | Browser local storage | Writes and removes a harmless temporary key. | Does not read customer backups. |
 | Supabase authentication | Calls `supabaseClient.auth.getSession()`. | Anonymous state is a warning for user-data testing. |
 | Database connectivity | Reads `customers.id` with `limit(1)`. | Requires the logged-in user's normal RLS path. |
@@ -80,6 +82,7 @@ The diagnostic report includes:
 - current screen
 - current user ID
 - browser user agent and platform
+- browser connection status
 - configured trade labels
 - company configured flag
 - outstanding operation-lock items

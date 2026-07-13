@@ -599,6 +599,10 @@
   .toast.warning { background:linear-gradient(135deg,#92400e,#78350f); }
   .toast-title { font-weight:900; line-height:1.25; }
   .toast-message { color:rgba(255,255,255,.84); font-size:13px; line-height:1.35; }
+  .offline-banner { position:fixed; top:16px; left:50%; transform:translateX(-50%); z-index:9200; width:min(720px,calc(100vw - 32px)); display:flex; align-items:center; justify-content:center; gap:8px; padding:11px 16px; border-radius:16px; background:rgba(120,53,15,.96); color:#fff7ed; border:1px solid rgba(251,191,36,.44); box-shadow:0 18px 44px rgba(15,23,42,.24); font-size:14px; line-height:1.35; }
+  .offline-banner strong { color:white; }
+  .offline-banner.hidden { display:none !important; }
+  body.app-offline .toast-region { top:76px; }
   @keyframes toastIn { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
   @media (min-width: 981px) {
     #viewQuote > .grid > div:last-child { align-self:stretch; }
@@ -641,6 +645,8 @@
     .feedback-button { width:auto; right:12px; bottom:12px; }
     .feedback-overlay { align-items:flex-end; padding:12px; }
     .toast-region { right:12px; top:12px; width:calc(100vw - 24px); }
+    body.app-offline .toast-region { top:82px; }
+    .offline-banner { top:10px; width:calc(100vw - 20px); padding:10px 12px; align-items:flex-start; flex-direction:column; gap:2px; font-size:13px; }
     .hide-mobile { display:none; }
     .day { min-height:95px; padding:6px; }
   }
@@ -3676,6 +3682,10 @@ Preset rates are only starting points:
     <a id="feedbackMailtoLink" class="feedback-mailto hidden" href="#">Open email draft</a>
   </div>
 </div>
+<div id="offlineBanner" class="offline-banner hidden" role="status" aria-live="polite">
+  <strong>You're offline.</strong>
+  <span>Cloud changes cannot be saved until you're connected again.</span>
+</div>
 <div id="toastRegion" class="toast-region" aria-live="polite" aria-atomic="true"></div>
 
 <script>
@@ -3721,6 +3731,10 @@ let pendingStandaloneCustomerId = null;
 let pendingQuoteCustomerId = null;
 let pendingQuoteId = null;
 const pendingPaymentIds = {};
+const applicationConnectionState = {
+  online: typeof navigator === "undefined" ? true : navigator.onLine !== false,
+  lastChangedAt: new Date().toISOString()
+};
 
 function beginOperation(key,title="Still working",message="Please wait for the current save to finish."){
   if(pendingOperations.has(key)){
@@ -3733,6 +3747,52 @@ function beginOperation(key,title="Still working",message="Please wait for the c
 
 function endOperation(key){
   if(key) pendingOperations.delete(key);
+}
+
+function browserReportsOnline(){
+  return typeof navigator === "undefined" || navigator.onLine !== false;
+}
+
+function connectionStatusLabel(){
+  return applicationConnectionState.online ? "Online" : "Offline";
+}
+
+function renderConnectionState(){
+  const isOnline=applicationConnectionState.online;
+  const banner=document.getElementById("offlineBanner");
+  if(banner) banner.classList.toggle("hidden",isOnline);
+  if(document.body) document.body.classList.toggle("app-offline",!isOnline);
+}
+
+function syncConnectionState(showReconnectToast=false){
+  const wasOnline=applicationConnectionState.online;
+  const isOnline=browserReportsOnline();
+  applicationConnectionState.online=isOnline;
+  applicationConnectionState.lastChangedAt=new Date().toISOString();
+  renderConnectionState();
+  if(!wasOnline && isOnline && showReconnectToast){
+    showToast("Connected.","Cloud syncing is available again.","success");
+  }
+  return isOnline;
+}
+
+function setupConnectionAwareness(){
+  syncConnectionState(false);
+  window.addEventListener("online",()=>syncConnectionState(true));
+  window.addEventListener("offline",()=>syncConnectionState(false));
+}
+
+function requireOnlineForCloudWrite(workflow="cloud save",notify=true){
+  if(syncConnectionState(false)) return true;
+  if(notify){
+    showToast(
+      "You're offline",
+      "Cloud changes cannot be saved until you're connected again.",
+      "warning",
+      5200
+    );
+  }
+  return false;
 }
 
 const CLIENT_DIAGNOSTIC_LOG_KEY = "projobfloClientDiagnostics";
@@ -3872,6 +3932,14 @@ async function getApplicationHealth(){
     checks.push(healthItem("Local configuration","PASS","Required client configuration is present."));
   }
 
+  syncConnectionState(false);
+  checks.push(healthItem(
+    "Connection",
+    applicationConnectionState.online ? "PASS" : "WARNING",
+    applicationConnectionState.online ? "Online." : "Offline. Cloud writes are blocked until reconnect.",
+    { status:connectionStatusLabel() }
+  ));
+
   if(typeof localStorage === "undefined"){
     checks.push(healthItem("Browser local storage","FAIL","localStorage is unavailable."));
   }else{
@@ -4009,7 +4077,9 @@ function buildDiagnosticReport(health){
       userId:currentUser?.id || "",
       browser:redactDiagnosticMessage(navigator.userAgent || ""),
       platform:redactDiagnosticMessage(navigator.platform || ""),
-      language:redactDiagnosticMessage(navigator.language || "")
+      language:redactDiagnosticMessage(navigator.language || ""),
+      connectionStatus:connectionStatusLabel(),
+      connectionLastChangedAt:applicationConnectionState.lastChangedAt
     },
     configuration:{
       supabaseUrlConfigured:!!SUPABASE_URL,
@@ -4581,15 +4651,17 @@ async function advanceEstimateNumberCloud() {
   const next = current + 1;
 
   if (currentUser) {
-    await saveUserSettings({
+    const saved = await saveUserSettings({
       next_estimate_number: next
     });
+    if(!saved) return false;
   }
 
   userSettings.next_estimate_number = next;
 
   const el = document.getElementById("estimateNumber");
   if (el) el.value = next;
+  return true;
 }
  function loadCrewSettings() {
   try {
@@ -4676,6 +4748,7 @@ function deleteCrew(index) {
 async function init() {
   renderAppVersion();
   setupHealthSupportButtons();
+  setupConnectionAwareness();
   document.getElementById("estimateDate").value = new Date().toISOString().slice(0,10);
   setEstimateNumberToNext();
   document.getElementById("scheduleDate").value = selectedDate;
@@ -4965,6 +5038,7 @@ async function addRoomPhotos(roomId, files) {
   if(list.length && !beginOperation(operationKey,"Photo upload already running","Please wait for these photos to finish uploading.")) return;
 
   try{
+  if(currentUser && !requireOnlineForCloudWrite("photo-upload")) return;
   if (!roomPhotos[roomId]) roomPhotos[roomId] = [];
 
   for (const file of list) {
@@ -5710,6 +5784,7 @@ async function emailContract(){
     alert("Please login first.");
     return;
   }
+  if(!requireOnlineForCloudWrite("signed-contract-email-send")) return;
 
   const estimateNumber = val("estimateNumber") || Date.now();
 
@@ -5778,6 +5853,7 @@ async function updateQuoteStatusCloud(id, updates) {
   };
 
   if (currentUser) {
+    if(!requireOnlineForCloudWrite("quote-status-update")) return false;
     const { error } = await supabaseClient
       .from("quotes")
       .update({
@@ -5847,12 +5923,12 @@ async function scheduleSelectedQuote(){
  let operationKey="";
  try{
   const selectedQuoteId = val("scheduleQuoteSelect");
- const q = quotes.find(q => String(q.cloudId || q.id) === String(selectedQuoteId));
-  if(!q){alert("Select a sold quote first.");return;}
- const ok = await requireLoggedIn();
- if(!ok) return;
+  const q = quotes.find(q => String(q.cloudId || q.id) === String(selectedQuoteId));
+   if(!q){alert("Select a sold quote first.");return;}
+  const ok = await requireLoggedIn();
+  if(!ok) return;
 
- const c=getCustomer(q.customerId);
+  const c=getCustomer(q.customerId);
  const quoteId = q.cloudId || q.id;
  const customerId = c.cloudId || c.id;
 
@@ -5872,11 +5948,12 @@ async function scheduleSelectedQuote(){
   notes:val("scheduleNotes")
  };
 
- if(!job.date){alert("Choose install date.");return;}
- operationKey="schedule-job-"+quoteId+"-"+job.date;
- if(!beginOperation(operationKey,"Job scheduling already running","Please wait for this job to finish scheduling.")) return;
+  if(!job.date){alert("Choose install date.");return;}
+  operationKey="schedule-job-"+quoteId+"-"+job.date;
+  if(!beginOperation(operationKey,"Job scheduling already running","Please wait for this job to finish scheduling.")) return;
+  if(!requireOnlineForCloudWrite("schedule-job-create")) return;
 
- const { data, error } = await supabaseClient
+  const { data, error } = await supabaseClient
    .from("jobs")
    .insert({
      user_id: currentUser.id,
@@ -5930,8 +6007,9 @@ async function scheduleSelectedQuote(){
 
  async function saveScheduledJobCloud(job){
  if(!currentUser || !job || !job.cloudId) return false;
+ if(!requireOnlineForCloudWrite("schedule-job-update")) return false;
 
- const { error } = await supabaseClient
+  const { error } = await supabaseClient
    .from("jobs")
    .update({
      start_date: job.date,
@@ -6015,6 +6093,7 @@ async function deleteScheduledJob(){
  const name=job ? job.customer : "this job";
  if(!confirm("Delete scheduled job for "+name+"?"))return;
  if(currentUser && job && job.cloudId){
+  if(!requireOnlineForCloudWrite("schedule-job-delete")) return;
   const { error } = await supabaseClient
     .from("jobs")
     .delete()
@@ -6437,6 +6516,7 @@ async function hydrateProjectTimelinePhotoUrls(quote){
   if(!quote) return;
   const timeline=quoteProjectTimeline(quote);
   const legacyPhotos=quote?.roomPhotosSnapshot || quote?.quoteData?.roomPhotos || quote?.roomPhotos || {};
+  let timelineChanged=false;
   for(const roomId of Object.keys(legacyPhotos || {})){
     for(const photo of legacyPhotos[roomId] || []){
       if(photo.cloudPath && !photo.url){
@@ -6448,12 +6528,15 @@ async function hydrateProjectTimelinePhotoUrls(quote){
     for(const photo of timeline[stage.key] || []){
       if(photo.cloudPath && !photo.url){
         photo.url=await getCloudPhotoUrl(photo.cloudPath);
+        timelineChanged=true;
       }
     }
   }
-  quote.projectPhotoTimeline=timeline;
-  quote.quoteData=quote.quoteData || {};
-  quote.quoteData.projectPhotoTimeline=timeline;
+  if(timelineChanged){
+    quote.projectPhotoTimeline=timeline;
+    quote.quoteData=quote.quoteData || {};
+    quote.quoteData.projectPhotoTimeline=timeline;
+  }
 }
 
 function renderProjectPhotoTimeline(job, quote){
@@ -6596,6 +6679,7 @@ async function persistProjectPhotoTimeline(job,quote,timeline){
     quote.projectPhotoTimeline=persistedTimeline;
     return true;
   }
+  if(!requireOnlineForCloudWrite("project-photo-timeline-save")) return false;
 
   const { error } = await supabaseClient
     .from("quotes")
@@ -6820,6 +6904,7 @@ async function persistJobActivityTimeline(job,quote,entries){
   }
   const quoteId=quote.cloudId || quote.id || job?.quoteId;
   if(!quoteId) return false;
+  if(!requireOnlineForCloudWrite("activity-timeline-save")) return false;
 
   const { error } = await supabaseClient
     .from("quotes")
@@ -6956,6 +7041,7 @@ async function persistJobProgressChecklist(job,quote,progress){
   if(currentUser){
     const quoteId=quote.cloudId || quote.id || job.quoteId;
     if(quoteId){
+      if(!requireOnlineForCloudWrite("job-progress-save")) return false;
       const { error } = await supabaseClient
         .from("quotes")
         .update({ quote_data: nextQuoteData })
@@ -7526,6 +7612,7 @@ async function addPayment(payment) {
     alert("Please log in first.");
     return false;
   }
+  if(!requireOnlineForCloudWrite("payment-save")) return false;
 
   const newPayment = {
     ...payment,
@@ -8304,6 +8391,11 @@ async function resetPassword() {
 }
  async function requireLoggedIn() {
   if (currentUser) return true;
+  if(!browserReportsOnline()){
+    syncConnectionState(false);
+    showToast("You're offline","Log in or save cloud changes after your connection returns.","warning",5200);
+    return false;
+  }
 
   const { data, error } = await supabaseClient.auth.getUser();
 
@@ -8332,6 +8424,7 @@ async function saveCurrentCustomerToCloud() {
   if (!customerName && !customerPhone && !customerEmail && !jobAddress && !notes) {
     return;
   }
+  if(!requireOnlineForCloudWrite("customer-save")) return;
   const customerId = currentCloudCustomerId || pendingStandaloneCustomerId || crypto.randomUUID();
   pendingStandaloneCustomerId = customerId;
 
@@ -8396,6 +8489,7 @@ async function saveCurrentQuoteToCloud(options = {}) {
   try{
   const ok = await requireLoggedIn();
   if (!ok) return;
+  if(!requireOnlineForCloudWrite("quote-save")) return false;
 
   const customerPayload = {
     user_id: currentUser.id,
@@ -8563,6 +8657,7 @@ async function loadQuotesFromCloud() {
     alert("No scheduled jobs to save.");
     return;
   }
+  if(!requireOnlineForCloudWrite("jobs-save")) return;
 
   let savedCount = 0;
 
@@ -8685,6 +8780,10 @@ async function queueAutoSave() {
 }
 async function autoSaveCurrentQuoteDraft() {
   if (!currentUser) return;
+  if(!requireOnlineForCloudWrite("quote-auto-save",false)){
+    setAutoSaveStatus("Offline - auto-save paused.");
+    return;
+  }
 
   setAutoSaveStatus("Saving online...");
 
@@ -8798,6 +8897,7 @@ if (customerError) {
  async function uploadPhotoToCloud(file, roomId, category) {
   const ok = await requireLoggedIn();
   if (!ok) return null;
+  if(!requireOnlineForCloudWrite("photo-upload")) return null;
 
   const fileExt = file.name.split(".").pop() || "jpg";
   const fileName = Date.now() + "-" + Math.random().toString(36).slice(2) + "." + fileExt;
@@ -8926,6 +9026,7 @@ async function uploadContractorLogo(file) {
   try{
   const ok = await requireLoggedIn();
   if (!ok) return false;
+  if(!requireOnlineForCloudWrite("logo-upload")) return false;
 
   if (!file) return false;
 
@@ -9226,6 +9327,7 @@ doc.text("PROJECT PROPOSAL", 14, 42);
  async function generateSignatureLink() {
   const ok = await requireLoggedIn();
   if (!ok) return;
+  if(!requireOnlineForCloudWrite("signature-link-create")) return;
 
   if (!currentCloudQuoteId) {
     await autoSaveCurrentQuoteDraft();
@@ -9599,6 +9701,7 @@ async function deleteCustomer(id){
   if(!reallySure)return;
 
   if(currentUser){
+    if(!requireOnlineForCloudWrite("customer-delete")) return;
     const { error } = await supabaseClient
       .from("customers")
       .delete()
@@ -9631,6 +9734,7 @@ async function saveUserSettings(updates) {
   try{
   const ok = await requireLoggedIn();
   if (!ok) return false;
+  if(!requireOnlineForCloudWrite("settings-save")) return false;
 
   const nextUserSettings = {
     ...(userSettings || {}),
@@ -9735,6 +9839,7 @@ async function saveCompanySettings() {
  async function createSignatureLink() {
   const ok = await requireLoggedIn();
   if (!ok) return "";
+  if(!requireOnlineForCloudWrite("signature-link-create")) return "";
 
   if (!currentCloudQuoteId) {
     await autoSaveCurrentQuoteDraft();
@@ -9789,6 +9894,7 @@ async function saveCompanySettings() {
 
   const approvalLink = await createSignatureLink();
   if (!approvalLink) return;
+  if(!requireOnlineForCloudWrite("proposal-email-send")) return;
 
   const { data: sessionData } = await supabaseClient.auth.getSession();
   const token = sessionData.session?.access_token;

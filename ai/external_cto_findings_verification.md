@@ -26,7 +26,7 @@ Some findings remain current or partially true:
 - Crews, trade setup, and preset rates remain localStorage-backed or mixed, so some setup data can disappear when switching devices.
 - Room photo deletion is local/metadata-only and does not delete Supabase Storage objects.
 - Project Photo Timeline uploads can leave orphaned storage objects if quote metadata persistence fails.
-- There is no explicit offline detection before cloud writes.
+- Offline awareness now uses browser online/offline events, an offline banner, reconnect toast, and preflight guards before major cloud writes.
 - Approval is RPC-first in source, but live deployment status cannot be inferred from repository code alone.
 - Money Tracker core outstanding balance is correct for the requested fixtures. The confirmed `Remaining To Collect` double-counting bug was fixed by using total unpaid balance instead of adding deposit shortfall on top of that balance.
 
@@ -373,28 +373,28 @@ Recommended action:
 
 ### 9. Offline Behavior
 
-Search results:
+Current source:
 
-- No `navigator.onLine` usage.
-- No `online` / `offline` event listeners.
-- The word `online` appears only in user-facing save/load messaging.
+- `navigator.onLine` is used through the central connection-state helper.
+- `online` / `offline` event listeners are registered during app initialization.
+- Major cloud write paths call the shared offline guard before attempting Supabase writes or Edge Function sends.
 
 Current behavior:
 
-- Cloud actions attempt Supabase requests normally.
-- If the browser is offline, requests should fail through existing Supabase error paths.
-- Some hardened workflows keep local state unchanged after failed cloud writes.
-- There is no preflight offline warning, no queued offline save mode, and no global offline banner.
+- Offline state shows a persistent banner.
+- Reconnect shows a brief success toast.
+- Major cloud write paths stop before the cloud request when offline and do not show success.
+- No offline write queue or background sync is implemented.
 
 Conclusion:
 
-- Confirmed current future architecture concern and five-user beta UX risk.
-- Not a blocker if first beta users are instructed that ProJobFlo requires an internet connection.
+- The previous missing-offline-awareness finding is fixed for beta reliability.
+- Offline sync remains intentionally unsupported; ProJobFlo still requires an internet connection for cloud saves.
 
 Recommended action:
 
-- Add a lightweight offline banner and preflight messaging before paid beta.
 - Do not queue writes offline until idempotency and sync conflict rules are server-backed.
+- Keep first beta users aware that offline mode is read/blocked only, not a sync feature.
 
 ### 10. Approval RPC Status
 
@@ -427,12 +427,12 @@ Before paid beta:
 2. `app- backup.html` is tracked and publicly deployable from the static root.
 3. Room photo deletion does not delete Supabase Storage objects and does not immediately persist metadata deletion.
 4. Project Photo Timeline has upload/persist behavior but no supported delete path.
-5. No explicit offline detection or offline user messaging exists.
 
 ## Fixed In This Pass
 
 1. `Remaining To Collect` no longer double counts partial unpaid deposits. It now uses total unpaid balance (`finalDue`) instead of `depositsDue + finalDue`.
 2. Signature-link error diagnostics no longer reference undefined `quote.id`; both functions now use the available `currentCloudQuoteId` safely.
+3. Offline awareness now shows an offline banner, reconnect toast, health/support connection status, and guards major cloud writes before Supabase requests.
 
 ## Stale / Already-Fixed Findings
 
@@ -443,6 +443,7 @@ Before paid beta:
 5. Explicit-zero `depositRequired` being ignored: fixed/stale.
 6. `Remaining To Collect` partial-deposit double counting: fixed.
 7. Undefined `quote.id` in signature-link diagnostics: fixed.
+8. Missing offline detection and offline user messaging: fixed.
 
 ## Partially True Findings
 
@@ -473,8 +474,7 @@ Before paid beta:
 1. `app- backup.html` is publicly accessible if deployed.
 2. Local crews/trades/preset rates do not follow the user across devices.
 3. Photo deletions can leave orphaned files.
-4. Offline saves fail through normal error paths without proactive offline messaging.
-5. Some user-facing alerts still feel less polished than the rest of the app.
+4. Some user-facing alerts still feel less polished than the rest of the app.
 
 ## Future Architecture Concerns
 
