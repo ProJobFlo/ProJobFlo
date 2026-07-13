@@ -126,6 +126,28 @@ Low:
 4. Confirm Supabase dashboard access for Hayden.
 5. Confirm the last known-good deployment URL loads.
 
+### Backup Review
+
+| Data area | Current backup strategy | Current recovery ability | Recommended cadence |
+|---|---|---|---|
+| Quotes | Stored in Supabase `quotes`; optional device backup via local app backup. | Recoverable from Supabase backups or manual row export if the row exists. Quote payload recovery requires JSON inspection. | Daily Supabase backup/PITR for beta; export affected rows before any repair. |
+| Customers | Stored in Supabase `customers`; optional device backup includes local customer array. | Recoverable from Supabase backups or manual row export. Relationship repair may require matching quote/customer IDs. | Daily Supabase backup/PITR; export before deletion or merge repairs. |
+| Jobs | Stored in Supabase `jobs`; optional device backup includes local job array. | Recoverable from Supabase backups or manual row export. Quote status should remain `Sold` even if job status changes. | Daily Supabase backup/PITR; export rows before schedule repair. |
+| Payments | Stored in Supabase `payments`. Money Tracker totals are derived from payment rows. | Recover by restoring or repairing payment rows only; do not edit derived totals. | Daily Supabase backup/PITR; export payment rows before duplicate cleanup. |
+| Settings | Company settings stored in `user_settings`; crews/trade presets still use localStorage in places. | Cloud settings recoverable from Supabase; device-local settings may be lost if browser storage is cleared. | Daily Supabase backup/PITR; document localStorage limitations for beta. |
+| Photos | Binary objects in `job-photos`/`contractor-logos`; metadata mostly in `quotes.quote_data` or `user_settings`. | Recovery may require matching storage paths to quote metadata. Orphaned objects or missing metadata require manual reconciliation. | Daily Supabase storage backup if available; export affected quote metadata before repair. |
+
+### Disaster Recovery Procedure
+
+1. Stop inviting new beta users until the incident is understood.
+2. Record current production commit, deployment time, and affected accounts.
+3. Check whether the incident is frontend-only, Supabase-only, or mixed.
+4. If frontend-only, follow `ai/rollback_plan.md`.
+5. If data is affected, export affected rows and storage metadata before any repair.
+6. Restore from Supabase backup/PITR only after confirming the blast radius and communicating downtime risk.
+7. Re-run the production smoke test after rollback or restoration.
+8. Document root cause, affected records, repair actions, and follow-up prevention.
+
 ### Manual Recovery Principles
 
 - Never delete or overwrite production records during triage without exporting the affected rows first.

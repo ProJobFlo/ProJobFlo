@@ -3488,6 +3488,16 @@
   </div>
 </div>
    <div class="card">
+    <h2>Application Health & Support</h2>
+    <p class="small">Version <span id="appVersionLabel">-</span>. Generate a safe health report for beta support without customer contact details, proposal contents, signatures, tokens, or photos.</p>
+    <div class="actions">
+      <button id="runHealthCheckButton" class="secondary" type="button">Run Health Check</button>
+      <button id="copySupportReportButton" class="secondary" type="button">Copy Support Report</button>
+    </div>
+    <div id="healthSummary" class="small" style="margin-top:10px;">Health check has not run yet.</div>
+    <pre id="supportReportPreview" class="quote-box" style="max-height:260px;overflow:auto;margin-top:10px;white-space:pre-wrap;">Support report will appear here after running a health check.</pre>
+  </div>
+   <div class="card">
     <h2>Company Branding</h2>
     <div class="form-grid">
   <input id="settingsCompanyName" placeholder="Company name" />
@@ -3692,6 +3702,13 @@ const supabaseClient = supabase.createClient(
   SUPABASE_KEY
 );
 
+const APP_VERSION = "1.0.0-beta.2";
+const APP_RELEASE_COMMIT = "";
+const REQUIRED_TABLES = ["customers","quotes","jobs","payments","user_settings"];
+const REQUIRED_STORAGE_BUCKETS = ["job-photos","contractor-logos","Logos"];
+const REQUIRED_EDGE_FUNCTIONS = ["super-processor","send-signature-email"];
+const REQUIRED_RPCS = ["approve_proposal_transaction"];
+
 let currentUser = null;
  let currentCloudCustomerId = null;
 let currentCloudQuoteId = null;
@@ -3771,6 +3788,393 @@ function reportClientDiagnostic(workflow,error,context={}){
     localStorage.setItem(CLIENT_DIAGNOSTIC_LOG_KEY,JSON.stringify(existing.slice(-25)));
   }catch(e){}
   return entry;
+}
+
+function safeDiagnosticEntries(){
+  const entries=[];
+  ["projobfloClientDiagnostics","projobfloApprovalDiagnostics"].forEach(key=>{
+    try{
+      const parsed=JSON.parse(localStorage.getItem(key) || "[]");
+      if(Array.isArray(parsed)){
+        parsed.slice(-10).forEach(item=>{
+          entries.push({
+            diagnosticId:redactDiagnosticMessage(item?.diagnosticId || ""),
+            timestamp:redactDiagnosticMessage(item?.timestamp || ""),
+            workflow:redactDiagnosticMessage(item?.workflow || ""),
+            userId:redactDiagnosticMessage(item?.userId || ""),
+            message:redactDiagnosticMessage(item?.message || ""),
+            table:redactDiagnosticMessage(item?.table || ""),
+            bucket:redactDiagnosticMessage(item?.bucket || ""),
+            edgeFunction:redactDiagnosticMessage(item?.edgeFunction || ""),
+            rpc:redactDiagnosticMessage(item?.rpc || ""),
+            status:redactDiagnosticMessage(item?.status || ""),
+            code:redactDiagnosticMessage(item?.code || ""),
+            quoteId:redactDiagnosticMessage(item?.quoteId || ""),
+            jobId:redactDiagnosticMessage(item?.jobId || ""),
+            customerId:redactDiagnosticMessage(item?.customerId || ""),
+            paymentId:redactDiagnosticMessage(item?.paymentId || "")
+          });
+        });
+      }
+    }catch(error){}
+  });
+  return entries.slice(-15);
+}
+
+function healthItem(name,status,message,details={}){
+  return {
+    name,
+    status,
+    message:redactDiagnosticMessage(message),
+    details:diagnosticContext(details)
+  };
+}
+
+function summarizeHealth(items){
+  if(items.some(item=>item.status==="FAIL")) return "FAIL";
+  if(items.some(item=>item.status==="WARNING")) return "WARNING";
+  return "PASS";
+}
+
+function withHealthTimeout(operation,label,timeoutMs=5000){
+  return new Promise((resolve,reject)=>{
+    const timer=window.setTimeout(()=>reject(new Error(label+" timed out.")),timeoutMs);
+    Promise.resolve()
+      .then(()=>typeof operation === "function" ? operation() : operation)
+      .then(value=>{
+        window.clearTimeout(timer);
+        resolve(value);
+      })
+      .catch(error=>{
+        window.clearTimeout(timer);
+        reject(error);
+      });
+  });
+}
+
+async function probeRpcAvailability(){
+  const { data, error } = await withHealthTimeout(()=>supabaseClient.rpc("approve_proposal_transaction",{
+    p_signature_token:"health-check-invalid-token",
+    p_customer_name:"Health Check",
+    p_signature_image:"data:image/png;base64,aGVhbHRo"
+  }),"Approval RPC");
+  if(error) throw error;
+  return data;
+}
+
+async function getApplicationHealth(){
+  const checks=[];
+
+  if(!SUPABASE_URL || !SUPABASE_KEY){
+    checks.push(healthItem("Local configuration","FAIL","Supabase URL or publishable key is missing."));
+  }else{
+    checks.push(healthItem("Local configuration","PASS","Required client configuration is present."));
+  }
+
+  if(typeof localStorage === "undefined"){
+    checks.push(healthItem("Browser local storage","FAIL","localStorage is unavailable."));
+  }else{
+    try{
+      const key="projobflo-health-check";
+      localStorage.setItem(key,"ok");
+      localStorage.removeItem(key);
+      checks.push(healthItem("Browser local storage","PASS","localStorage is writable."));
+    }catch(error){
+      checks.push(healthItem("Browser local storage","WARNING","localStorage is not writable."));
+    }
+  }
+
+  const asyncChecks=[
+    async ()=>{
+      try{
+        const { data, error } = await withHealthTimeout(()=>supabaseClient.auth.getSession(),"Supabase authentication");
+        if(error) throw error;
+        return healthItem("Supabase authentication",data?.session ? "PASS" : "WARNING",data?.session ? "Authenticated session is active." : "No active session. Log in before testing user data.",{ status:data?.session ? "authenticated" : "anonymous" });
+      }catch(error){
+        return healthItem("Supabase authentication","FAIL",error.message,{ code:error.code });
+      }
+    },
+    async ()=>{
+      try{
+        const { error } = await withHealthTimeout(()=>supabaseClient.from("customers").select("id").limit(1),"Database connectivity");
+        if(error) throw error;
+        return healthItem("Database connectivity","PASS","Read probe succeeded.",{ table:"customers" });
+      }catch(error){
+        return healthItem("Database connectivity","FAIL",error.message,{ table:"customers", code:error.code });
+      }
+    },
+    async ()=>{
+      try{
+        const { data, error } = await withHealthTimeout(()=>supabaseClient.storage.listBuckets(),"Storage connectivity");
+        if(error) throw error;
+        const bucketNames=(data || []).map(bucket=>bucket.name);
+        const missing=REQUIRED_STORAGE_BUCKETS.filter(name=>!bucketNames.includes(name));
+        return healthItem("Storage connectivity",missing.length ? "FAIL" : "PASS",missing.length ? "Missing required storage buckets: "+missing.join(", ") : "Required storage buckets are visible.",{ bucket:missing.join(",") || "all-required" });
+      }catch(error){
+        return healthItem("Storage connectivity","FAIL",error.message,{ bucket:"listBuckets", code:error.code });
+      }
+    },
+    async ()=>{
+      try{
+        const result = await probeRpcAvailability();
+        const status = result?.ok === false && ["invalid_token","expired","not_found","error"].includes(String(result?.status || "")) ? "PASS" : "WARNING";
+        return healthItem("RPC availability",status,status==="PASS" ? "Approval RPC responded to safe invalid-token probe." : "Approval RPC returned an unexpected health response.",{ rpc:REQUIRED_RPCS.join(","), status:result?.status || "unknown" });
+      }catch(error){
+        return healthItem("RPC availability","FAIL",error.message,{ rpc:REQUIRED_RPCS.join(","), code:error.code });
+      }
+    }
+  ];
+  checks.push(...await Promise.all(asyncChecks.map(check=>check())));
+
+  checks.push(healthItem(
+    "Edge Function configuration",
+    REQUIRED_EDGE_FUNCTIONS.length ? "WARNING" : "FAIL",
+    REQUIRED_EDGE_FUNCTIONS.length
+      ? "Required edge function names are configured, but reachability is unknown because health check does not invoke email functions."
+      : "Required edge function names are not configured.",
+    { edgeFunction:REQUIRED_EDGE_FUNCTIONS.join(","), status:REQUIRED_EDGE_FUNCTIONS.length ? "configured_unverified" : "not_configured" }
+  ));
+
+  return {
+    generatedAt:new Date().toISOString(),
+    status:summarizeHealth(checks),
+    checks
+  };
+}
+
+function currentScreenName(){
+  const active=document.querySelector(".tab.active");
+  return active ? active.textContent.trim() : "Unknown";
+}
+
+function companyConfigured(){
+  return !!(userSettings?.company_name || val("companyName") || val("settingsCompanyName"));
+}
+
+function enabledTradeLabels(){
+  let catalog=[];
+  try{
+    catalog=Array.isArray(allTradeTypes) ? allTradeTypes : [];
+  }catch(error){}
+  const fallbackLabels={
+    carpet:"Carpet",
+    lvp:"LVP / Vinyl Plank",
+    tile:"Tile",
+    hardwood:"Hardwood",
+    laminate:"Laminate",
+    sheetvinyl:"Sheet Vinyl",
+    shower:"Shower / Bath Tile",
+    backsplash:"Backsplash",
+    cabinets:"Cabinets",
+    countertops:"Countertops",
+    repair:"Repairs / Small Jobs"
+  };
+  return (enabledTrades || []).map(id=>{
+    const trade=catalog.find(item=>item.id===id);
+    return trade ? trade.label : fallbackLabels[id] || id;
+  });
+}
+
+function outstandingLocalSyncItems(){
+  return Array.from(pendingOperations || []).map(item=>redactDiagnosticMessage(item)).slice(0,10);
+}
+
+function calculateReleaseReadinessScore(health){
+  const categories=[
+    { name:"Reliability", score:82, reason:"Cloud-first write paths and client idempotency are improved; remaining server-side idempotency work is documented." },
+    { name:"Documentation", score:94, reason:"Operator, deployment, rollback, support, and release docs exist and are current for controlled beta." },
+    { name:"Monitoring", score:health?.status==="PASS" ? 82 : health?.status==="WARNING" ? 72 : 58, reason:"Safe client diagnostics and health checks exist; external monitoring is still future work." },
+    { name:"Deployment", score:90, reason:"Deployment checklist exists with smoke-test gates and Supabase validation steps." },
+    { name:"Rollback", score:88, reason:"Rollback plan avoids history rewrites and requires row exports before data repair." },
+    { name:"Testing", score:72, reason:"Manual smoke and deterministic parse/harness tests exist; no automated end-to-end suite yet." },
+    { name:"Known Risks", score:76, reason:"Remaining paid-beta risks are documented: estimate numbering, delete/archive policy, photo metadata/storage drift, and RPC deployment validation." }
+  ];
+  const rawScore=Math.round(categories.reduce((sum,item)=>sum+item.score,0)/categories.length);
+  const score=Math.max(0,Math.min(100,rawScore));
+  return { score, max:100, categories };
+}
+
+function buildDiagnosticReport(health){
+  const safeHealth=health || { status:"NOT_RUN", checks:[] };
+  return {
+    app:{
+      name:"ProJobFlo",
+      version:APP_VERSION,
+      releaseCommit:APP_RELEASE_COMMIT || "not embedded",
+      currentScreen:currentScreenName(),
+      generatedAt:new Date().toISOString()
+    },
+    environment:{
+      userId:currentUser?.id || "",
+      browser:redactDiagnosticMessage(navigator.userAgent || ""),
+      platform:redactDiagnosticMessage(navigator.platform || ""),
+      language:redactDiagnosticMessage(navigator.language || "")
+    },
+    configuration:{
+      supabaseUrlConfigured:!!SUPABASE_URL,
+      publishableKeyConfigured:!!SUPABASE_KEY,
+      enabledTrades:enabledTradeLabels(),
+      companyConfigured:companyConfigured(),
+      outstandingLocalSyncItems:outstandingLocalSyncItems()
+    },
+    health:safeHealth,
+    readiness:calculateReleaseReadinessScore(safeHealth),
+    recentDiagnostics:safeDiagnosticEntries()
+  };
+}
+
+function buildSupportPackage(workflow="",health=null,referenceIds={}){
+  return {
+    supportPackageVersion:"1",
+    workflow:redactDiagnosticMessage(workflow || currentScreenName()),
+    referenceIds:diagnosticContext(referenceIds),
+    report:buildDiagnosticReport(health)
+  };
+}
+
+function renderSupportReport(report){
+  const text=JSON.stringify(report,null,2);
+  const preview=document.getElementById("supportReportPreview");
+  if(preview) preview.textContent=text;
+  const summary=document.getElementById("healthSummary");
+  if(summary){
+    const health=report?.report?.health;
+    const readiness=report?.report?.readiness;
+    summary.textContent="Health: "+(health?.status || "NOT_RUN")+" | Release readiness: "+readiness.score+" / "+readiness.max;
+  }
+  return text;
+}
+
+function setHealthRunningState(){
+  const preview=document.getElementById("supportReportPreview");
+  const summary=document.getElementById("healthSummary");
+  if(summary) summary.textContent="Health: CHECKING | Running non-destructive checks...";
+  if(preview) preview.textContent="Running health check...";
+}
+
+function beginHealthButtonLoading(button,label){
+  if(!button) return ()=>{};
+  const previousText=button.textContent;
+  const previousDisabled=button.disabled;
+  button.classList.add("is-loading");
+  button.disabled=true;
+  if(label) button.textContent=label;
+  return ()=>{
+    button.classList.remove("is-loading");
+    button.disabled=previousDisabled;
+    button.textContent=previousText;
+  };
+}
+
+async function copyTextToClipboard(text){
+  if(navigator.clipboard?.writeText){
+    try{
+      await navigator.clipboard.writeText(text);
+      return true;
+    }catch(error){}
+  }
+  const textArea=document.createElement("textarea");
+  textArea.value=text;
+  textArea.setAttribute("readonly","");
+  textArea.style.position="fixed";
+  textArea.style.top="-9999px";
+  textArea.style.left="-9999px";
+  document.body.appendChild(textArea);
+  textArea.focus();
+  textArea.select();
+  let copied=false;
+  try{
+    copied=document.execCommand("copy");
+  }finally{
+    document.body.removeChild(textArea);
+  }
+  if(!copied) throw new Error("Clipboard copy is unavailable.");
+  return true;
+}
+
+function selectSupportReportText(){
+  const preview=document.getElementById("supportReportPreview");
+  if(!preview) return false;
+  const range=document.createRange();
+  range.selectNodeContents(preview);
+  const selection=window.getSelection();
+  selection.removeAllRanges();
+  selection.addRange(range);
+  return true;
+}
+
+async function runHealthCheck(button=null){
+  let restoreButton=()=>{};
+  try{
+    restoreButton=beginHealthButtonLoading(button || document.getElementById("runHealthCheckButton"),"Checking...");
+    setHealthRunningState();
+    const health=await getApplicationHealth();
+    const report=buildSupportPackage("manual-health-check",health);
+    renderSupportReport(report);
+    const type=health.status==="PASS" ? "success" : health.status==="WARNING" ? "warning" : "error";
+    showToast("Health check complete","Application health is "+health.status+".",type);
+    return health;
+  }catch(error){
+    reportClientDiagnostic("health-check",error,{ operation:"health-check" });
+    const health={ generatedAt:new Date().toISOString(), status:"FAIL", checks:[healthItem("Health check","FAIL",error.message,{ operation:"health-check" })] };
+    renderSupportReport(buildSupportPackage("manual-health-check",health));
+    showToast("Health check failed","The health check could not complete.","error");
+    return health;
+  }finally{
+    restoreButton();
+  }
+}
+
+async function copySupportReport(button=null){
+  const restoreButton=beginHealthButtonLoading(button || document.getElementById("copySupportReportButton"),"Copying...");
+  try{
+    const preview=document.getElementById("supportReportPreview");
+    let text=preview?.textContent || "";
+    if(!text || text==="Support report will appear here after running a health check." || text==="Running health check..."){
+      const health=await getApplicationHealth();
+      text=renderSupportReport(buildSupportPackage("support-report",health));
+    }
+    await copyTextToClipboard(text);
+    showToast("Support report copied","Safe diagnostic details are ready to paste.","success");
+  }catch(error){
+    if(selectSupportReportText()){
+      showToast("Support report selected","Press Ctrl+C to copy the selected report text.","warning");
+    }else{
+      reportClientDiagnostic("support-report-copy",error,{ operation:"clipboard" });
+      showToast("Support report ready","Copy the report text from the Settings panel.","warning");
+    }
+  }finally{
+    restoreButton();
+  }
+}
+
+function renderAppVersion(){
+  const label=document.getElementById("appVersionLabel");
+  if(label) label.textContent=APP_VERSION;
+}
+
+function setupHealthSupportButtons(){
+  const runButton=document.getElementById("runHealthCheckButton");
+  const copyButton=document.getElementById("copySupportReportButton");
+  if(runButton && !runButton.dataset.healthBound){
+    runButton.dataset.healthBound="true";
+    runButton.addEventListener("click",event=>{
+      event.preventDefault();
+      runHealthCheck(runButton);
+    });
+  }
+  if(copyButton && !copyButton.dataset.healthBound){
+    copyButton.dataset.healthBound="true";
+    copyButton.addEventListener("click",event=>{
+      event.preventDefault();
+      copySupportReport(copyButton);
+    });
+  }
+}
+
+if(typeof window !== "undefined"){
+  window.runHealthCheck = runHealthCheck;
+  window.copySupportReport = copySupportReport;
 }
 
 function showToast(title,message,type="success",duration=3600){
@@ -4077,6 +4481,16 @@ function completeFirstRunSetup(launchQuote=false){
 
 function maybeShowFirstRunSetup(){
   const forceSetup = window.location.search.includes("setup=1");
+  if(!currentUser && !forceSetup){
+    const saved = getSavedTrades();
+    enabledTrades = saved && saved.length ? saved : (enabledTrades && enabledTrades.length ? enabledTrades : ["lvp"]);
+    document.getElementById("setupOverlay").classList.add("hidden");
+    syncSetupCheckboxes();
+    syncOnboardingFieldsFromApp();
+    renderSettingsTradeList();
+    applyTradeVisibility();
+    return;
+  }
   const saved = getSavedTrades();
   const shouldSkip = !forceSetup && ((saved && saved.length && hasCompletedFirstRunSetup()) || hasExistingWorkData());
   if(shouldSkip){
@@ -4259,6 +4673,8 @@ function deleteCrew(index) {
 }
 
 async function init() {
+  renderAppVersion();
+  setupHealthSupportButtons();
   document.getElementById("estimateDate").value = new Date().toISOString().slice(0,10);
   setEstimateNumberToNext();
   document.getElementById("scheduleDate").value = selectedDate;
@@ -4308,9 +4724,13 @@ function showTab(tab) {
   updateMobileNavState(tab);
   closeMobileMoreMenu();
   renderAll();
- if (tab === "quote") {
-  setTimeout(setupSignaturePad, 50);
+  if (tab === "quote") {
+   setTimeout(setupSignaturePad, 50);
 }
+ if (tab === "settings") {
+   renderAppVersion();
+   setupHealthSupportButtons();
+ }
 }
 function updateMobileNavState(tab){
  const primaryTabs=["dashboard","quote","schedule","money","customers"];

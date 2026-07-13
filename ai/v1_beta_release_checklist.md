@@ -78,6 +78,9 @@ Operations:
 - [ ] `git diff --check` passes.
 - [ ] `app.html` script parses.
 - [ ] `approve.html` script parses.
+- [ ] Settings shows the expected app version.
+- [ ] Settings Health Check runs without exposing sensitive data.
+- [ ] Support Report copies and includes app version, user ID, safe diagnostics, and health status.
 - [ ] Production smoke test passes.
 - [ ] Rollback commit is known.
 - [ ] Supabase access is confirmed.
@@ -88,6 +91,7 @@ Operations:
 These can be accepted for the first 5 free beta users if Hayden is ready to monitor manually:
 
 - No external error monitoring service.
+- Application health and support reports are client-side only.
 - No automated browser regression suite.
 - Some preferences/setup state still uses browser local storage.
 - Photo storage and quote metadata can require manual recovery if one side saves and the other fails.
