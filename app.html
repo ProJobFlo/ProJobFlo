@@ -3395,7 +3395,7 @@
           <div class="cashflow-kpi">
             <div class="cashflow-kpi-label">Remaining To Collect</div>
             <div id="moneyRemainingToCollect" class="cashflow-kpi-value">$0.00</div>
-            <div class="cashflow-kpi-note">Deposits due plus final balances</div>
+            <div class="cashflow-kpi-note">Total unpaid balance</div>
           </div>
           <div class="cashflow-kpi">
             <div class="cashflow-kpi-label">Average Job Value</div>
@@ -7353,7 +7353,7 @@ function renderMoneyTracker(){
  });
  collected = payments.reduce((s,p)=>s+Number(p.amount||0),0);
   const depositsReceived=payments.filter(p=>p.type==="Deposit").reduce((s,p)=>s+Number(p.amount||0),0);
-  const remainingToCollect=depositsDue+finalDue;
+  const remainingToCollect=finalDue;
   const trackedValue=soldQuotes.reduce((s,q)=>s+Number(q.amount||0),0);
   const averageJobValue=soldQuotes.length ? trackedValue / soldQuotes.length : 0;
   const collectionBase=collected+finalDue;
@@ -9251,7 +9251,7 @@ doc.text("PROJECT PROPOSAL", 14, 42);
     .eq("user_id", currentUser.id);
 
   if (error) {
-    reportClientDiagnostic("signature-link-create",error,{ table:"quotes", quoteId:quote.id });
+    reportClientDiagnostic("signature-link-create",error,{ table:"quotes", quoteId:currentCloudQuoteId || "" });
     alert("Could not create signature link: " + error.message);
     return;
   }
@@ -9767,7 +9767,7 @@ async function saveCompanySettings() {
     .eq("user_id", currentUser.id);
 
   if (error) {
-    reportClientDiagnostic("signature-link-create",error,{ table:"quotes", quoteId:quote.id });
+    reportClientDiagnostic("signature-link-create",error,{ table:"quotes", quoteId:currentCloudQuoteId || "" });
     alert("Could not create signature link: " + error.message);
     return "";
   }
