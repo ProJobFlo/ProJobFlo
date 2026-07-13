@@ -3717,6 +3717,62 @@ function endOperation(key){
   if(key) pendingOperations.delete(key);
 }
 
+const CLIENT_DIAGNOSTIC_LOG_KEY = "projobfloClientDiagnostics";
+const SAFE_DIAGNOSTIC_KEYS = new Set([
+  "workflow",
+  "operation",
+  "table",
+  "bucket",
+  "edgeFunction",
+  "rpc",
+  "status",
+  "code",
+  "customerId",
+  "quoteId",
+  "jobId",
+  "paymentId",
+  "photoId",
+  "activityId"
+]);
+
+function redactDiagnosticMessage(message){
+  return String(message || "Unknown error")
+    .replace(/data:image\/[a-zA-Z0-9.+-]+;base64,[A-Za-z0-9+/=]+/g,"[redacted image]")
+    .replace(/(access_token|refresh_token|signature_token|token|password)=?[^&\s"]+/gi,"$1=[redacted]")
+    .replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi,"[redacted email]")
+    .replace(/\b(?:\+?1[-.\s]?)?(?:\(?\d{3}\)?[-.\s]?)\d{3}[-.\s]?\d{4}\b/g,"[redacted phone]")
+    .replace(/\b\d{1,6}\s+[A-Za-z0-9.'#-]+(?:\s+[A-Za-z0-9.'#-]+){0,5}\s+(?:Street|St|Road|Rd|Avenue|Ave|Drive|Dr|Lane|Ln|Boulevard|Blvd|Court|Ct|Circle|Cir|Way|Trail|Trl|Place|Pl)\b(?:[, A-Za-z0-9.-]*)?/gi,"[redacted address]")
+    .replace(/\b[A-Z][a-z]+(?:['-][A-Z]?[a-z]+)?\s+[A-Z][a-z]+(?:['-][A-Z]?[a-z]+)?\b/g,"[redacted name]")
+    .slice(0,360);
+}
+
+function diagnosticContext(context={}){
+  return Object.entries(context || {}).reduce((safe,[key,value])=>{
+    if(SAFE_DIAGNOSTIC_KEYS.has(key) && value !== undefined && value !== null){
+      safe[key]=String(value).slice(0,120);
+    }
+    return safe;
+  },{});
+}
+
+function reportClientDiagnostic(workflow,error,context={}){
+  const entry={
+    diagnosticId:"diag-"+Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,8),
+    timestamp:new Date().toISOString(),
+    workflow,
+    userId:currentUser?.id || "",
+    message:redactDiagnosticMessage(error?.message || error?.error_description || error?.details || error),
+    ...diagnosticContext(context)
+  };
+  console.error("ProJobFlo diagnostic",entry);
+  try{
+    const existing=JSON.parse(localStorage.getItem(CLIENT_DIAGNOSTIC_LOG_KEY) || "[]");
+    existing.push(entry);
+    localStorage.setItem(CLIENT_DIAGNOSTIC_LOG_KEY,JSON.stringify(existing.slice(-25)));
+  }catch(e){}
+  return entry;
+}
+
 function showToast(title,message,type="success",duration=3600){
   const region=document.getElementById("toastRegion");
   if(!region) return;
@@ -5311,7 +5367,7 @@ async function updateQuoteStatusCloud(id, updates) {
       .eq("user_id", currentUser.id);
 
     if (error) {
-      console.error(error);
+      reportClientDiagnostic("quote-status-update",error,{ table:"quotes", quoteId:quote.id, status:nextStatus });
       showToast("Quote status was not updated","Cloud save failed: " + error.message,"error");
       return false;
     }
@@ -5415,7 +5471,7 @@ async function scheduleSelectedQuote(){
    .single();
 
  if(error){
-   console.error(error);
+   reportClientDiagnostic("schedule-job-create",error,{ table:"jobs", quoteId:q.id, jobId:job.id, status:job.status });
    showToast("Job was not scheduled","Cloud save failed: " + error.message,"error");
    return;
   }
@@ -5467,7 +5523,7 @@ async function scheduleSelectedQuote(){
    .eq("user_id", currentUser.id);
 
  if(error){
-   console.error(error);
+   reportClientDiagnostic("schedule-job-update",error,{ table:"jobs", jobId:job.id, status:updatedJob.status });
    showToast("Schedule was not updated","Cloud save failed: " + error.message,"error");
    return false;
   }
@@ -5545,7 +5601,7 @@ async function deleteScheduledJob(){
     .eq("user_id", currentUser.id);
 
   if(error){
-    console.error(error);
+    reportClientDiagnostic("schedule-job-delete",error,{ table:"jobs", jobId:editingJobId });
     showToast("Job was not deleted","Cloud delete failed: " + error.message,"error");
     return;
   }
@@ -6127,7 +6183,7 @@ async function persistProjectPhotoTimeline(job,quote,timeline){
     .eq("user_id", currentUser.id);
 
   if(error){
-    console.error(error);
+    reportClientDiagnostic("project-photo-timeline-save",error,{ table:"quotes", quoteId:quote.id, jobId:job.id });
     showToast("Photos uploaded, timeline not saved","Quote save failed: " + error.message,"warning");
     return false;
   }
@@ -6351,7 +6407,7 @@ async function persistJobActivityTimeline(job,quote,entries){
     .eq("user_id", currentUser.id);
 
   if(error){
-    console.error(error);
+    reportClientDiagnostic("activity-timeline-save",error,{ table:"quotes", quoteId:quote.id, jobId:job.id });
     showToast("Activity was not saved","Cloud save failed: " + error.message,"error");
     return false;
   }
@@ -6486,7 +6542,7 @@ async function persistJobProgressChecklist(job,quote,progress){
         .eq("user_id", currentUser.id);
 
       if(error){
-        console.error(error);
+        reportClientDiagnostic("job-progress-save",error,{ table:"quotes", quoteId:quote.id, jobId:job.id });
         showToast("Progress was not saved","Cloud save failed: " + error.message,"error");
         return false;
       }
@@ -7072,7 +7128,7 @@ async function addPayment(payment) {
     .single();
 
   if (error) {
-    console.error(error);
+    reportClientDiagnostic("payment-save",error,{ table:"payments", quoteId:payment.quoteId, paymentId:payment.id });
     showToast("Payment was not recorded","Cloud save failed: " + error.message,"error");
     return false;
   }
@@ -7114,7 +7170,7 @@ async function addPayment(payment) {
     .order("paid_at", { ascending: false });
 
   if (error) {
-    console.error(error);
+    reportClientDiagnostic("payments-load",error,{ table:"payments" });
     showToast("Payments did not load","Cloud load failed: " + error.message,"error");
     return;
   }
@@ -7875,7 +7931,7 @@ async function saveCurrentCustomerToCloud() {
     .single();
 
   if (error) {
-    console.error(error);
+    reportClientDiagnostic("customer-save",error,{ table:"customers", customerId:payload.id });
     showToast("Customer was not saved","Cloud save failed: " + error.message,"error");
     return;
   }
@@ -7899,7 +7955,7 @@ async function loadCustomersFromCloud() {
     .order("created_at", { ascending: false });
 
   if (error) {
-    console.error(error);
+    reportClientDiagnostic("customers-load",error,{ table:"customers" });
     showToast("Customers did not load","Cloud load failed: " + error.message,"error");
     return;
   }
@@ -7946,7 +8002,7 @@ const { data: customerData, error: customerError } = await supabaseClient
 savedCustomer = customerData;
 
   if (customerError) {
-    console.error(customerError);
+    reportClientDiagnostic("quote-customer-save",customerError,{ table:"customers", customerId:customerPayload.id });
     showToast("Customer was not saved","Quote customer save failed: " + customerError.message,"error");
     return;
   }
@@ -8009,7 +8065,7 @@ const { data, error } = await supabaseClient
   .single();
 
   if (error) {
-    console.error(error);
+    reportClientDiagnostic("quote-save",error,{ table:"quotes", quoteId:quotePayload.id, customerId:quotePayload.customer_id, status:quotePayload.status });
     showToast("Quote was not saved","Cloud save failed: " + error.message,"error");
     return false;
   }
@@ -8042,7 +8098,7 @@ async function loadQuotesFromCloud() {
     .order("created_at", { ascending: false });
 
   if (error) {
-    console.error(error);
+    reportClientDiagnostic("quotes-load",error,{ table:"quotes" });
     showToast("Quotes did not load","Cloud load failed: " + error.message,"error");
     return;
   }
@@ -8103,7 +8159,7 @@ async function loadQuotesFromCloud() {
       .select();
 
     if (error) {
-      console.error(error);
+      reportClientDiagnostic("jobs-save",error,{ table:"jobs", jobId:job.id, quoteId:job.quoteId });
       showToast("Job was not saved","Cloud save failed: " + error.message,"error");
       return;
     }
@@ -8125,7 +8181,7 @@ async function loadJobsFromCloud() {
     .order("start_date", { ascending: true });
 
   if (error) {
-    console.error(error);
+    reportClientDiagnostic("jobs-load",error,{ table:"jobs" });
     showToast("Jobs did not load","Cloud load failed: " + error.message,"error");
     return;
   }
@@ -8234,7 +8290,7 @@ const { error: customerError } = await supabaseClient
   .upsert(customerPayload);
 
 if (customerError) {
-  console.error(customerError);
+  reportClientDiagnostic("quote-customer-upsert",customerError,{ table:"customers", customerId:customerPayload.id });
   setAutoSaveStatus("Customer auto-save failed.");
   return;
 }
@@ -8280,7 +8336,7 @@ if (customerError) {
     });
 
   if (quoteError) {
-    console.error(quoteError);
+    reportClientDiagnostic("quote-upsert",quoteError,{ table:"quotes", quoteId:quotePayload.id, customerId:quotePayload.customer_id, status:quotePayload.status });
     setAutoSaveStatus("Quote auto-save failed.");
     return;
   }
@@ -8336,7 +8392,7 @@ if (customerError) {
     .upload(filePath, file);
 
   if (error) {
-    console.error(error);
+    reportClientDiagnostic("photo-upload",error,{ bucket:"job-photos", photoId:roomId, operation:category || "room-photo" });
     showToast("Photo was not uploaded","Upload failed: " + error.message,"error");
     return null;
   }
@@ -8462,7 +8518,7 @@ async function uploadContractorLogo(file) {
     });
 
   if (error) {
-    console.error(error);
+    reportClientDiagnostic("logo-upload",error,{ bucket:"contractor-logos" });
     showToast("Logo was not uploaded","Upload failed: " + error.message,"error");
     return false;
   }
@@ -8774,7 +8830,7 @@ doc.text("PROJECT PROPOSAL", 14, 42);
     .eq("user_id", currentUser.id);
 
   if (error) {
-    console.error(error);
+    reportClientDiagnostic("signature-link-create",error,{ table:"quotes", quoteId:quote.id });
     alert("Could not create signature link: " + error.message);
     return;
   }
@@ -9129,7 +9185,7 @@ async function deleteCustomer(id){
       .eq("user_id", currentUser.id);
 
     if(error){
-      console.error(error);
+      reportClientDiagnostic("customer-delete",error,{ table:"customers", customerId:customer.id });
       showToast("Customer was not deleted","Cloud delete failed: " + error.message,"error");
       return;
     }
@@ -9169,7 +9225,7 @@ async function saveUserSettings(updates) {
     });
 
   if (error) {
-    console.error(error);
+    reportClientDiagnostic("settings-save",error,{ table:"user_settings" });
     showToast("Settings were not saved","Cloud save failed: " + error.message,"error");
     return false;
   }
@@ -9290,7 +9346,7 @@ async function saveCompanySettings() {
     .eq("user_id", currentUser.id);
 
   if (error) {
-    console.error(error);
+    reportClientDiagnostic("signature-link-create",error,{ table:"quotes", quoteId:quote.id });
     alert("Could not create signature link: " + error.message);
     return "";
   }

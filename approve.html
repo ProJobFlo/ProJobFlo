@@ -459,6 +459,44 @@ if (expiresAt) {
         message.includes("function") && message.includes("not found");
     }
 
+    function redactApprovalDiagnostic(message) {
+      return String(message || "Unknown error")
+        .replace(/data:image\/[a-zA-Z0-9.+-]+;base64,[A-Za-z0-9+/=]+/g, "[redacted image]")
+        .replace(/(access_token|refresh_token|signature_token|token|password)=?[^&\s"]+/gi, "$1=[redacted]")
+        .replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi, "[redacted email]")
+        .replace(/\b(?:\+?1[-.\s]?)?(?:\(?\d{3}\)?[-.\s]?)\d{3}[-.\s]?\d{4}\b/g, "[redacted phone]")
+        .replace(/\b\d{1,6}\s+[A-Za-z0-9.'#-]+(?:\s+[A-Za-z0-9.'#-]+){0,5}\s+(?:Street|St|Road|Rd|Avenue|Ave|Drive|Dr|Lane|Ln|Boulevard|Blvd|Court|Ct|Circle|Cir|Way|Trail|Trl|Place|Pl)\b(?:[, A-Za-z0-9.-]*)?/gi, "[redacted address]")
+        .replace(/\b[A-Z][a-z]+(?:['-][A-Z]?[a-z]+)?\s+[A-Z][a-z]+(?:['-][A-Z]?[a-z]+)?\b/g, "[redacted name]")
+        .slice(0, 360);
+    }
+
+    function reportApprovalDiagnostic(workflow, error, context = {}) {
+      const allowlist = new Set(["workflow", "operation", "table", "edgeFunction", "rpc", "status", "code", "quoteId"]);
+      const safeContext = Object.entries(context || {}).reduce((safe, [key, value]) => {
+        if (allowlist.has(key) && value !== undefined && value !== null) {
+          safe[key] = String(value).slice(0, 120);
+        }
+        return safe;
+      }, {});
+      const entry = {
+        diagnosticId: "approval-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 8),
+        timestamp: new Date().toISOString(),
+        workflow,
+        quoteId: loadedQuote?.id || "",
+        userId: loadedQuote?.user_id || "",
+        message: redactApprovalDiagnostic(error?.message || error?.error_description || error?.details || error),
+        ...safeContext
+      };
+      console.error("ProJobFlo approval diagnostic", entry);
+      try {
+        const key = "projobfloApprovalDiagnostics";
+        const existing = JSON.parse(localStorage.getItem(key) || "[]");
+        existing.push(entry);
+        localStorage.setItem(key, JSON.stringify(existing.slice(-25)));
+      } catch (storageError) {}
+      return entry;
+    }
+
     function acceptanceQuoteData(baseQuote, printedName, signedAt) {
       const quoteData = { ...(baseQuote?.quote_data || {}) };
       const existing = Array.isArray(quoteData.jobActivityTimeline)
@@ -565,7 +603,7 @@ if (expiresAt) {
         });
 
       if (insertError) {
-        console.error(insertError);
+        reportApprovalDiagnostic("legacy-signature-insert", insertError, { table: "proposal_signatures" });
         return {
           ok: false,
           status: "signature_failed",
@@ -588,7 +626,7 @@ if (expiresAt) {
         .single();
 
       if (updateError) {
-        console.error(updateError);
+        reportApprovalDiagnostic("legacy-quote-approval-update", updateError, { table: "quotes" });
         return {
           ok: false,
           status: "partial_signature_saved",
@@ -624,11 +662,11 @@ if (expiresAt) {
       );
 
       if (emailError) {
-        console.error("Contractor notification email failed:", emailError);
+        reportApprovalDiagnostic("contractor-signature-notification", emailError, { edgeFunction: "send-signature-email" });
         return false;
       }
 
-      console.log("Contractor notification email sent:", emailData);
+      console.info("Contractor notification email sent.");
       return true;
     }
 
@@ -889,9 +927,9 @@ function renderApproveLineItems(q) {
         renderAcceptedConfirmation(loadedQuote);
         showApprovalMessage("Proposal accepted successfully. You may safely close this page.", "success");
         notifyContractorOfAcceptance(loadedQuote, printedName)
-          .catch(error => console.error("Contractor notification email failed:", error));
+          .catch(error => reportApprovalDiagnostic("contractor-signature-notification", error, { edgeFunction: "send-signature-email" }));
       } catch (error) {
-        console.error(error);
+        reportApprovalDiagnostic("proposal-approval-submit", error, { rpc: "approve_proposal_transaction" });
         showApprovalMessage(
           "Approval was not saved. Please check your connection and try again.",
           "error"
