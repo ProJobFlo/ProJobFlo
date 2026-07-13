@@ -24,8 +24,8 @@ Some findings remain current or partially true:
 - `app- backup.html` is tracked by Git and would be publicly deployable on static hosting unless removed or excluded.
 - `generateSignatureLink()` and `createSignatureLink()` both still exist and duplicate token/update/link behavior.
 - Crews, trade setup, and preset rates remain localStorage-backed or mixed, so some setup data can disappear when switching devices.
-- Room photo deletion is local/metadata-only and does not delete Supabase Storage objects.
-- Project Photo Timeline uploads can leave orphaned storage objects if quote metadata persistence fails.
+- Room photo deletion now deletes known Supabase Storage objects and quote metadata in a cloud-first order when a safe `cloudPath` exists.
+- Project Photo Timeline deletion is now supported for real timeline photos, and upload now attempts cleanup if metadata persistence fails.
 - Offline awareness now uses browser online/offline events, an offline banner, reconnect toast, and preflight guards before major cloud writes.
 - Approval is RPC-first in source, but live deployment status cannot be inferred from repository code alone.
 - Money Tracker core outstanding balance is correct for the requested fixtures. The confirmed `Remaining To Collect` double-counting bug was fixed by using total unpaid balance instead of adding deposit shortfall on top of that balance.
@@ -341,35 +341,37 @@ No file removal was performed in this verification sprint.
 
 Room photo deletion:
 
-- Function: `removeRoomPhoto(roomId, photoId)` at `app.html:4997`
-- Behavior: filters the in-memory `roomPhotos[roomId]` array, re-renders, recalculates quote.
-- It does not delete from Supabase Storage.
-- It does not immediately persist quote metadata deletion unless a later quote save/autosave succeeds.
+- Function: `removeRoomPhoto(roomId, photoKey)` in `app.html`
+- Current behavior: identifies the exact room photo, confirms deletion, deletes the `job-photos` object when a safe `cloudPath` exists, saves updated `quotes.quote_data.roomPhotos`, then updates local UI.
+- Legacy photos with no `cloudPath` are removed from metadata/local state only; the app does not guess a storage object from a URL.
 
 Project Photo Timeline deletion:
 
-- No supported project-photo delete function was found.
-- Upload and metadata persistence exist, but deletion does not appear implemented for timeline photos.
+- Current behavior: delete is available from timeline thumbnails and the lightbox for real Project Photo Timeline photos.
+- The app targets an exact stage/photo identity, deletes the known `job-photos` object when a safe `cloudPath` exists, then saves updated `quotes.quote_data.projectPhotoTimeline`.
+- Legacy room-photo echoes displayed in the timeline are not deleted from the timeline view; users must delete them from the Quote Builder room-photo context.
 
 Storage delete:
 
-- No `supabaseClient.storage.from("job-photos").remove(...)` path was found for room or project photos.
+- `deleteStoredPhotoObject()` removes objects only from the allowlisted `job-photos` bucket and only under `{currentUser.id}/rooms/`.
+- Paths with `/`, `..`, backslashes, a wrong bucket, or another user's prefix are rejected before the Storage API call.
 
 Orphan risks:
 
-- Room photos uploaded to `job-photos` can remain in Storage after local deletion.
-- Project Photo Timeline uploads can succeed while quote metadata persistence fails, leaving orphaned storage objects.
+- Room-photo upload can still leave an orphan if the upload succeeds and the later quote autosave fails.
+- Project Photo Timeline upload now attempts to delete newly uploaded blobs if timeline metadata save fails.
 - Existing metadata can reference objects that later become inaccessible if storage paths or signed URL generation fail.
 
 Conclusion:
 
-- Confirmed current paid-beta blocker / five-user beta risk depending on expected photo volume.
+- The original delete gap is fixed for photos with stored `cloudPath` metadata.
+- Remaining risk is now orphan prevention/cleanup for upload failure edge cases, legacy metadata without paths, and server-side policy verification.
 
 Recommended action:
 
-- Add cloud-first photo metadata delete with rollback on failed metadata save.
-- Add Supabase Storage object delete for known `cloudPath` values.
-- Add orphan cleanup guidance or tooling before paid beta.
+- Confirm Supabase Storage delete policies enforce owner-only access.
+- Consider a server-side photo metadata table or RPC before paid launch.
+- Use `ai/photo_storage_integrity.md` for manual orphan dry-runs and cleanup review.
 
 ### 9. Offline Behavior
 
@@ -425,14 +427,14 @@ Before paid beta:
 
 1. `generateSignatureLink()` and `createSignatureLink()` duplicate approval-link token/update behavior.
 2. `app- backup.html` is tracked and publicly deployable from the static root.
-3. Room photo deletion does not delete Supabase Storage objects and does not immediately persist metadata deletion.
-4. Project Photo Timeline has upload/persist behavior but no supported delete path.
+3. Photo metadata/storage drift can still happen for legacy photos without `cloudPath` and room-photo upload/autosave failures.
 
 ## Fixed In This Pass
 
 1. `Remaining To Collect` no longer double counts partial unpaid deposits. It now uses total unpaid balance (`finalDue`) instead of `depositsDue + finalDue`.
 2. Signature-link error diagnostics no longer reference undefined `quote.id`; both functions now use the available `currentCloudQuoteId` safely.
 3. Offline awareness now shows an offline banner, reconnect toast, health/support connection status, and guards major cloud writes before Supabase requests.
+4. Cloud-backed room-photo and Project Photo Timeline deletion now removes known `job-photos` storage objects and quote metadata in a cloud-first order.
 
 ## Stale / Already-Fixed Findings
 
@@ -465,7 +467,7 @@ Before paid beta:
 
 1. Deploy and validate `approve_proposal_transaction` live; then decide whether to remove legacy fallback.
 2. Remove or exclude `app- backup.html` from the deploy root.
-3. Define cloud-backed photo deletion and orphan cleanup.
+3. Validate photo storage policies and the documented orphan cleanup process against the live Supabase project.
 4. Add server-side idempotency for payments and scheduled jobs.
 5. Decide whether crews/trades/presets must become cloud-backed settings for paid users.
 
@@ -473,7 +475,7 @@ Before paid beta:
 
 1. `app- backup.html` is publicly accessible if deployed.
 2. Local crews/trades/preset rates do not follow the user across devices.
-3. Photo deletions can leave orphaned files.
+3. Legacy photos without `cloudPath` and failed room-photo autosaves can still leave orphaned files.
 4. Some user-facing alerts still feel less polished than the rest of the app.
 
 ## Future Architecture Concerns

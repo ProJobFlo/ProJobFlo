@@ -2133,6 +2133,26 @@
     box-shadow:0 14px 32px rgba(0,0,0,.24);
     cursor:pointer;
   }
+  .project-photo-thumb-open {
+    width:100%;
+    padding:0;
+    border:0;
+    border-radius:0;
+    background:transparent;
+    color:inherit;
+    text-align:left;
+    cursor:pointer;
+  }
+  .project-photo-thumb-actions {
+    display:flex;
+    gap:8px;
+    padding:0 10px 10px;
+  }
+  .project-photo-thumb-actions button {
+    min-height:34px;
+    font-size:12px;
+    padding:8px 10px;
+  }
   .project-photo-thumb img {
     display:block;
     width:100%;
@@ -3645,6 +3665,7 @@ Preset rates are only starting points:
           <strong id="photoLightboxTitle">Project Photo</strong>
           <div id="photoLightboxMeta" class="small"></div>
         </div>
+        <button id="photoLightboxDeleteButton" class="danger" type="button" onclick="deleteActiveProjectPhotoFromLightbox()">Delete Photo</button>
         <button class="secondary" type="button" onclick="closeProjectPhotoLightbox()">Close</button>
       </div>
     </div>
@@ -5068,7 +5089,88 @@ async function addRoomPhotos(roomId, files) {
     endOperation(operationKey);
   }
 }
-function removeRoomPhoto(roomId,photoId){roomPhotos[roomId]=(roomPhotos[roomId]||[]).filter(p=>p.id!==photoId);renderRooms();calculateQuote();}
+function photoIdentity(photo){
+  return String(photo?.id || photo?.cloudPath || photo?.fileName || photo?.name || photo?.url || photo?.dataUrl || "");
+}
+
+function cleanPhotoMetadata(photo){
+  const copy={...photo};
+  if(copy.url && String(copy.url).startsWith("blob:")) delete copy.url;
+  delete copy.dataUrl;
+  delete copy.previewUrl;
+  delete copy.localUrl;
+  return copy;
+}
+
+function cleanRoomPhotosMetadata(source=roomPhotos){
+  const output={};
+  Object.keys(source || {}).forEach(roomId=>{
+    output[roomId]=(source[roomId] || []).filter(Boolean).map(cleanPhotoMetadata);
+  });
+  return output;
+}
+
+async function persistRoomPhotoMetadata(proposedRoomPhotos){
+  if(!currentUser || !currentCloudQuoteId) return true;
+  if(!requireOnlineForCloudWrite("room-photo-delete")) return false;
+  const existingQuote=quotes.find(q=>String(q.cloudId || q.id)===String(currentCloudQuoteId));
+  if(!existingQuote){
+    showToast("Photo was not removed","Reload this quote before deleting cloud-backed room photos.","warning");
+    return false;
+  }
+  const baseQuoteData={...(existingQuote?.quoteData || {})};
+  const nextQuoteData={...baseQuoteData, roomPhotos:cleanRoomPhotosMetadata(proposedRoomPhotos)};
+  const { error } = await supabaseClient
+    .from("quotes")
+    .update({ quote_data: nextQuoteData })
+    .eq("id", currentCloudQuoteId)
+    .eq("user_id", currentUser.id);
+  if(error){
+    reportClientDiagnostic("room-photo-metadata-delete",error,{ table:"quotes", quoteId:currentCloudQuoteId });
+    showToast("Photo was not removed","The storage file may be deleted, but quote photo metadata was not saved. Please refresh before trying again.","error");
+    return false;
+  }
+  if(existingQuote){
+    existingQuote.quoteData=nextQuoteData;
+    existingQuote.roomPhotosSnapshot=nextQuoteData.roomPhotos;
+  }
+  return true;
+}
+
+async function removeRoomPhoto(roomId,photoKey){
+  const photos=roomPhotos[roomId] || [];
+  const photo=photos.find(p=>photoIdentity(p)===String(photoKey));
+  if(!photo){showToast("Photo not found","This room photo could not be found. Refresh and try again.","warning");return;}
+  const isCloudBacked=Boolean(currentUser && currentCloudQuoteId);
+  const hasStoragePath=Boolean(photo.cloudPath);
+  const message=hasStoragePath
+    ? "Delete this photo from ProJobFlo and cloud storage?"
+    : "This older photo has no saved cloud path. Remove it from this quote only?";
+  if(!confirm(message)) return;
+
+  const operationKey="room-photo-delete-"+roomId+"-"+photoIdentity(photo);
+  if(!beginOperation(operationKey,"Photo delete already running","Please wait for this photo delete to finish.")) return;
+  try{
+    if(isCloudBacked && !requireOnlineForCloudWrite("room-photo-delete")) return;
+    const proposed={...roomPhotos};
+    proposed[roomId]=photos.filter(p=>photoIdentity(p)!==String(photoKey));
+
+    if(isCloudBacked && hasStoragePath){
+      const deleted=await deleteStoredPhotoObject("job-photos",photo.cloudPath,{ workflow:"room-photo-delete", quoteId:currentCloudQuoteId, photoId:photoIdentity(photo) });
+      if(!deleted) return;
+    }
+
+    const metadataSaved=await persistRoomPhotoMetadata(proposed);
+    if(!metadataSaved) return;
+
+    roomPhotos=proposed;
+    renderRooms();
+    calculateQuote();
+    showToast("Photo removed",hasStoragePath ? "The photo and its cloud file were deleted." : "The photo was removed from this quote.","success");
+  } finally {
+    endOperation(operationKey);
+  }
+}
 function renderRoomPhotos(roomId){
   const gallery=document.getElementById("roomPhotos-"+roomId);
   if(!gallery)return;
@@ -5076,6 +5178,7 @@ function renderRoomPhotos(roomId){
   gallery.innerHTML="";
 
   (roomPhotos[roomId]||[]).forEach(photo=>{
+    if(!photo.id) photo.id=crypto.randomUUID();
     const card=document.createElement("div");
     card.className="photo-card";
 
@@ -5097,7 +5200,7 @@ function renderRoomPhotos(roomId){
 
     const remove=document.createElement("button");
     remove.textContent="X";
-    remove.onclick=function(){removeRoomPhoto(roomId,photo.id);};
+    remove.onclick=function(){removeRoomPhoto(roomId,photoIdentity(photo));};
 
     card.append(img,remove,label);
     gallery.appendChild(card);
@@ -6443,6 +6546,7 @@ const PROJECT_PHOTO_STAGES = [
 
 let activeProjectPhotos = [];
 let activeProjectPhotoIndex = 0;
+let activeProjectPhotoJobId = "";
 let photoLightboxTouchX = null;
 
 function projectPhotoStageByKey(stageKey){
@@ -6579,13 +6683,18 @@ function renderProjectPhotoTimeline(job, quote){
               const caption=photo.caption || photo.category || "Project documentation";
               if(!url) return "";
               const index=flatIndex++;
-              return url ? `<button class="project-photo-thumb" type="button" onclick="openProjectPhotoLightbox('${jobId}',${index})">
+              const photoKey=encodeURIComponent(photoIdentity(photo));
+              const canDelete=!photo.legacyRoomPhoto;
+              return url ? `<div class="project-photo-thumb">
+                <button class="project-photo-thumb-open" type="button" onclick="openProjectPhotoLightbox('${jobId}',${index})">
                 <img src="${escapeAttr(url)}" alt="${escapeAttr(caption)}">
                 <span class="project-photo-thumb-meta">
                   <strong>${escapeHtml(formatProjectPhotoDate(photo.uploadedAt))}</strong>
                   ${escapeHtml(stage.title)}<br>${escapeHtml(caption)}
                 </span>
-              </button>` : "";
+                </button>
+                ${canDelete ? `<div class="project-photo-thumb-actions"><button class="danger" type="button" onclick="deleteProjectTimelinePhoto('${jobId}','${stage.key}','${photoKey}')">Delete</button></div>` : ""}
+              </div>` : "";
             }).join("")}</div>` : `<div class="project-photo-empty"><strong>No ${escapeHtml(stage.title)} yet.</strong><p>Upload photos here to build the project history for this stage.</p></div>`}
           </div>
         </details>`;
@@ -6622,11 +6731,13 @@ async function handleJobTimelineUpload(jobId,stageKey,files){
   const captionEl=document.getElementById(`projectPhotoCaption-${jobId}-${stageKey}`);
   const caption=captionEl ? captionEl.value.trim() : "";
   const timeline=quoteProjectTimeline(quote);
+  const uploadedCloudPaths=[];
 
   for(const file of list){
     const uploadedAt=new Date().toISOString();
     const cloudPhoto=await uploadPhotoToCloud(file,"timeline-"+stageKey,stage.title);
     if(!cloudPhoto) continue;
+    uploadedCloudPaths.push(cloudPhoto.cloudPath);
 
     timeline[stageKey].push({
       id: crypto.randomUUID(),
@@ -6646,15 +6757,21 @@ async function handleJobTimelineUpload(jobId,stageKey,files){
     });
   }
 
+  const saved=await persistProjectPhotoTimeline(job,quote,timeline);
+  if(!saved){
+    for(const cloudPath of uploadedCloudPaths){
+      await deleteStoredPhotoObject("job-photos",cloudPath,{ workflow:"project-photo-upload-cleanup", quoteId:quote.cloudId || quote.id || "", jobId:job.id, photoId:cloudPath });
+    }
+    return;
+  }
   if(captionEl) captionEl.value="";
-  await persistProjectPhotoTimeline(job,quote,timeline);
   openJobFile(jobId);
   } finally {
     endOperation(operationKey);
   }
 }
 
-async function persistProjectPhotoTimeline(job,quote,timeline){
+async function persistProjectPhotoTimeline(job,quote,timeline,options={}){
   const baseQuoteData={...(quote.quoteData || {})};
 
   const quoteId=quote.cloudId || quote.id || job.quoteId;
@@ -6689,12 +6806,66 @@ async function persistProjectPhotoTimeline(job,quote,timeline){
 
   if(error){
     reportClientDiagnostic("project-photo-timeline-save",error,{ table:"quotes", quoteId:quote.id, jobId:job.id });
-    showToast("Photos uploaded, timeline not saved","Quote save failed: " + error.message,"warning");
+    showToast(options.failureTitle || "Photos uploaded, timeline not saved",options.failureMessage || ("Quote save failed: " + error.message),options.failureType || "warning");
     return false;
   }
   quote.quoteData=nextQuoteData;
   quote.projectPhotoTimeline=persistedTimeline;
   return true;
+}
+
+async function deleteProjectTimelinePhoto(jobId,stageKey,encodedPhotoKey){
+  const job=findScheduledJob(jobId);
+  const quote=getJobQuote(job);
+  if(!job || !quote){showToast("Photo not found","Could not find the job file for this photo.","warning");return false;}
+  const photoKey=decodeURIComponent(String(encodedPhotoKey || ""));
+  const stage=projectPhotoStageByKey(stageKey);
+  const timeline=quoteProjectTimeline(quote);
+  const stagePhotos=timeline[stage.key] || [];
+  const photo=stagePhotos.find(p=>photoIdentity(p)===photoKey);
+  if(!photo){showToast("Photo not found","Refresh the Job File and try again.","warning");return false;}
+  if(photo.legacyRoomPhoto){
+    showToast("Use Quote Builder for room photos","This is an older room photo shown in the project history. Delete it from the room photo section instead.","warning");
+    return false;
+  }
+  const hasStoragePath=Boolean(photo.cloudPath);
+  const message=hasStoragePath
+    ? "Delete this project timeline photo from ProJobFlo and cloud storage?"
+    : "This older timeline photo has no saved cloud path. Remove it from the project timeline only?";
+  if(!confirm(message)) return false;
+
+  const operationKey="project-photo-delete-"+jobId+"-"+stage.key+"-"+photoKey;
+  if(!beginOperation(operationKey,"Photo delete already running","Please wait for this photo delete to finish.")) return false;
+  try{
+    if(currentUser && !requireOnlineForCloudWrite("project-photo-delete")) return false;
+    if(currentUser && hasStoragePath){
+      const deleted=await deleteStoredPhotoObject("job-photos",photo.cloudPath,{ workflow:"project-photo-delete", quoteId:quote.cloudId || quote.id || "", jobId:job.id, photoId:photoIdentity(photo) });
+      if(!deleted) return false;
+    }
+
+    const proposed=quoteProjectTimeline(quote);
+    proposed[stage.key]=(proposed[stage.key] || []).filter(p=>photoIdentity(p)!==photoKey);
+    const saved=await persistProjectPhotoTimeline(job,quote,proposed,{
+      failureTitle:"Photo file deleted, timeline not updated",
+      failureMessage:"The storage file was removed, but quote photo metadata was not saved. Refresh before trying again and check storage cleanup if needed.",
+      failureType:"error"
+    });
+    if(!saved) return false;
+
+    showToast("Photo removed",hasStoragePath ? "The timeline photo and cloud file were deleted." : "The timeline photo metadata was removed.","success");
+    openJobFile(jobId);
+    if(!document.getElementById("photoLightboxOverlay")?.classList.contains("hidden")){
+      activeProjectPhotos=flatProjectTimelinePhotos(quote);
+      if(!activeProjectPhotos.length) closeProjectPhotoLightbox();
+      else{
+        activeProjectPhotoIndex=Math.min(activeProjectPhotoIndex,activeProjectPhotos.length-1);
+        renderProjectPhotoLightbox();
+      }
+    }
+    return true;
+  } finally {
+    endOperation(operationKey);
+  }
 }
 
 function handleProjectPhotoDragOver(event){
@@ -6717,6 +6888,7 @@ async function openProjectPhotoLightbox(jobId,index){
   const quote=getJobQuote(job);
   if(!quote) return;
   await hydrateProjectTimelinePhotoUrls(quote);
+  activeProjectPhotoJobId=jobId;
   activeProjectPhotos=flatProjectTimelinePhotos(quote);
   activeProjectPhotoIndex=Math.max(0,Math.min(Number(index)||0,activeProjectPhotos.length-1));
   renderProjectPhotoLightbox();
@@ -6731,15 +6903,23 @@ function renderProjectPhotoLightbox(){
   const image=document.getElementById("photoLightboxImage");
   const title=document.getElementById("photoLightboxTitle");
   const meta=document.getElementById("photoLightboxMeta");
+  const deleteButton=document.getElementById("photoLightboxDeleteButton");
   if(image) image.src=jobPhotoUrl(photo);
   if(title) title.textContent=photo.caption || photo.category || "Project Photo";
   if(meta) meta.textContent=(photo.stageTitle || projectPhotoStageByKey(photo.timelineStage).title) + " - " + formatProjectPhotoDate(photo.uploadedAt);
+  if(deleteButton) deleteButton.classList.toggle("hidden",Boolean(photo.legacyRoomPhoto));
 }
 
 function closeProjectPhotoLightbox(){
   const overlay=document.getElementById("photoLightboxOverlay");
   if(overlay) overlay.classList.add("hidden");
   document.removeEventListener("keydown",handleProjectPhotoLightboxKey);
+}
+
+async function deleteActiveProjectPhotoFromLightbox(){
+  const photo=activeProjectPhotos[activeProjectPhotoIndex];
+  if(!photo){closeProjectPhotoLightbox();return;}
+  await deleteProjectTimelinePhoto(activeProjectPhotoJobId || photo.jobId || "",photo.timelineStage || "estimate",encodeURIComponent(photoIdentity(photo)));
 }
 
 function handlePhotoLightboxBackdrop(event){
@@ -8925,6 +9105,35 @@ if (customerError) {
     uploadedAt: new Date().toISOString()
   };
 }
+
+function isAllowedPhotoStoragePath(bucket, cloudPath){
+  if(bucket!=="job-photos") return false;
+  if(!currentUser || !currentUser.id) return false;
+  const path=String(cloudPath || "");
+  if(!path || path.startsWith("/") || path.includes("..") || path.includes("\\")) return false;
+  return path.startsWith(currentUser.id + "/rooms/");
+}
+
+async function deleteStoredPhotoObject(bucket, cloudPath, context={}){
+  const ok = await requireLoggedIn();
+  if(!ok) return false;
+  if(!requireOnlineForCloudWrite(context.workflow || "photo-delete")) return false;
+  if(!isAllowedPhotoStoragePath(bucket,cloudPath)){
+    reportClientDiagnostic(context.workflow || "photo-delete",new Error("Rejected unsafe photo storage path"),{ bucket, quoteId:context.quoteId || "", jobId:context.jobId || "", photoId:context.photoId || "" });
+    showToast("Photo was not deleted","The stored photo path did not match the expected account folder.","error");
+    return false;
+  }
+  const { error } = await supabaseClient.storage
+    .from(bucket)
+    .remove([cloudPath]);
+  if(error){
+    reportClientDiagnostic(context.workflow || "photo-delete",error,{ bucket, quoteId:context.quoteId || "", jobId:context.jobId || "", photoId:context.photoId || "" });
+    showToast("Photo was not deleted","Cloud storage delete failed: " + error.message,"error");
+    return false;
+  }
+  return true;
+}
+
  async function getCloudPhotoUrl(cloudPath) {
   if (!cloudPath) return "";
 

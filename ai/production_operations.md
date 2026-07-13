@@ -198,8 +198,20 @@ Photo issue:
 
 1. Inspect `job-photos` storage for uploaded object path.
 2. Inspect the quote's Project Photo Timeline metadata in `quote_data`.
-3. If object exists but metadata is missing, add metadata only after confirming customer/quote/job/stage.
-4. If metadata exists but signed URL fails, inspect bucket permissions and object path.
+3. Inspect room photo metadata in `quote_data.roomPhotos`.
+4. If object exists but metadata is missing, add metadata only after confirming customer/quote/job/stage.
+5. If metadata exists but signed URL fails, inspect bucket permissions and object path.
+6. For deletion issues, compare the exact `cloudPath` to `ai/photo_storage_integrity.md`; do not infer paths from signed URLs.
+
+Photo storage cleanup:
+
+1. Do not mass-delete production storage automatically.
+2. Export affected quote rows and list storage objects before any cleanup.
+3. Build a dry-run list of metadata `cloudPath` values from `quote_data.roomPhotos` and `quote_data.projectPhotoTimeline`.
+4. Compare that list with objects under `job-photos/{user_id}/rooms/`.
+5. Manually review possible orphans and broken metadata references.
+6. Use a retention window before deletion; 30 days is recommended during beta.
+7. Confirm Supabase Storage backups before destructive cleanup.
 
 Settings/logo issue:
 
@@ -236,6 +248,6 @@ For every production release:
 2. Some important data is stored inside `quotes.quote_data`; recovery requires careful JSON inspection.
 3. Customer deletion does not have a documented server-side cascade/archival policy.
 4. Estimate number generation is not server-transactional.
-5. Photo metadata and storage objects can still become mismatched if upload succeeds but metadata save fails.
+5. Room photo metadata and storage objects can still become mismatched if upload succeeds but quote autosave fails. Project Photo Timeline upload now attempts storage cleanup when metadata save fails.
 6. Proposal approval legacy fallback should remain only until the RPC is deployed and validated, then be reconsidered before paid beta.
 7. There is no automated end-to-end regression suite.
