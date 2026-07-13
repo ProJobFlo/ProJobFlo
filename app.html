@@ -2872,11 +2872,11 @@
   </div>
   <div class="actions">
     <button onclick="signUp()">Create Account</button>
-    <button class="success" onclick="signIn()">Login</button>
+    <button class="success" onclick="signIn()">Log In</button>
     <button class="secondary" onclick="resetPassword()">Forgot Password</button>
     <button class="danger" onclick="signOut()">Logout</button>
   </div>
-  <p id="authStatus" class="small">Not logged in.</p>
+  <p id="authStatus" class="small">Log in to keep quotes, jobs, customers, and payments synced.</p>
   <p id="autoSaveStatus" class="small">Auto-save waiting.</p>
 </div>
   <div class="topbar" style="align-items:center;margin-bottom:8px;">
@@ -2886,7 +2886,7 @@
       style="height:175px;width:auto;"
     >
     <p style="margin:-38px 0 0 0;color:#6b7280;font-size:14px;">
-      Quote â†’ Sign â†’ Schedule â†’ Complete
+      Quote -> Sign -> Schedule -> Complete
     </p>
   </div>
 
@@ -2928,12 +2928,12 @@
   </div>
 
   <nav class="mobile-bottom-nav" aria-label="Mobile app navigation">
-    <button id="mobileNavDashboard" class="mobile-nav-item" type="button"><span class="mobile-nav-icon">â–¦</span><span>Dashboard</span></button>
-    <button id="mobileNavQuote" class="mobile-nav-item active" type="button"><span class="mobile-nav-icon">âœŽ</span><span>Quote</span></button>
-    <button id="mobileNavSchedule" class="mobile-nav-item" type="button"><span class="mobile-nav-icon">â–¡</span><span>Schedule</span></button>
+    <button id="mobileNavDashboard" class="mobile-nav-item" type="button"><span class="mobile-nav-icon">D</span><span>Dashboard</span></button>
+    <button id="mobileNavQuote" class="mobile-nav-item active" type="button"><span class="mobile-nav-icon">Q</span><span>Quote</span></button>
+    <button id="mobileNavSchedule" class="mobile-nav-item" type="button"><span class="mobile-nav-icon">S</span><span>Schedule</span></button>
     <button id="mobileNavMoney" class="mobile-nav-item" type="button"><span class="mobile-nav-icon">$</span><span>Money</span></button>
-    <button id="mobileNavCustomers" class="mobile-nav-item" type="button"><span class="mobile-nav-icon">â—Ž</span><span>Customers</span></button>
-    <button id="mobileNavMore" class="mobile-nav-item" type="button"><span class="mobile-nav-icon">â€¢â€¢â€¢</span><span>More</span></button>
+    <button id="mobileNavCustomers" class="mobile-nav-item" type="button"><span class="mobile-nav-icon">C</span><span>Customers</span></button>
+    <button id="mobileNavMore" class="mobile-nav-item" type="button"><span class="mobile-nav-icon">...</span><span>More</span></button>
   </nav>
 
 
@@ -3229,7 +3229,7 @@
         </div>
 
         <div class="sold-screen hidden" id="soldScreen">
-          <h2>Job Sold ðŸŽ‰</h2>
+          <h2>Job Sold</h2>
           <div class="stat"><div class="stat-label">Contract Total</div><div id="soldTotal" class="stat-value">$0.00</div></div>
           <div class="stat"><div class="stat-label">Deposit Required</div><div id="soldDepositRequired" class="stat-value">$0.00</div></div>
           <input id="soldDepositCollected" placeholder="Deposit collected today $" inputmode="decimal" />
@@ -3313,9 +3313,9 @@
       <div>
         <div class="card">
           <div class="calendar-header">
-            <button class="secondary" onclick="changeMonth(-1)">â† Prev</button>
+            <button class="secondary" onclick="changeMonth(-1)">Prev</button>
             <div id="calendarTitle" class="calendar-title"></div>
-            <button class="secondary" onclick="changeMonth(1)">Next â†’</button>
+            <button class="secondary" onclick="changeMonth(1)">Next</button>
           </div>
           <div class="actions" style="margin-bottom:10px;">
             <span class="pill" style="background:#d97706;color:white;">Sold</span>
@@ -3472,8 +3472,8 @@
 
   <div id="viewSettings" class="hidden">
   <div class="card">
-  <h2>Cloud Sync</h2>
-  <p id="cloudSyncSummary" class="small">Login to sync your data across devices.</p>
+  <h2>Account & Sync</h2>
+  <p id="cloudSyncSummary" class="small">Log in to keep ProJobFlo backed up and available across devices.</p>
   <p id="cloudSaveIndicator" class="small">Auto-save waiting.</p>
 
 
@@ -3489,7 +3489,7 @@
 </div>
    <div class="card">
     <h2>Application Health & Support</h2>
-    <p class="small">Version <span id="appVersionLabel">-</span>. Generate a safe health report for beta support without customer contact details, proposal contents, signatures, tokens, or photos.</p>
+    <p class="small">Version <span id="appVersionLabel">-</span>. Generate a safe support report without customer contact details, proposal contents, signatures, tokens, or photos.</p>
     <div class="actions">
       <button id="runHealthCheckButton" class="secondary" type="button">Run Health Check</button>
       <button id="copySupportReportButton" class="secondary" type="button">Copy Support Report</button>
@@ -3498,7 +3498,8 @@
     <pre id="supportReportPreview" class="quote-box" style="max-height:260px;overflow:auto;margin-top:10px;white-space:pre-wrap;">Support report will appear here after running a health check.</pre>
   </div>
    <div class="card">
-    <h2>Company Branding</h2>
+    <h2>Business Profile & Branding</h2>
+    <p class="small">These details appear on customer-facing quotes, proposals, and PDFs.</p>
     <div class="form-grid">
   <input id="settingsCompanyName" placeholder="Company name" />
   <input id="settingsCompanyPhone" placeholder="Company phone" />
@@ -3513,7 +3514,7 @@
 </div>
 
   <p class="small">
-    Upload your company logo. This logo will appear on proposals and PDFs.
+    Add your company logo for proposals and PDFs. You can update it any time.
   </p>
 
   <input
@@ -3535,7 +3536,7 @@
     <div class="grid">
       <div>
         <div class="card">
-          <h2>Contractor Preset Rates</h2>
+          <h2>Quote Defaults</h2>
           <p class="small">These are starting rates only. They autofill templates, but every quote can still be changed on the fly.</p>
           <div class="form-grid preset-row" data-trade="lvp">
             <input id="presetLvpInstall" placeholder="LVP install $/sqft" value="" />
@@ -3570,17 +3571,17 @@
       </div>
       <div>
         <div class="card">
-          <h2>Trade Types</h2>
-          <p class="small">Change which templates and preset fields this contractor sees.</p>
+          <h2>Trade Setup</h2>
+          <p class="small">Choose the work types, templates, and preset fields your team uses.</p>
           <div id="settingsTradeList" class="setup-grid"></div>
           <div class="actions">
             <button class="success" onclick="saveTradeSettingsFromSettings()">Save Trade Types</button>
-            <button class="secondary" onclick="localStorage.removeItem('fastQuoteTradeSetup'); enabledTrades=[]; document.getElementById('setupOverlay').classList.remove('hidden'); syncSetupCheckboxes();">Show Setup Screen</button>
+            <button class="secondary" onclick="localStorage.removeItem('fastQuoteTradeSetup'); enabledTrades=[]; document.getElementById('setupOverlay').classList.remove('hidden'); syncSetupCheckboxes();">Review Setup</button>
           </div>
         </div>
 
        <div class="card">
-          <h2>Manage Crews</h2>
+          <h2>Job Crews</h2>
           <p class="small">Add the crews, installers, or subcontractors you actually use.</p>
           <div class="two">
             <input id="newCrewName" placeholder="Crew name, ex: Devon, Tile Crew, Subcontractor" />
@@ -3589,13 +3590,13 @@
           <div id="crewList"></div>
         </div>
         <div class="card">
-          <h2>How Presets Work</h2>
-          <div class="quote-box">Templates should tell the contractor what to quote, not force what to charge.
+          <h2>How Quote Defaults Work</h2>
+          <div class="quote-box">Templates help you start faster without locking in prices.
 
 Preset rates are only starting points:
 - They autofill when a template loads.
-- The contractor can change any rate on the quote screen.
-- Customer never sees internal preset logic.</div>
+- You can change any rate on the quote screen.
+- Customers never see internal preset logic.</div>
         </div>
       </div>
     </div>
@@ -5217,7 +5218,7 @@ function buildQuoteText(measured,order,subtotal,tax,total,deposit){
    const sqft=roomSqft(r);
    const lengthText=displayFeetInches(r.lengthFt ?? r.length ?? 0, r.lengthIn ?? 0);
    const widthText=displayFeetInches(r.widthFt ?? r.width ?? 0, r.widthIn ?? 0);
-   return "â€¢ " + (r.name||"Room") + "\n  " + lengthText + " x " + widthText + " = " + sqft.toFixed(2) + " sqft";
+   return "- " + (r.name||"Room") + "\n  " + lengthText + " x " + widthText + " = " + sqft.toFixed(2) + " sqft";
  }).join("\n\n") : "No rooms added.";
 
  const itemLines=lineItems.length ? lineItems.map(i=>{
@@ -5417,8 +5418,8 @@ await loadAllCloudData();
 
 alert(
     val("quoteSaveStatus") === "Sold"
-      ? "Quote saved to cloud as sold. Go to Schedule tab to schedule it."
-      : "Unsold quote saved to cloud for follow-up."
+      ? "Quote saved as sold. Go to Schedule to place it on the calendar."
+      : "Unsold quote saved for follow-up."
   );
   } finally {
     endOperation("save-current-quote");
@@ -5761,7 +5762,7 @@ function getCustomer(id){
 function renderFollowUps(){
  const filter=val("followFilter");let list=quotes.slice();if(filter==="due")list=list.filter(q=>isDue(q));if(filter==="all")list=list.filter(q=>q.status==="Unsold");if(filter==="sold")list=list.filter(q=>q.status==="Sold"||q.status==="Scheduled");if(filter==="lost")list=list.filter(q=>q.status==="Lost");list.sort((a,b)=>a.nextFollowUpAt-b.nextFollowUpAt);
   const box=document.getElementById("followUpList");if(!box)return;if(!list.length){box.innerHTML="<div class='empty-state'><strong>No follow-ups in this view.</strong><p>Quotes that need attention will appear here automatically.</p></div>";return;}
- box.innerHTML=list.map(q=>{const c=getCustomer(q.customerId);const due=isDue(q);return `<div class="quote-card ${due?"urgent":""}"><div class="title">${escapeHtml(c.name||"Unnamed")}</div><div class="small">${escapeHtml(c.phone||"")} â€¢ ${escapeHtml(c.email||"")}</div><div>${escapeHtml(c.address||"")}</div><div>Quote: <strong>${dollars(q.amount)}</strong></div><div>Status: <span class="pill ${due?"status-FollowUpDue":"status-"+q.status.replaceAll(" ","")}">${due?"Follow-Up Due":q.status}</span></div><div class="small">Next follow-up: ${new Date(q.nextFollowUpAt).toLocaleString()}</div><div class="actions" style="margin-top:8px;"><button class="success" onclick="openQuoteFromFollowUp('${q.id}')">Open Quote</button><button class="secondary" onclick="selectFollowUp('${q.id}')">Follow Up</button><button class="success" onclick="markSold('${q.id}')">Sold</button><button class="warning" onclick="snoozeQuote('${q.id}')">Snooze 48h</button><button class="danger" onclick="markLost('${q.id}')">Lost</button></div></div>`;}).join("");
+  box.innerHTML=list.map(q=>{const c=getCustomer(q.customerId);const due=isDue(q);return `<div class="quote-card ${due?"urgent":""}"><div class="title">${escapeHtml(c.name||"Unnamed")}</div><div class="small">${escapeHtml(c.phone||"")} - ${escapeHtml(c.email||"")}</div><div>${escapeHtml(c.address||"")}</div><div>Quote: <strong>${dollars(q.amount)}</strong></div><div>Status: <span class="pill ${due?"status-FollowUpDue":"status-"+q.status.replaceAll(" ","")}">${due?"Follow-Up Due":q.status}</span></div><div class="small">Next follow-up: ${new Date(q.nextFollowUpAt).toLocaleString()}</div><div class="actions" style="margin-top:8px;"><button class="success" onclick="openQuoteFromFollowUp('${q.id}')">Open Quote</button><button class="secondary" onclick="selectFollowUp('${q.id}')">Follow Up</button><button class="success" onclick="markSold('${q.id}')">Sold</button><button class="warning" onclick="snoozeQuote('${q.id}')">Snooze 48h</button><button class="danger" onclick="markLost('${q.id}')">Lost</button></div></div>`;}).join("");
 }
 function selectFollowUp(id){const q=quotes.find(q => String(q.id) === String(id));const c=getCustomer(q.customerId);const msg=buildFollowUpMessage(q,c);document.getElementById("selectedFollowUp").innerHTML=`<div class="quote-card"><div class="title">${escapeHtml(c.name)}</div><div>${escapeHtml(c.phone)}<br>${escapeHtml(c.email)}</div><div class="quote-box">${escapeHtml(msg)}</div><div class="actions" style="margin-top:8px;"><button onclick="copyText(\`${escapeJs(msg)}\`)">Copy</button><button class="secondary" onclick="openSms('${escapeAttr(c.phone)}', \`${escapeJs(msg)}\`)">Text</button><button class="secondary" onclick="openEmail('${escapeAttr(c.email)}', \`${escapeJs(msg)}\`)">Email</button><button class="success" onclick="markFollowedUp(${q.id})">Mark Followed Up</button></div></div>`;}
 function buildFollowUpMessage(q,c){const first=(c.name||"there").split(" ")[0];return `Hi ${first}, this is following up on the flooring quote for ${c.address||"your project"}. The estimate was ${dollars(q.amount)}. I wanted to see if you had any questions or if you would like to get on the schedule.`;}
@@ -5788,7 +5789,7 @@ async function updateQuoteStatusCloud(id, updates) {
 
     if (error) {
       reportClientDiagnostic("quote-status-update",error,{ table:"quotes", quoteId:quote.id, status:nextStatus });
-      showToast("Quote status was not updated","Cloud save failed: " + error.message,"error");
+      showToast("Quote status was not updated","Could not save online: " + error.message,"error");
       return false;
     }
   }
@@ -5892,7 +5893,7 @@ async function scheduleSelectedQuote(){
 
  if(error){
    reportClientDiagnostic("schedule-job-create",error,{ table:"jobs", quoteId:q.id, jobId:job.id, status:job.status });
-   showToast("Job was not scheduled","Cloud save failed: " + error.message,"error");
+   showToast("Job was not scheduled","Could not save online: " + error.message,"error");
    return;
   }
 
@@ -5944,7 +5945,7 @@ async function scheduleSelectedQuote(){
 
  if(error){
    reportClientDiagnostic("schedule-job-update",error,{ table:"jobs", jobId:job.id, status:updatedJob.status });
-   showToast("Schedule was not updated","Cloud save failed: " + error.message,"error");
+   showToast("Schedule was not updated","Could not save online: " + error.message,"error");
    return false;
   }
   return true;
@@ -6038,7 +6039,7 @@ async function deleteScheduledJob(){
 function calendarStatusClass(status){if(status==="Sold")return"cal-Sold";if(status==="Scheduled")return"cal-Scheduled";if(status==="Materials Ordered")return"cal-Ordered";if(status==="Ready to Install")return"cal-Ready";if(status==="In Progress")return"cal-Progress";if(status==="Complete")return"cal-Complete";return"cal-Scheduled";}
 function jobCoversDate(job,iso){const duration=Math.max(1,Number(job.duration)||1);const start=new Date(job.date+"T00:00:00");const target=new Date(iso+"T00:00:00");for(let i=0;i<duration;i++){const d=new Date(start);d.setDate(start.getDate()+i);if(fmtDate(d)===fmtDate(target))return true;}return false;}
 function getJobDayNumber(job,iso){const start=new Date(job.date+"T00:00:00");const target=new Date(iso+"T00:00:00");return Math.round((target-start)/(1000*60*60*24))+1;}
-function renderCalendar(){const title=currentMonth.toLocaleDateString(undefined,{month:"long",year:"numeric"});document.getElementById("calendarTitle").textContent=title;const cal=document.getElementById("calendar");if(!cal)return;cal.innerHTML="";const year=currentMonth.getFullYear();const month=currentMonth.getMonth();const first=new Date(year,month,1);const start=new Date(first);start.setDate(first.getDate()-first.getDay());for(let i=0;i<42;i++){const day=new Date(start);day.setDate(start.getDate()+i);const iso=fmtDate(day);const div=document.createElement("div");div.className="day";if(day.getMonth()!==month)div.classList.add("muted");if(iso===selectedDate)div.classList.add("selected");const number=document.createElement("div");number.className="day-number";number.textContent=day.getDate();div.appendChild(number);jobs.filter(j=>jobCoversDate(j,iso)).forEach(job=>{const event=document.createElement("div");event.className="event "+calendarStatusClass(job.status);const dayNum=getJobDayNumber(job,iso);event.innerHTML="<strong>"+escapeHtml(job.customer||"Unnamed")+"</strong><br>"+escapeHtml(job.status)+" â€¢ "+escapeHtml(job.crew)+" â€¢ Day "+dayNum+"/"+(Number(job.duration)||1);
+ function renderCalendar(){const title=currentMonth.toLocaleDateString(undefined,{month:"long",year:"numeric"});document.getElementById("calendarTitle").textContent=title;const cal=document.getElementById("calendar");if(!cal)return;cal.innerHTML="";const year=currentMonth.getFullYear();const month=currentMonth.getMonth();const first=new Date(year,month,1);const start=new Date(first);start.setDate(first.getDate()-first.getDay());for(let i=0;i<42;i++){const day=new Date(start);day.setDate(start.getDate()+i);const iso=fmtDate(day);const div=document.createElement("div");div.className="day";if(day.getMonth()!==month)div.classList.add("muted");if(iso===selectedDate)div.classList.add("selected");const number=document.createElement("div");number.className="day-number";number.textContent=day.getDate();div.appendChild(number);jobs.filter(j=>jobCoversDate(j,iso)).forEach(job=>{const event=document.createElement("div");event.className="event "+calendarStatusClass(job.status);const dayNum=getJobDayNumber(job,iso);event.innerHTML="<strong>"+escapeHtml(job.customer||"Unnamed")+"</strong><br>"+escapeHtml(job.status)+" - "+escapeHtml(job.crew)+" - Day "+dayNum+"/"+(Number(job.duration)||1);
 event.onclick=function(){editScheduledJob(job.id);};
 div.appendChild(event);});cal.appendChild(div);}}
 function renderSelectedJobs(){
@@ -6048,7 +6049,7 @@ function renderSelectedJobs(){
   const dayJobs = jobs.filter(j => jobCoversDate(j, selectedDate));
 
   if(!dayJobs.length){
-    box.innerHTML = "<p class='small'>No jobs scheduled for this date.</p>";
+    box.innerHTML = "<div class='empty-state'><strong>No jobs scheduled for this date.</strong><p>Select a sold quote above, choose the install details, and schedule it on the calendar.</p></div>";
     return;
   }
 
@@ -6250,7 +6251,7 @@ function renderSelectedJobs(){
   if(!box) return;
   const dayJobs=jobs.filter(j=>jobCoversDate(j,selectedDate));
   if(!dayJobs.length){
-    box.innerHTML="<p class='small'>No jobs scheduled for this date.</p>";
+    box.innerHTML="<div class='empty-state'><strong>No jobs scheduled for this date.</strong><p>Select a sold quote above, choose the install details, and schedule it on the calendar.</p></div>";
     return;
   }
   box.innerHTML=dayJobs.map(j=>{
@@ -6502,7 +6503,7 @@ function renderProjectPhotoTimeline(job, quote){
                   ${escapeHtml(stage.title)}<br>${escapeHtml(caption)}
                 </span>
               </button>` : "";
-            }).join("")}</div>` : `<div class="project-photo-empty"><strong>No ${escapeHtml(stage.title)} yet.</strong>Upload photos here to build the project history.</div>`}
+            }).join("")}</div>` : `<div class="project-photo-empty"><strong>No ${escapeHtml(stage.title)} yet.</strong><p>Upload photos here to build the project history for this stage.</p></div>`}
           </div>
         </details>`;
       }).join("")}
@@ -6828,7 +6829,7 @@ async function persistJobActivityTimeline(job,quote,entries){
 
   if(error){
     reportClientDiagnostic("activity-timeline-save",error,{ table:"quotes", quoteId:quote.id, jobId:job.id });
-    showToast("Activity was not saved","Cloud save failed: " + error.message,"error");
+    showToast("Activity was not saved","Could not save online: " + error.message,"error");
     return false;
   }
   quote.quoteData=nextQuoteData;
@@ -6889,7 +6890,7 @@ function renderJobActivityTimeline(job,quote){
           <div class="job-activity-description">${escapeHtml(activity.description || "")}</div>
           ${activity.author ? `<div class="job-activity-author">By ${escapeHtml(activity.author)}</div>` : ""}
         </div>
-      `).join("") : `<div class="job-file-empty">No activity has been recorded for this job yet.</div>`}
+      `).join("") : `<div class="job-file-empty"><strong>No activity recorded yet.</strong><p>Schedule changes, payments, status updates, and job notes will appear here.</p></div>`}
     </div>
   </div>`;
 }
@@ -6963,7 +6964,7 @@ async function persistJobProgressChecklist(job,quote,progress){
 
       if(error){
         reportClientDiagnostic("job-progress-save",error,{ table:"quotes", quoteId:quote.id, jobId:job.id });
-        showToast("Progress was not saved","Cloud save failed: " + error.message,"error");
+        showToast("Progress was not saved","Could not save online: " + error.message,"error");
         return false;
       }
     }
@@ -7305,7 +7306,7 @@ function renderCustomers(){
     `;
   }).join("");
 }
-function selectCustomer(id){const c=getCustomer(id);const qs=quotes.filter(q=>q.customerId===id).sort((a,b)=>b.createdAt-a.createdAt);const js=jobs.filter(j=>j.customerId===id).sort((a,b)=>a.date.localeCompare(b.date));document.getElementById("customerDetails").innerHTML=`<div class="customer-card"><div class="title">${escapeHtml(c.name||"Unnamed")}</div><div>${escapeHtml(c.phone||"")}<br>${escapeHtml(c.email||"")}<br>${escapeHtml(c.address||"")}</div></div><h3>Quote History</h3>${qs.length?qs.map(q=>`<div class="quote-card"><div>Quote: <strong>${dollars(q.amount)}</strong></div><div>Status: <span class="pill ${statusClass(q.status)}">${escapeHtml(q.status)}</span></div><div class="small">${new Date(q.createdAt).toLocaleString()}</div></div>`).join(""):"<p>No quote history.</p>"}<h3>Scheduled Jobs</h3>${js.length?js.map(j=>`<div class="job-card"><div>${escapeHtml(j.date)} â€¢ ${escapeHtml(j.crew)}</div><div>Status: ${escapeHtml(j.status)}</div></div>`).join(""):"<p>No scheduled jobs.</p>"}`;}
+function selectCustomer(id){const c=getCustomer(id);const qs=quotes.filter(q=>q.customerId===id).sort((a,b)=>b.createdAt-a.createdAt);const js=jobs.filter(j=>j.customerId===id).sort((a,b)=>a.date.localeCompare(b.date));document.getElementById("customerDetails").innerHTML=`<div class="customer-card"><div class="title">${escapeHtml(c.name||"Unnamed")}</div><div>${escapeHtml(c.phone||"")}<br>${escapeHtml(c.email||"")}<br>${escapeHtml(c.address||"")}</div></div><h3>Quote History</h3>${qs.length?qs.map(q=>`<div class="quote-card"><div>Quote: <strong>${dollars(q.amount)}</strong></div><div>Status: <span class="pill ${statusClass(q.status)}">${escapeHtml(q.status)}</span></div><div class="small">${new Date(q.createdAt).toLocaleString()}</div></div>`).join(""):"<div class='empty-state'><strong>No quote history yet.</strong><p>Create this customer's first quote to start their project record.</p></div>"}<h3>Scheduled Jobs</h3>${js.length?js.map(j=>`<div class="job-card"><div>${escapeHtml(j.date)} - ${escapeHtml(j.crew)}</div><div>Status: ${escapeHtml(j.status)}</div></div>`).join(""):"<div class='empty-state'><strong>No scheduled jobs yet.</strong><p>Accepted quotes will appear here after they are scheduled.</p></div>"}`;}
 function statusClass(status){if(status==="Materials Ordered")return"status-Ordered";if(status==="Ready to Install")return"status-Ready";if(status==="In Progress")return"status-Progress";return"status-"+String(status).replaceAll(" ","");}
 
 function isMoneyTrackedQuote(q) {
@@ -7456,7 +7457,7 @@ function renderPaymentSelectors(){
    const sel=document.getElementById(id);
    if(!sel)return;
    const sold = quotes.filter(isMoneyTrackedQuote);
-   sel.innerHTML=sold.length?sold.map(q=>{const c=getCustomer(q.customerId);return `<option value="${q.id}">${escapeHtml(c.name||"Unnamed")} â€” ${dollars(q.amount)}</option>`;}).join(""):`<option value="">No sold jobs</option>`;
+   sel.innerHTML=sold.length?sold.map(q=>{const c=getCustomer(q.customerId);return `<option value="${q.id}">${escapeHtml(c.name||"Unnamed")} - ${dollars(q.amount)}</option>`;}).join(""):`<option value="">No sold jobs</option>`;
  });
 }
 
@@ -7549,7 +7550,7 @@ async function addPayment(payment) {
 
   if (error) {
     reportClientDiagnostic("payment-save",error,{ table:"payments", quoteId:payment.quoteId, paymentId:payment.id });
-    showToast("Payment was not recorded","Cloud save failed: " + error.message,"error");
+    showToast("Payment was not recorded","Could not save online: " + error.message,"error");
     return false;
   }
 
@@ -7591,7 +7592,7 @@ async function addPayment(payment) {
 
   if (error) {
     reportClientDiagnostic("payments-load",error,{ table:"payments" });
-    showToast("Payments did not load","Cloud load failed: " + error.message,"error");
+    showToast("Payments did not load","Could not load online data: " + error.message,"error");
     return;
   }
 
@@ -7764,27 +7765,27 @@ function renderDashboard(){
      if(q.createdAt){
        events.push({
          time:Number(q.createdAt)||0,
-         icon:"ðŸ“",
-         title:"Quote created",
-         detail:`${name} ${estimate ? "â€¢ Proposal #" + estimate : ""} â€¢ ${dollars(q.amount)}`
+          icon:"Q",
+          title:"Quote created",
+          detail:`${name} ${estimate ? "- Proposal #" + estimate : ""} - ${dollars(q.amount)}`
        });
      }
 
      if(q.signatureStatus==="Sent" || q.signature_status==="Sent"){
        events.push({
          time:Number(q.sentAt || q.updatedAt || q.createdAt || 0),
-         icon:"ðŸ“¨",
-         title:"Proposal sent",
-         detail:`${name} ${estimate ? "â€¢ Proposal #" + estimate : ""}`
+          icon:"S",
+          title:"Proposal sent",
+          detail:`${name} ${estimate ? "- Proposal #" + estimate : ""}`
        });
      }
 
      if(q.status==="Sold" || q.signatureStatus==="Signed" || q.signature_status==="Signed"){
        events.push({
          time:Number(q.signedAt || q.signed_at || q.updatedAt || q.createdAt || 0),
-         icon:"âœ…",
-         title:"Proposal signed",
-         detail:`${name} ${estimate ? "â€¢ Proposal #" + estimate : ""} â€¢ ${dollars(q.amount)}`
+          icon:"A",
+          title:"Proposal signed",
+          detail:`${name} ${estimate ? "- Proposal #" + estimate : ""} - ${dollars(q.amount)}`
        });
      }
    });
@@ -7792,17 +7793,17 @@ function renderDashboard(){
    jobs.forEach(j=>{
      events.push({
        time:new Date((j.date || selectedDate) + "T00:00:00").getTime(),
-       icon:"ðŸ“…",
-       title:"Job scheduled",
-       detail:`${j.customer || "Unnamed Customer"} â€¢ ${j.date || ""} â€¢ ${j.crew || ""}`
+        icon:"J",
+        title:"Job scheduled",
+        detail:`${j.customer || "Unnamed Customer"} - ${j.date || ""} - ${j.crew || ""}`
      });
 
      if(j.status==="Complete"){
        events.push({
          time:new Date((j.date || selectedDate) + "T00:00:00").getTime(),
-         icon:"ðŸ",
-         title:"Job completed",
-         detail:`${j.customer || "Unnamed Customer"} â€¢ ${dollars(j.total)}`
+          icon:"C",
+          title:"Job completed",
+          detail:`${j.customer || "Unnamed Customer"} - ${dollars(j.total)}`
        });
      }
    });
@@ -7812,9 +7813,9 @@ function renderDashboard(){
      const c=q ? getCustomer(q.customerId) : {};
      events.push({
        time:Number(p.createdAt || p.date || nowMs()),
-       icon:"ðŸ’µ",
-       title:"Payment recorded",
-       detail:`${c.name || "Customer"} â€¢ ${p.type || "Payment"} â€¢ ${dollars(p.amount)}`
+        icon:"$",
+        title:"Payment recorded",
+        detail:`${c.name || "Customer"} - ${p.type || "Payment"} - ${dollars(p.amount)}`
      });
    });
 
@@ -7844,7 +7845,7 @@ function renderDashboard(){
      .slice(0,6);
 
    upcoming.innerHTML=upcomingJobs.length
-     ? upcomingJobs.map(j=>`<div class="job-card"><div class="title">${escapeHtml(j.customer||"Unnamed")}</div><div>${escapeHtml(j.date)} â€¢ ${escapeHtml(j.crew||"")}</div><div>Status: <span class="pill ${statusClass(j.status)}">${escapeHtml(j.status)}</span></div><div>Total: <strong>${dollars(j.total)}</strong></div></div>`).join("")
+      ? upcomingJobs.map(j=>`<div class="job-card"><div class="title">${escapeHtml(j.customer||"Unnamed")}</div><div>${escapeHtml(j.date)} - ${escapeHtml(j.crew||"")}</div><div>Status: <span class="pill ${statusClass(j.status)}">${escapeHtml(j.status)}</span></div><div>Total: <strong>${dollars(j.total)}</strong></div></div>`).join("")
       : "<div class='empty-state'><strong>No upcoming jobs scheduled.</strong><p>Sold jobs will appear here after they are placed on the calendar.</p></div>";
  }
 
@@ -8270,7 +8271,7 @@ if (targetTab) {
 } else {
   showTab("dashboard");
 }
- showToast("Logged in","Cloud data is ready.","success");
+ showToast("Logged in","Your ProJobFlo data is ready.","success");
   } finally {
    restoreButton();
   }
@@ -8352,7 +8353,7 @@ async function saveCurrentCustomerToCloud() {
 
   if (error) {
     reportClientDiagnostic("customer-save",error,{ table:"customers", customerId:payload.id });
-    showToast("Customer was not saved","Cloud save failed: " + error.message,"error");
+    showToast("Customer was not saved","Could not save online: " + error.message,"error");
     return;
   }
 
@@ -8376,7 +8377,7 @@ async function loadCustomersFromCloud() {
 
   if (error) {
     reportClientDiagnostic("customers-load",error,{ table:"customers" });
-    showToast("Customers did not load","Cloud load failed: " + error.message,"error");
+    showToast("Customers did not load","Could not load online data: " + error.message,"error");
     return;
   }
 
@@ -8386,7 +8387,7 @@ async function loadCustomersFromCloud() {
   const authStatus = document.getElementById("authStatus");
   if (authStatus) {
     authStatus.textContent =
-      "Logged in as " + currentUser.email + " - Cloud customers loaded: " + customers.length;
+      "Logged in as " + currentUser.email + " - Customers loaded: " + customers.length;
   }
 }
 async function saveCurrentQuoteToCloud(options = {}) {
@@ -8486,7 +8487,7 @@ const { data, error } = await supabaseClient
 
   if (error) {
     reportClientDiagnostic("quote-save",error,{ table:"quotes", quoteId:quotePayload.id, customerId:quotePayload.customer_id, status:quotePayload.status });
-    showToast("Quote was not saved","Cloud save failed: " + error.message,"error");
+    showToast("Quote was not saved","Could not save online: " + error.message,"error");
     return false;
   }
  
@@ -8519,7 +8520,7 @@ async function loadQuotesFromCloud() {
 
   if (error) {
     reportClientDiagnostic("quotes-load",error,{ table:"quotes" });
-    showToast("Quotes did not load","Cloud load failed: " + error.message,"error");
+    showToast("Quotes did not load","Could not load online data: " + error.message,"error");
     return;
   }
 
@@ -8580,14 +8581,14 @@ async function loadQuotesFromCloud() {
 
     if (error) {
       reportClientDiagnostic("jobs-save",error,{ table:"jobs", jobId:job.id, quoteId:job.quoteId });
-      showToast("Job was not saved","Cloud save failed: " + error.message,"error");
+      showToast("Job was not saved","Could not save online: " + error.message,"error");
       return;
     }
 
     savedCount++;
   }
 
-  showToast("Jobs saved",savedCount + " job(s) saved to cloud.","success");
+  showToast("Jobs saved",savedCount + " job(s) saved online.","success");
   await loadJobsFromCloud();
 }
 
@@ -8602,7 +8603,7 @@ async function loadJobsFromCloud() {
 
   if (error) {
     reportClientDiagnostic("jobs-load",error,{ table:"jobs" });
-    showToast("Jobs did not load","Cloud load failed: " + error.message,"error");
+    showToast("Jobs did not load","Could not load online data: " + error.message,"error");
     return;
   }
 
@@ -8633,7 +8634,7 @@ async function loadJobsFromCloud() {
   const authStatus = document.getElementById("authStatus");
   if (authStatus) {
     authStatus.textContent =
-      "Logged in as " + currentUser.email + " - Cloud jobs loaded: " + jobs.length;
+      "Logged in as " + currentUser.email + " - Jobs loaded: " + jobs.length;
   }
 }
  function setAutoSaveStatus(message) {
@@ -8685,7 +8686,7 @@ async function queueAutoSave() {
 async function autoSaveCurrentQuoteDraft() {
   if (!currentUser) return;
 
-  setAutoSaveStatus("Saving to cloud...");
+  setAutoSaveStatus("Saving online...");
 
   if (!currentCloudCustomerId) {
   currentCloudCustomerId = crypto.randomUUID();
@@ -8761,7 +8762,7 @@ if (customerError) {
     return;
   }
 
-  setAutoSaveStatus("Cloud Saved - " + new Date().toLocaleTimeString());
+  setAutoSaveStatus("Saved online - " + new Date().toLocaleTimeString());
 }
  async function loadAllCloudData() {
   const ok = await requireLoggedIn();
@@ -8778,13 +8779,13 @@ if (customerError) {
   if (authStatus) {
     authStatus.textContent =
       "Logged in as " + currentUser.email +
-      " - Cloud data loaded.";
+      " - Data loaded.";
   }
 
   const cloudSummary = document.getElementById("cloudSyncSummary");
   if (cloudSummary) {
     cloudSummary.textContent =
-      "Cloud sync active for " + currentUser.email +
+      "Online sync active for " + currentUser.email +
       ". Customers, quotes, jobs, and payments load automatically after login.";
   }
 }
@@ -8912,7 +8913,7 @@ if (customerError) {
   renderLineItems();
   calculateQuote();
 
-  setAutoSaveStatus("Quote loaded from cloud âœ“");
+  setAutoSaveStatus("Quote loaded");
 }
  function setVal(id, value) {
   const el = document.getElementById(id);
@@ -9494,7 +9495,7 @@ function renderCustomerProfile(customer){
                 <div class="customer-muted">${escapeHtml(event.detail)}</div>
                 <div class="customer-muted">${escapeHtml(event.meta || "")}</div>
               </div>
-            `).join("") : `<div class="job-file-empty">No activity has been recorded for this customer yet.</div>`}
+            `).join("") : `<div class="job-file-empty"><strong>No customer activity yet.</strong><p>Quotes, scheduled jobs, payments, and notes will appear here as the relationship grows.</p></div>`}
           </div>
         </section>
 
@@ -9510,7 +9511,7 @@ function renderCustomerProfile(customer){
                 <div class="customer-muted">${dollars(q.amount || q.total || 0)} / ${q.createdAt ? escapeHtml(new Date(Number(q.createdAt)).toLocaleString()) : "Date not saved"}</div>
                 <div class="actions" style="margin-top:8px;"><button class="secondary" type="button" onclick="openQuoteFromFollowUp('${escapeAttr(q.id)}'); closeCustomerProfile();">Open Quote</button></div>
               </div>
-            `).join("") : `<div class="job-file-empty">No quotes for this customer yet.</div>`}
+            `).join("") : `<div class="job-file-empty"><strong>No quotes for this customer yet.</strong><p>Create a quote to start their project history.</p></div>`}
           </div>
         </section>
       </main>
@@ -9529,7 +9530,7 @@ function renderCustomerProfile(customer){
                 <div class="customer-muted">${escapeHtml(j.notes || "No schedule notes saved.")}</div>
                 <div class="actions" style="margin-top:8px;"><button class="secondary" type="button" onclick="openJobFile('${escapeAttr(j.id)}')">Open Job Command Center</button></div>
               </div>
-            `).join("") : `<div class="job-file-empty">No scheduled jobs for this customer yet.</div>`}
+            `).join("") : `<div class="job-file-empty"><strong>No scheduled jobs for this customer yet.</strong><p>Accepted quotes will appear here after they are placed on the schedule.</p></div>`}
           </div>
         </section>
 
@@ -9544,7 +9545,7 @@ function renderCustomerProfile(customer){
                 </div>
                 <div class="customer-muted">${escapeHtml(p.method || p.paymentMethod || p.payment_method || "Method not saved")} / ${escapeHtml(new Date(p.createdAt || p.date || Date.now()).toLocaleString())}</div>
               </div>
-            `).join("") : `<div class="job-file-empty">No payments recorded for this customer yet.</div>`}
+            `).join("") : `<div class="job-file-empty"><strong>No payments recorded for this customer yet.</strong><p>Deposits and final payments will appear here once they are recorded.</p></div>`}
           </div>
         </section>
 
@@ -9646,7 +9647,7 @@ async function saveUserSettings(updates) {
 
   if (error) {
     reportClientDiagnostic("settings-save",error,{ table:"user_settings" });
-    showToast("Settings were not saved","Cloud save failed: " + error.message,"error");
+    showToast("Settings were not saved","Could not save online: " + error.message,"error");
     return false;
   }
   userSettings = nextUserSettings;
