@@ -83,6 +83,11 @@
       margin-top: 8px;
     }
 
+    button:disabled {
+      cursor: not-allowed;
+      opacity: .62;
+    }
+
     .success {
       background: #047857;
       color: white;
@@ -97,6 +102,32 @@
     .danger {
       background: #dc2626;
       color: white;
+    }
+
+    .approval-message {
+      display: none;
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 12px;
+      font-weight: 700;
+    }
+
+    .approval-message.info {
+      display: block;
+      background: #dbeafe;
+      color: #1e3a8a;
+    }
+
+    .approval-message.success {
+      display: block;
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .approval-message.error {
+      display: block;
+      background: #fee2e2;
+      color: #991b1b;
     }
 
     .accepted-card {
@@ -219,7 +250,8 @@
       <canvas id="signaturePad"></canvas>
 
       <button class="secondary" onclick="clearSignature()">Clear Signature</button>
-      <button class="success" onclick="acceptProposal()">Accept Proposal</button>
+      <button id="acceptProposalButton" class="success" onclick="acceptProposal()">Accept Proposal</button>
+      <div id="approvalMessage" class="approval-message" role="status" aria-live="polite"></div>
     </div>
   </div>
 
@@ -237,6 +269,7 @@
     let signatureComplete = false;
     let canvas;
     let ctx;
+    let approvalSubmitting = false;
 
     function getToken() {
       const params = new URLSearchParams(window.location.search);
@@ -387,6 +420,216 @@ if (expiresAt) {
     function clearSignature() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       signatureComplete = false;
+    }
+
+    function showApprovalMessage(message, type = "info") {
+      const box = document.getElementById("approvalMessage");
+      if (!box) return;
+      box.textContent = message || "";
+      box.className = "approval-message " + type;
+      box.style.display = message ? "block" : "none";
+    }
+
+    function setApprovalLoading(isLoading, message) {
+      approvalSubmitting = !!isLoading;
+      const button = document.getElementById("acceptProposalButton");
+      const nameInput = document.getElementById("signedCustomerName");
+      const clearButton = document.querySelector("#acceptCard button.secondary");
+
+      if (button) {
+        button.disabled = approvalSubmitting;
+        button.textContent = approvalSubmitting ? "Accepting..." : "Accept Proposal";
+      }
+      if (nameInput) nameInput.disabled = approvalSubmitting;
+      if (clearButton) clearButton.disabled = approvalSubmitting;
+      if (canvas) canvas.style.pointerEvents = approvalSubmitting ? "none" : "";
+      if (message) showApprovalMessage(message, "info");
+    }
+
+    function proposalIsExpired(data) {
+      if (!data?.expires_at) return false;
+      return new Date() > new Date(data.expires_at);
+    }
+
+    function approvalRpcMissing(error) {
+      const message = String(error?.message || error || "").toLowerCase();
+      return message.includes("approve_proposal_transaction") ||
+        message.includes("schema cache") ||
+        message.includes("could not find the function") ||
+        message.includes("function") && message.includes("not found");
+    }
+
+    function acceptanceQuoteData(baseQuote, printedName, signedAt) {
+      const quoteData = { ...(baseQuote?.quote_data || {}) };
+      const existing = Array.isArray(quoteData.jobActivityTimeline)
+        ? quoteData.jobActivityTimeline
+        : [];
+      const hasAcceptedActivity = existing.some(activity =>
+        String(activity?.activityType || "").toLowerCase() === "quote accepted"
+      );
+      const activity = hasAcceptedActivity ? [] : [{
+        id: crypto.randomUUID(),
+        timestamp: signedAt,
+        activityType: "Quote Accepted",
+        description: "Proposal accepted by " + printedName + ".",
+        author: "",
+        customerId: baseQuote?.customer_id || quoteData.customerId || "",
+        quoteId: baseQuote?.id || "",
+        jobId: ""
+      }];
+
+      return {
+        ...quoteData,
+        status: "Sold",
+        signature_status: "Signed",
+        signed_at: signedAt,
+        acceptedAt: signedAt,
+        signed_customer_name: printedName,
+        jobActivityTimeline: [...existing, ...activity]
+      };
+    }
+
+    function acceptedQuoteFromResult(result, fallbackQuote, printedName, signedAt) {
+      const quote = result?.quote || result?.data?.quote || fallbackQuote || {};
+      const quoteData = quote.quote_data || acceptanceQuoteData(quote, printedName, signedAt);
+      return {
+        ...quote,
+        status: quote.status || "Sold",
+        signature_status: quote.signature_status || "Signed",
+        signed_at: quote.signed_at || quoteData.signed_at || signedAt,
+        signed_customer_name: quote.signed_customer_name || quoteData.signed_customer_name || printedName,
+        quote_data: quoteData
+      };
+    }
+
+    async function refreshProposalByToken() {
+      const token = getToken();
+      if (!token) return null;
+      const { data, error } = await supabaseClient
+        .from("quotes")
+        .select("*")
+        .eq("signature_token", token)
+        .single();
+      if (error) throw error;
+      loadedQuote = data;
+      return data;
+    }
+
+    async function approveProposalTransaction(printedName, signatureImage) {
+      const { data, error } = await supabaseClient.rpc("approve_proposal_transaction", {
+        p_signature_token: getToken(),
+        p_customer_name: printedName,
+        p_signature_image: signatureImage
+      });
+
+      if (error) {
+        if (approvalRpcMissing(error)) {
+          return {
+            ok: false,
+            rpcMissing: true,
+            message: error.message
+          };
+        }
+        return {
+          ok: false,
+          status: "error",
+          message: error.message || "Approval could not be saved."
+        };
+      }
+
+      return data || { ok: false, status: "error", message: "Approval did not return a result." };
+    }
+
+    async function approveProposalLegacy(printedName, signatureImage) {
+      const latest = await refreshProposalByToken();
+      if (!latest) {
+        return { ok: false, status: "not_found", message: "Proposal not found or link is invalid." };
+      }
+      if (isProposalAccepted(latest)) {
+        return { ok: true, status: "already_signed", quote: latest };
+      }
+      if (proposalIsExpired(latest)) {
+        return { ok: false, status: "expired", message: "This proposal has expired. Please contact the contractor for updated pricing." };
+      }
+
+      const signedAt = new Date().toISOString();
+      const quoteData = acceptanceQuoteData(latest, printedName, signedAt);
+
+      const { error: insertError } = await supabaseClient
+        .from("proposal_signatures")
+        .insert({
+          quote_id: latest.id,
+          user_id: latest.user_id,
+          customer_name: printedName,
+          signature_image: signatureImage
+        });
+
+      if (insertError) {
+        console.error(insertError);
+        return {
+          ok: false,
+          status: "signature_failed",
+          message: "Signature could not be saved: " + insertError.message
+        };
+      }
+
+      const { data: updated, error: updateError } = await supabaseClient
+        .from("quotes")
+        .update({
+          signature_status: "Signed",
+          status: "Sold",
+          signed_at: signedAt,
+          signed_customer_name: printedName,
+          signature_image: signatureImage,
+          quote_data: quoteData
+        })
+        .eq("id", latest.id)
+        .select()
+        .single();
+
+      if (updateError) {
+        console.error(updateError);
+        return {
+          ok: false,
+          status: "partial_signature_saved",
+          message: "Signature may have been saved, but the proposal status did not update. Please contact the contractor before trying again."
+        };
+      }
+
+      return {
+        ok: true,
+        status: "signed",
+        quote: updated || acceptedQuoteFromResult(null, latest, printedName, signedAt)
+      };
+    }
+
+    async function notifyContractorOfAcceptance(quote, printedName) {
+      const contractorEmail = quote?.quote_data?.company?.email || "";
+      if (!contractorEmail) {
+        console.warn("Proposal accepted, but contractor email is missing.");
+        return false;
+      }
+
+      const { data: emailData, error: emailError } = await supabaseClient.functions.invoke(
+        "send-signature-email",
+        {
+          body: {
+            quote_id: quote.id,
+            customer_name: printedName,
+            estimate_number: quote.estimate_number,
+            total: quote.total,
+            contractor_email: contractorEmail
+          }
+        }
+      );
+
+      if (emailError) {
+        console.error("Contractor notification email failed:", emailError);
+        return false;
+      }
+
+      console.log("Contractor notification email sent:", emailData);
+      return true;
     }
 
     function resolveLineQty(item, totals) {
@@ -589,14 +832,23 @@ function renderApproveLineItems(q) {
 }
 
     async function acceptProposal() {
-      if (window.proposalExpired) {
-  alert(
-    "This proposal has expired. Please contact the contractor for updated pricing."
-  );
-  return;
-}
+      if (approvalSubmitting) return;
+
       if (!loadedQuote) {
-        alert("Proposal not loaded.");
+        showApprovalMessage("Proposal not loaded.", "error");
+        return;
+      }
+
+      if (isProposalAccepted(loadedQuote)) {
+        renderAcceptedConfirmation(loadedQuote);
+        return;
+      }
+
+      if (window.proposalExpired || proposalIsExpired(loadedQuote)) {
+        showApprovalMessage(
+          "This proposal has expired. Please contact the contractor for updated pricing.",
+          "error"
+        );
         return;
       }
 
@@ -604,103 +856,51 @@ function renderApproveLineItems(q) {
         document.getElementById("signedCustomerName").value.trim();
 
       if (!printedName) {
-        alert("Please enter your printed name.");
+        showApprovalMessage("Please enter your printed name.", "error");
         return;
       }
 
       if (!signatureComplete) {
-        alert("Please sign before approving.");
+        showApprovalMessage("Please sign before approving.", "error");
         return;
       }
 
       const signatureImage = canvas.toDataURL("image/png");
+      setApprovalLoading(true, "Saving your approval...");
 
-      const { error: insertError } = await supabaseClient
-        .from("proposal_signatures")
-        .insert({
-          quote_id: loadedQuote.id,
-          user_id: loadedQuote.user_id,
-          customer_name: printedName,
-          signature_image: signatureImage
-        });
+      try {
+        let result = await approveProposalTransaction(printedName, signatureImage);
 
-      if (insertError) {
-        console.error(insertError);
-        alert("Signature could not be saved: " + insertError.message);
-        return;
-      }
-
-     const signedAt = new Date().toISOString();
-
-      const { error: updateError } = await supabaseClient
-        .from("quotes")
-        .update({
-          signature_status: "Signed",
-          status: "Sold",
-          signed_at: signedAt,
-          signed_customer_name: printedName,
-          signature_image: signatureImage,
-          quote_data: {
-            ...(loadedQuote.quote_data || {}),
-            status: "Sold",
-            signature_status: "Signed",
-            signed_at: signedAt,
-            signed_customer_name: printedName
-          }
-        })
-        .eq("id", loadedQuote.id);
-
-      if (updateError) {
-        console.error(updateError);
-        alert("Proposal signed, but quote status did not update.");
-        return;
-      }
-      const contractorEmail =
-  loadedQuote?.quote_data?.company?.email ||
-  "";
-
-if (!contractorEmail) {
-  alert("Proposal accepted, but contractor email is missing. Please contact the contractor directly.");
-  return;
-}
-const { data: emailData, error: emailError } = await supabaseClient.functions.invoke(
-  "send-signature-email",
-  {
-    body: {
-      quote_id: loadedQuote.id,
-      customer_name: printedName,
-      estimate_number: loadedQuote.estimate_number,
-      total: loadedQuote.total,
-      contractor_email: contractorEmail
-    }
-  }
-);
-
-if (emailError) {
-  console.error("Contractor notification email failed:", emailError);
-  alert("Proposal was accepted, but contractor email failed: " + emailError.message);
-  return;
-}
-
-console.log("Contractor notification email sent:", emailData);
-
-      loadedQuote = {
-        ...loadedQuote,
-        status: "Sold",
-        signature_status: "Signed",
-        signed_at: signedAt,
-        signed_customer_name: printedName,
-        quote_data: {
-          ...(loadedQuote.quote_data || {}),
-          status: "Sold",
-          signature_status: "Signed",
-          signed_at: signedAt,
-          signed_customer_name: printedName
+        if (result.rpcMissing) {
+          console.warn("approve_proposal_transaction RPC is not deployed. Using legacy approval fallback.");
+          result = await approveProposalLegacy(printedName, signatureImage);
         }
-      };
 
-      renderAcceptedConfirmation(loadedQuote);
-      alert("Proposal accepted successfully. Contractor has been notified.");
+        if (!result?.ok) {
+          showApprovalMessage(
+            result?.message || "Approval was not saved. Please try again.",
+            "error"
+          );
+          return;
+        }
+
+        const signedAt = result?.signed_at || result?.quote?.signed_at || new Date().toISOString();
+        loadedQuote = acceptedQuoteFromResult(result, loadedQuote, printedName, signedAt);
+        renderAcceptedConfirmation(loadedQuote);
+        showApprovalMessage("Proposal accepted successfully. You may safely close this page.", "success");
+        notifyContractorOfAcceptance(loadedQuote, printedName)
+          .catch(error => console.error("Contractor notification email failed:", error));
+      } catch (error) {
+        console.error(error);
+        showApprovalMessage(
+          "Approval was not saved. Please check your connection and try again.",
+          "error"
+        );
+      } finally {
+        if (!isProposalAccepted(loadedQuote)) {
+          setApprovalLoading(false);
+        }
+      }
     }
 
     loadProposal();

@@ -3698,6 +3698,24 @@ let currentCloudQuoteId = null;
  let contractorLogoUrl = "";
 let autoSaveTimer = null;
 let autoSaveEnabled = true;
+const pendingOperations = new Set();
+let pendingStandaloneCustomerId = null;
+let pendingQuoteCustomerId = null;
+let pendingQuoteId = null;
+const pendingPaymentIds = {};
+
+function beginOperation(key,title="Still working",message="Please wait for the current save to finish."){
+  if(pendingOperations.has(key)){
+    showToast(title,message,"warning");
+    return false;
+  }
+  pendingOperations.add(key);
+  return true;
+}
+
+function endOperation(key){
+  if(key) pendingOperations.delete(key);
+}
 
 function showToast(title,message,type="success",duration=3600){
   const region=document.getElementById("toastRegion");
@@ -4466,11 +4484,15 @@ async function addRoomPhotos(roomId, files) {
   const catEl = document.getElementById("photoCategory-" + roomId);
   const category = catEl ? catEl.value : "Other";
   const list = Array.from(files || []);
+  const operationKey = "room-photo-upload-"+roomId+"-"+list.map(f=>f.name+"-"+f.size+"-"+f.lastModified).join("|");
+  if(list.length && !beginOperation(operationKey,"Photo upload already running","Please wait for these photos to finish uploading.")) return;
 
+  try{
   if (!roomPhotos[roomId]) roomPhotos[roomId] = [];
 
   for (const file of list) {
     const localPhoto = {
+      id: crypto.randomUUID(),
       name: file.name,
       category,
       url: URL.createObjectURL(file),
@@ -4491,6 +4513,9 @@ async function addRoomPhotos(roomId, files) {
 
   calculateQuote();
   queueAutoSave();
+  } finally {
+    endOperation(operationKey);
+  }
 }
 function removeRoomPhoto(roomId,photoId){roomPhotos[roomId]=(roomPhotos[roomId]||[]).filter(p=>p.id!==photoId);renderRooms();calculateQuote();}
 function renderRoomPhotos(roomId){
@@ -4892,6 +4917,12 @@ function getOrCreateCustomer(){
  const customer={id:Date.now()+Math.random(),name,phone,email,address,createdAt:nowMs()};customers.push(customer);return customer;
 }
 async function saveCurrentQuote(){
+  const restoreButton=beginButtonLoading("Saving...");
+  if(!beginOperation("save-current-quote","Quote save already running","Please wait for this quote save to finish.")){
+    restoreButton();
+    return;
+  }
+  try{
   if(!val("customerName")){
     alert("Enter customer name first.");
     return;
@@ -4913,6 +4944,10 @@ alert(
       ? "Quote saved to cloud as sold. Go to Schedule tab to schedule it."
       : "Unsold quote saved to cloud for follow-up."
   );
+  } finally {
+    endOperation("save-current-quote");
+    restoreButton();
+  }
 }
 function startNewQuote(){
  const proceed = confirm("Start a new quote? This will clear the current quote screen. Saved customers, quotes, follow-ups, and scheduled jobs will stay saved.");
@@ -4927,6 +4962,9 @@ function newQuote(){
 
   currentCloudCustomerId = null;
   currentCloudQuoteId = null;
+  pendingStandaloneCustomerId = null;
+  pendingQuoteCustomerId = null;
+  pendingQuoteId = null;
 
   rooms = [];
   roomPhotos = {};
@@ -5065,6 +5103,13 @@ function saveAcceptedQuoteAsSold(savedQuote=null, savedCustomer=null, acceptedAt
 }
 
 async function acceptQuote(){
+ const restoreButton=beginButtonLoading("Accepting...");
+ const operationKey="accept-current-quote";
+ if(!beginOperation(operationKey,"Quote acceptance already running","Please wait for this acceptance to finish.")){
+  restoreButton();
+  return;
+ }
+ try{
  const signedName=val("customerSignatureName")||val("customerName");
  if(!signedName){alert("Enter customer's printed name first.");return;}
  if(!signatureComplete){alert("Please have the customer sign before accepting.");return;}
@@ -5104,8 +5149,17 @@ document.getElementById("soldDepositCollected").value =
  
  const depositCollected = Number(val("depositCollected")) || 0;
 
-if (depositCollected > 0) {
-  await addPayment({
+const existingDeposit = payments.some(p =>
+  String(p.quoteId) === String(quote.cloudId || currentCloudQuoteId || quote.id) &&
+  p.type === "Deposit" &&
+  p.notes === "Deposit collected during quote acceptance"
+);
+
+if (depositCollected > 0 && !existingDeposit) {
+  const depositKey = "acceptance-deposit-" + (quote.cloudId || currentCloudQuoteId || quote.id);
+  if(!pendingPaymentIds[depositKey]) pendingPaymentIds[depositKey]=crypto.randomUUID();
+  const depositSaved = await addPayment({
+    id: pendingPaymentIds[depositKey],
     quoteId: quote.cloudId || currentCloudQuoteId || quote.id,
     amount: depositCollected,
     type: "Deposit",
@@ -5113,6 +5167,7 @@ if (depositCollected > 0) {
     notes: "Deposit collected during quote acceptance",
     date: new Date().toISOString()
   });
+  if(depositSaved) delete pendingPaymentIds[depositKey];
 }
 
  renderAll();
@@ -5147,7 +5202,11 @@ if (depositCollected > 0) {
    dateField.value=selectedDate;
  }
 
- alert("Choose the install date, crew, and click Schedule Job.");
+  alert("Choose the install date, crew, and click Schedule Job.");
+ } finally {
+  endOperation(operationKey);
+  restoreButton();
+ }
 }
 function setupSignaturePad(){const canvas=document.getElementById("signaturePad");const ctx=canvas.getContext("2d");let drawing=false,lastX=0,lastY=0;function resize(){const rect=canvas.getBoundingClientRect();canvas.width=rect.width;canvas.height=rect.height;ctx.lineWidth=3;ctx.lineCap="round";ctx.strokeStyle="#0f172a";}function pos(e){const rect=canvas.getBoundingClientRect();const p=e.touches?e.touches[0]:e;return{x:p.clientX-rect.left,y:p.clientY-rect.top};}function start(e){e.preventDefault();drawing=true;const p=pos(e);lastX=p.x;lastY=p.y;}function draw(e){if(!drawing)return;e.preventDefault();const p=pos(e);ctx.beginPath();ctx.moveTo(lastX,lastY);ctx.lineTo(p.x,p.y);ctx.stroke();lastX=p.x;lastY=p.y;signatureComplete=true;}function stop(){drawing=false;}resize();window.addEventListener("resize",resize);canvas.addEventListener("mousedown",start);canvas.addEventListener("mousemove",draw);window.addEventListener("mouseup",stop);canvas.addEventListener("touchstart",start,{passive:false});canvas.addEventListener("touchmove",draw,{passive:false});canvas.addEventListener("touchend",stop);}
 function clearSignature(){const canvas=document.getElementById("signaturePad");if(!canvas)return;const ctx=canvas.getContext("2d");ctx.clearRect(0,0,canvas.width,canvas.height);signatureComplete=false;acceptedAt="";document.getElementById("acceptedStatus").textContent="Signature cleared.";}
@@ -5308,6 +5367,7 @@ function setSelectedDate(iso){selectedDate=iso;document.getElementById("schedule
 function changeMonth(delta){currentMonth.setMonth(currentMonth.getMonth()+delta);renderCalendar();}
 async function scheduleSelectedQuote(){
  const restoreButton=beginButtonLoading("Scheduling...");
+ let operationKey="";
  try{
   const selectedQuoteId = val("scheduleQuoteSelect");
  const q = quotes.find(q => String(q.cloudId || q.id) === String(selectedQuoteId));
@@ -5336,6 +5396,8 @@ async function scheduleSelectedQuote(){
  };
 
  if(!job.date){alert("Choose install date.");return;}
+ operationKey="schedule-job-"+quoteId+"-"+job.date;
+ if(!beginOperation(operationKey,"Job scheduling already running","Please wait for this job to finish scheduling.")) return;
 
  const { data, error } = await supabaseClient
    .from("jobs")
@@ -5382,8 +5444,9 @@ async function scheduleSelectedQuote(){
     "Editing scheduled job for "+(savedJob.customer||"customer")+".";
 
   renderAll();
-  showToast("Job scheduled","This job is now on your calendar.","success");
+ showToast("Job scheduled","This job is now on your calendar.","success");
  } finally {
+  endOperation(operationKey);
   restoreButton();
  }
 }
@@ -5468,6 +5531,9 @@ async function updateScheduledJob(){
 
 async function deleteScheduledJob(){
  if(!editingJobId){alert("Select a calendar job first, then delete it.");return;}
+ const operationKey="delete-job-"+editingJobId;
+ if(!beginOperation(operationKey,"Job delete already running","Please wait for this delete to finish.")) return;
+ try{
  const job=jobs.find(j=>String(j.id)===String(editingJobId));
  const name=job ? job.customer : "this job";
  if(!confirm("Delete scheduled job for "+name+"?"))return;
@@ -5488,6 +5554,9 @@ async function deleteScheduledJob(){
  editingJobId=null;
  document.getElementById("scheduleEditStatus").textContent="Scheduled job deleted. Select another calendar job to edit.";
  renderAll();
+ } finally {
+  endOperation(operationKey);
+ }
 }
 
 function calendarStatusClass(status){if(status==="Sold")return"cal-Sold";if(status==="Scheduled")return"cal-Scheduled";if(status==="Materials Ordered")return"cal-Ordered";if(status==="Ready to Install")return"cal-Ready";if(status==="In Progress")return"cal-Progress";if(status==="Complete")return"cal-Complete";return"cal-Scheduled";}
@@ -5982,7 +6051,10 @@ async function handleJobTimelineUpload(jobId,stageKey,files){
   if(!job || !quote){alert("Could not find this job file.");return;}
   const list=Array.from(files || []);
   if(!list.length) return;
+  const operationKey="project-photo-upload-"+jobId+"-"+stageKey+"-"+list.map(f=>f.name+"-"+f.size+"-"+f.lastModified).join("|");
+  if(!beginOperation(operationKey,"Photo upload already running","Please wait for these photos to finish uploading.")) return;
 
+  try{
   const ok=await requireLoggedIn();
   if(!ok) return;
 
@@ -6017,6 +6089,9 @@ async function handleJobTimelineUpload(jobId,stageKey,files){
   if(captionEl) captionEl.value="";
   await persistProjectPhotoTimeline(job,quote,timeline);
   openJobFile(jobId);
+  } finally {
+    endOperation(operationKey);
+  }
 }
 
 async function persistProjectPhotoTimeline(job,quote,timeline){
@@ -6288,6 +6363,15 @@ async function persistJobActivityTimeline(job,quote,entries){
 async function appendJobActivity(job,quote,type,description,timestamp){
   if(!quote) return false;
   const entries=quoteActivityTimeline(quote);
+  const quoteId=quote?.cloudId || quote?.id || job?.quoteId || "";
+  const jobId=job?.cloudId || job?.id || "";
+  const duplicate=entries.some(activity =>
+    String(activity?.activityType || "") === String(type || "") &&
+    String(activity?.description || "") === String(description || "") &&
+    String(activity?.quoteId || quoteId || "") === String(quoteId || "") &&
+    String(activity?.jobId || jobId || "") === String(jobId || "")
+  );
+  if(duplicate) return true;
   entries.push(makeJobActivity(job,quote,type,description,timestamp));
   return persistJobActivityTimeline(job,quote,entries);
 }
@@ -6299,9 +6383,15 @@ async function addManualJobActivity(jobId){
   const input=document.getElementById("jobActivityNote-"+jobId);
   const note=input ? input.value.trim() : "";
   if(!note){alert("Add a job note first.");return;}
-  const saved=await appendJobActivity(job,quote,"Manual Note",note);
-  if(saved && input) input.value="";
-  if(saved) openJobFile(jobId);
+  const operationKey="manual-job-note-"+jobId+"-"+note;
+  if(!beginOperation(operationKey,"Job note already saving","Please wait for this note to finish saving.")) return;
+  try{
+    const saved=await appendJobActivity(job,quote,"Manual Note",note);
+    if(saved && input) input.value="";
+    if(saved) openJobFile(jobId);
+  } finally {
+    endOperation(operationKey);
+  }
 }
 
 function renderJobActivityTimeline(job,quote){
@@ -6903,6 +6993,8 @@ function prefillPayment(quoteId, amount, type){
 
 async function recordPayment(){
  const restoreButton=beginButtonLoading("Recording...");
+ let operationKey="";
+ let paymentKey="";
  try{
  const quoteId = val("paymentJobSelect");
  if(!quoteId){alert("Select a job/quote first.");return;}
@@ -6910,7 +7002,18 @@ async function recordPayment(){
  if(amount<=0){alert("Enter payment amount.");return;}
  const ok = await requireLoggedIn();
  if(!ok) return;
+ paymentKey=[
+  quoteId,
+  amount.toFixed(2),
+  val("paymentType"),
+  val("paymentMethod"),
+  val("paymentNotes").trim()
+ ].join("|");
+ operationKey="record-payment-"+paymentKey;
+ if(!beginOperation(operationKey,"Payment already recording","Please wait for this payment save to finish.")) return;
+ if(!pendingPaymentIds[paymentKey]) pendingPaymentIds[paymentKey]=crypto.randomUUID();
  const saved = await addPayment({
+  id: pendingPaymentIds[paymentKey],
   quoteId,
   amount,
   type: val("paymentType"),
@@ -6919,10 +7022,12 @@ async function recordPayment(){
   date: new Date().toISOString()
 });
  if(!saved) return;
+ delete pendingPaymentIds[paymentKey];
  document.getElementById("paymentAmount").value="";
  document.getElementById("paymentNotes").value="";
  showToast("Payment recorded","Money Tracker has been updated.","success");
  } finally {
+  endOperation(operationKey);
   restoreButton();
  }
 }
@@ -6947,13 +7052,13 @@ async function addPayment(payment) {
 
   const newPayment = {
     ...payment,
-    id: crypto.randomUUID(),
+    id: payment.id || crypto.randomUUID(),
     quoteId: resolvedQuoteId
   };
 
   const { data, error } = await supabaseClient
     .from("payments")
-    .insert({
+    .upsert({
       id: newPayment.id,
       user_id: currentUser.id,
       quote_id: resolvedQuoteId,
@@ -6972,7 +7077,7 @@ async function addPayment(payment) {
     return false;
   }
 
-  payments.push({
+  const savedPayment = {
     id: data?.id || newPayment.id,
     quoteId: data?.quote_id || resolvedQuoteId,
     amount: Number(data?.amount ?? newPayment.amount),
@@ -6980,7 +7085,9 @@ async function addPayment(payment) {
     method: data?.method || newPayment.method,
     notes: data?.notes || newPayment.notes,
     date: data?.paid_at || data?.created_at || newPayment.date
-  });
+  };
+  payments = payments.filter(p => String(p.id) !== String(savedPayment.id));
+  payments.push(savedPayment);
 
   const activityJob = jobs.find(j => String(j.quoteId) === String(resolvedQuoteId));
   const activityQuote = matchingQuote || quotes.find(q => String(q.id) === String(resolvedQuoteId) || String(q.cloudId) === String(resolvedQuoteId));
@@ -7734,6 +7841,8 @@ async function resetPassword() {
 
 async function saveCurrentCustomerToCloud() {
  console.log("SAVE CUSTOMER FIRED");
+  if(!beginOperation("save-current-customer","Customer save already running","Please wait for this customer save to finish.")) return;
+  try{
   const ok = await requireLoggedIn();
   if (!ok) return;
 
@@ -7746,8 +7855,11 @@ async function saveCurrentCustomerToCloud() {
   if (!customerName && !customerPhone && !customerEmail && !jobAddress && !notes) {
     return;
   }
+  const customerId = currentCloudCustomerId || pendingStandaloneCustomerId || crypto.randomUUID();
+  pendingStandaloneCustomerId = customerId;
 
   const customerPayload = {
+    id: customerId,
     user_id: currentUser.id,
     name: customerName || "Unnamed Customer",
     phone: customerPhone,
@@ -7758,7 +7870,7 @@ async function saveCurrentCustomerToCloud() {
 
   const { data, error } = await supabaseClient
     .from("customers")
-    .insert(customerPayload)
+    .upsert(customerPayload)
     .select()
     .single();
 
@@ -7768,8 +7880,13 @@ async function saveCurrentCustomerToCloud() {
     return;
   }
 
+  currentCloudCustomerId = data?.id || customerId;
+  pendingStandaloneCustomerId = null;
   showToast("Customer saved",data.name + " is in your customer database.","success");
   await loadCustomersFromCloud();
+  } finally {
+    endOperation("save-current-customer");
+  }
 }
 
 async function loadCustomersFromCloud() {
@@ -7797,6 +7914,9 @@ async function loadCustomersFromCloud() {
   }
 }
 async function saveCurrentQuoteToCloud(options = {}) {
+  const operationKey = "save-current-quote-cloud";
+  if(!beginOperation(operationKey,"Quote save already running","Please wait for this quote save to finish.")) return false;
+  try{
   const ok = await requireLoggedIn();
   if (!ok) return;
 
@@ -7811,7 +7931,8 @@ async function saveCurrentQuoteToCloud(options = {}) {
 
  let savedCustomer = null;
 
-const customerId = currentCloudCustomerId || crypto.randomUUID();
+const customerId = currentCloudCustomerId || pendingQuoteCustomerId || crypto.randomUUID();
+pendingQuoteCustomerId = customerId;
 
 const { data: customerData, error: customerError } = await supabaseClient
   .from("customers")
@@ -7870,7 +7991,8 @@ savedCustomer = customerData;
     }
   };
 
-  const quoteId = currentCloudQuoteId || crypto.randomUUID();
+  const quoteId = currentCloudQuoteId || pendingQuoteId || crypto.randomUUID();
+  pendingQuoteId = quoteId;
 
 const { data, error } = await supabaseClient
   .from("quotes")
@@ -7894,6 +8016,8 @@ const { data, error } = await supabaseClient
  
  currentCloudCustomerId = savedCustomer.id || customerId;
  currentCloudQuoteId = data.id;
+ pendingQuoteCustomerId = null;
+ pendingQuoteId = null;
 
  if(!options.skipReload){
    await loadCustomersFromCloud();
@@ -7903,6 +8027,9 @@ const { data, error } = await supabaseClient
    customer: savedCustomer,
    quote: data
  };
+  } finally {
+    endOperation(operationKey);
+  }
 }
 
 async function loadQuotesFromCloud() {
@@ -8317,6 +8444,9 @@ if (customerError) {
  }
 
 async function uploadContractorLogo(file) {
+  const operationKey = "upload-contractor-logo";
+  if(!beginOperation(operationKey,"Logo upload already running","Please wait for this logo upload to finish.")) return false;
+  try{
   const ok = await requireLoggedIn();
   if (!ok) return false;
 
@@ -8359,6 +8489,9 @@ async function uploadContractorLogo(file) {
 
   showToast("Logo uploaded","Your company logo is ready for proposals.","success");
   return true;
+  } finally {
+    endOperation(operationKey);
+  }
 }
 async function generateQuotePDF() {
   const { jsPDF } = window.jspdf;
@@ -8976,6 +9109,9 @@ function selectCustomer(id){
   overlay.classList.remove("hidden");
 }
 async function deleteCustomer(id){
+  const operationKey="delete-customer-"+id;
+  if(!beginOperation(operationKey,"Customer delete already running","Please wait for this delete to finish.")) return;
+  try{
   const c=customers.find(c=>String(c.id)===String(id));
   const name=c?.name||"this customer";
 
@@ -9008,8 +9144,14 @@ async function deleteCustomer(id){
   if(box)box.innerHTML="<p class='small'>Select a customer to view details.</p>";
 
   showToast("Customer deleted","Customer record removed.","success");
+  } finally {
+    endOperation(operationKey);
+  }
 }
 async function saveUserSettings(updates) {
+  const operationKey = "save-user-settings";
+  if(!beginOperation(operationKey,"Settings save already running","Please wait for this settings save to finish.")) return false;
+  try{
   const ok = await requireLoggedIn();
   if (!ok) return false;
 
@@ -9033,6 +9175,9 @@ async function saveUserSettings(updates) {
   }
   userSettings = nextUserSettings;
   return true;
+  } finally {
+    endOperation(operationKey);
+  }
 }
 
 async function loadUserSettings() {
@@ -9079,6 +9224,8 @@ setEstimateNumberToNext();
   }
 }
 async function saveCompanySettings() {
+   const restoreButton=beginButtonLoading("Saving...");
+   try{
    const saved = await saveUserSettings({
     company_name: val("settingsCompanyName").trim(),
     company_phone: val("settingsCompanyPhone").trim(),
@@ -9089,6 +9236,9 @@ async function saveCompanySettings() {
   });
 
   if(saved) showToast("Company settings saved","Proposal settings are up to date.","success");
+   } finally {
+    restoreButton();
+   }
 }
  function applyCompanySettingsToQuote() {
   if (!userSettings) return;
